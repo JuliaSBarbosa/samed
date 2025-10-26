@@ -1,0 +1,172 @@
+/* ======= Estilos Gerais ======= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: #f3f3f3;
+    color: #333;
+}
+
+/* ======= Cabeçalho ======= */
+header.topo {
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 40px;
+    border-bottom: 2px solid #e8e8e8;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo img {
+    width: 45px;
+    height: 45px;
+}
+
+.logo h1 {
+    color: #9ad2ea;
+    font-size: 26px;
+}
+
+.menu {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.menu a {
+    text-decoration: none;
+    color: #9ad2ea;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+.menu a:hover,
+.menu a.ativo {
+    color: #58b4db;
+}
+
+.divisor {
+    color: #ccc;
+}
+
+.botao-sair {
+    display: flex;
+    align-items: center;
+    background-color: #9ad2ea;
+    color: #fff;
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.botao-sair img {
+    width: 18px;
+    margin-right: 6px;
+}
+
+.botao-sair:hover {
+    background-color: #6bbcd6;
+}
+
+/* ======= Conteúdo Principal ======= */
+main {
+    text-align: center;
+    margin-top: 70px;
+}
+
+.titulo {
+    color: #7ec6e6;
+    font-size: 38px;
+    margin-bottom: 50px;
+}
+
+.opcoes {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 40px;
+}
+
+.card {
+    width: 250px;
+    height: 140px;
+    background-color: #fff;
+    border: 1px solid #bfe0ef;
+    border-radius: 10px;
+    box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    padding: 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 3px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/*padronizar tamanho das imagens de icone das div na tela de inicio*/
+.card .icone {
+    width: 70px;
+    height: 70px;
+    margin-bottom: 15px;
+}
+
+.card img {
+    width: 50px;
+    margin-bottom: 10px;
+}
+
+.card p {
+    font-size: 16px;
+    color: #444;
+}
+
+/* para tirar o sublinhado de link das divs*/
+.link-card {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+/* ======= Rodapé ======= */
+footer {
+    background-color: #9ad2ea;
+    color: #fff;
+    margin-top: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 15px 0;
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.footer-logo img {
+    width: 45px;
+}
+
+footer p {
+    font-size: 15px;
+}
+
+.lojas img {
+    height: 35px;
+    margin-left: 10px;
+}
+
