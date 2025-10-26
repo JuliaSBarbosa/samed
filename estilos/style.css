@@ -170,3 +170,67 @@ footer p {
     margin-left: 10px;
 }
 
+
+/*======= TELA FICHA MEDICA DO USUARIO ======= */
+.ficha-medica {
+    text-align: center;
+    margin-top: 30px;
+  }
+  
+  .ficha-medica h2 {
+    color: #6ec1e4;
+    font-weight: 700;
+    font-size: 1.5em;
+    margin-bottom: 5px;
+  }
+  
+  .ficha-medica hr {
+    width: 120px;
+    border: 2px solid #6ec1e4;
+    border-radius: 2px;
+    margin: 0 auto 20px;
+  }
+  
+  .card-ficha {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    padding: 25px;
+    width: 400px;
+    margin: 0 auto;
+    text-align: left;
+  }
+  
+  .perfil {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .perfil img {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    margin-right: 15px;
+  }
+  
+  .info-basica, .contato-emergencia {
+    margin-top: 15px;
+  }
+  
+  h4 {
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: #333;
+  }
+  
+  p {
+    margin: 4px 0;
+    font-size: 0.95em;
+    color: #333;
+  }
+  
+  strong {
+    font-weight: 700;
+  }
+  
