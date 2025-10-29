@@ -52,7 +52,7 @@ Projeto desenvolvido por Julia Barbosa, Amábile Silvério, Gustavo Marques e Ca
 ---
 
 <div align="center">
-  <img src="img/samed_logo.png" alt="SAMED Logo" width="150"/>
+  <img src="img/logo.svg" alt="SAMED Logo" width="150"/>
   <p><b>SAMED - Sistema de Assistência Médica Digital</b><br>
   “Cuidando de quem você ama, mesmo quando você não pode falar.”</p>
 </div>
