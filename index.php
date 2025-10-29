@@ -13,7 +13,7 @@
     <!-- Cabeçalho -->
     <header class="topo">
         <div class="logo">
-            <img src="img/logo.png" alt="Logo SAMED">
+            <img src="img/logo.svg" alt="Logo SAMED">
             <h1>SAMED</h1>
         </div>
 
@@ -22,13 +22,13 @@
             <span class="divisor">|</span>
             <a href="perfil.php">MEU PERFIL</a>
             <span class="divisor">|</span>
-            <a href="hospital.php">HOSPITAL</a>
+             <a href="dependentes.php">DEPENDENTES</a>
             <span class="divisor">|</span>
-            <a href="dependentes.php">DEPENDENTES</a>
+            <a href="hospital.php">UNIDADES DE SAÚDE</a>
         </nav>
 
         <a href="sair.php" class="botao-sair">
-            <img src="img/sair-icon.png" alt="Sair">
+            <img src="img/sair.svg" alt="Sair">
             SAIR
         </a>
     </header>
@@ -65,7 +65,7 @@
     <!-- Rodapé -->
     <footer>
         <div class="footer-logo">
-            <img src="img/logo.png" alt="Logo SAMED">
+            <img src="img/logo.svg" alt="Logo SAMED">
             <h1>SAMED</h1>
         </div>
         <p>DESENVOLVIDO POR GRUPO AINDA SEM NOME.</p>
