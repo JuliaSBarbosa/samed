@@ -144,7 +144,7 @@ main {
 footer {
     background-color: #9ad2ea;
     color: #fff;
-    margin-top: 80px;
+    margin-top: 40px;
     display: flex;
     align-items: center;
     justify-content: space-around;
@@ -175,62 +175,99 @@ footer p {
 .ficha-medica {
     text-align: center;
     margin-top: 30px;
-  }
-  
-  .ficha-medica h2 {
+}
+
+.ficha-medica h2 {
     color: #6ec1e4;
     font-weight: 700;
     font-size: 1.5em;
     margin-bottom: 5px;
-  }
-  
-  .ficha-medica hr {
+}
+
+.ficha-medica hr {
     width: 120px;
     border: 2px solid #6ec1e4;
     border-radius: 2px;
     margin: 0 auto 20px;
-  }
-  
-  .card-ficha {
+}
+
+.card-ficha {
     background: #fff;
     border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     padding: 25px;
-    width: 400px;
+    width: 800px;
     margin: 0 auto;
     text-align: left;
-  }
-  
-  .perfil {
+}
+
+.perfil {
     display: flex;
     align-items: center;
     margin-bottom: 20px;
-  }
-  
-  .perfil img {
+}
+
+.perfil img {
     width: 70px;
     height: 70px;
     border-radius: 50%;
     margin-right: 15px;
-  }
-  
-  .info-basica, .contato-emergencia {
+}
+
+.info-basica,
+.contato-emergencia {
     margin-top: 15px;
-  }
-  
-  h4 {
+}
+
+h4 {
     font-weight: 700;
     margin-bottom: 5px;
     color: #333;
-  }
-  
-  p {
+}
+
+p {
     margin: 4px 0;
     font-size: 0.95em;
     color: #333;
-  }
-  
-  strong {
+}
+
+strong {
     font-weight: 700;
-  }
-  
+}
+
+/* ======= ESTILOS DO CARROSSEL BOOTSTRAP ======= */
+
+/* Deixa o carrossel um pouco mais largo que o card, 
+           para os controles não ficarem colados */
+#fichaCarousel {
+    max-width: 1000px;
+    /* ALTERADO: Aumentado de 600px para 1000px */
+    margin: 0 auto;
+}
+
+/* Garante que os slides tenham uma altura mínima
+           para os cards não pularem visualmente */
+.carousel-item {
+    padding: 20px 0;
+}
+
+/*Força a altura mínima no container dos slides */
+.carousel-inner {
+    min-height: 500px;
+}
+
+/* Deixa as setas de controle (prev/next) escuras para ver no fundo branco */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 50%;
+    padding: 10px;
+    background-size: 60%;
+}
+
+/* Deixa os indicadores (bolinhas) com a cor do tema do site */
+.carousel-indicators [data-bs-target] {
+    background-color: #9ad2ea;
+    height: 5px;
+    width: 30px;
+}

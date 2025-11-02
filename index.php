@@ -40,21 +40,21 @@
         <div class="opcoes">
             <a href="perfil.php" class="link-card">
                 <div class="card">
-                    <img src="img/user-icon.png" alt="Usuário" class="icone">
+                    <img src="img/usuario.svg" alt="Usuário" class="icone">
                     <p>Acesse a sua ficha de informações</p>
                 </div>
             </a>
 
             <a href="hospital.php" class="link-card">
                 <div class="card">
-                    <img src="img/local-icon.png" alt="Hospitais" class="icone">
+                    <img src="img/local.svg" alt="Hospitais" class="icone">
                     <p>Confira lista de hospitais próximos</p>
                 </div>
             </a>
 
             <a href="dependentes.php" class="link-card">
                 <div class="card">
-                    <img src="img/local-icon.png" alt="Dependentes" class="icone">
+                    <img src="img/dependentes.svg" alt="Dependentes" class="icone">
                     <p>Dados dos Dependentes</p>
                 </div>
             </a>
