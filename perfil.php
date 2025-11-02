@@ -38,6 +38,8 @@
         <section class="ficha-medica">
             <h2>FICHA MÉDICA</h2>
             <hr>
+
+            <!--slide 1-->
             <div class="card-ficha">
                 <div class="perfil">
                     <img src="img/user-icon.png" alt="Foto do usuário">
@@ -61,6 +63,44 @@
                     <p><strong>CONTATO:</strong> PATRÍCIA</p>
                     <p><strong>PARENTESCO:</strong> MÃE</p>
                     <p><strong>TELEFONE:</strong> (19) 99695-1292</p>
+                </div>
+            </div>
+
+            <!--slide 2-->
+            <div class="card-ficha">
+                <div class="perfil">
+                    <img src="img/user-icon.png" alt="Foto do usuário">
+                    <div>
+                        <h3>JOANA DARK</h3>
+                        <p><strong>IDADE:</strong> 23 ANOS</p>
+                    </div>
+                </div>
+
+                <div class="info-basica">
+                    <h4>INFORMAÇÕES MÉDICAS/h4>
+                    <p><strong>DOENÇAS CRÔNICAS:</strong>DIABETE TIPO 1 | HIPERTENSÃO</p>
+                    <p><strong>ALERGIA:</strong>AZITROMICINA</p>
+                    <p><strong>TIPO SANGUÍNEO:</strong>A+</p>
+                    <p><strong>MEDICAÇÃO DE USO CONTÍNUO:</strong>CAPTOPRIL | INSULINA</p>
+                    <p><strong>DOENÇA MENTAL:</strong>NÃO</p>
+                    <p><strong>DISPOSITIVO IMPLANTADOS:</strong>MARCA PASSO | BOMBA DE INSULINA</p>
+                    <p><strong>INFORMAÇÕES RELEVANTES:</strong>GRÁVIDA</p>
+                </div>
+            </div>
+
+            <!--slide 3-->
+            <div class="card-ficha">
+                <div class="perfil">
+                    <img src="img/user-icon.png" alt="Foto do usuário">
+                    <div>
+                        <h3>JOANA DARK</h3>
+                        <p><strong>IDADE:</strong> 23 ANOS</p>
+                    </div>
+                </div>
+
+                <div class="info-basica">
+                    <h4>HISTÓRICO MÉDICO</h4>
+                    <p><strong>CIRURGIA:</strong> RETIRADA AMIDALA EM 2016</p>
                 </div>
             </div>
         </section>
