@@ -271,3 +271,165 @@ strong {
     height: 5px;
     width: 30px;
 }
+
+/* ======= Estilos da Página de Hospitais ======= */
+
+.hospital-list-container {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 20px 40px;
+    max-width: 700px; /* Define uma largura máxima para o card */
+    margin: 0 auto; /* Centraliza o card na tela */
+}
+
+.hospital-list {
+    list-style: none; /* Remove as bolinhas da lista */
+    padding: 0;
+    margin: 0;
+}
+
+.hospital-card {
+    display: flex;
+    align-items: center;
+    padding: 25px 0;
+    border-bottom: 1px solid #f0f0f0; /* Linha divisória sutil */
+}
+
+/* Remove a linha do último item da lista */
+.hospital-card:last-child {
+    border-bottom: none;
+}
+
+.hospital-logo {
+    height: 70px;
+    width: 70px;
+    object-fit: contain; /* Garante que o logo não distorça */
+    margin-right: 25px;
+    flex-shrink: 0; /* Impede que o logo encolha */
+}
+
+.hospital-info {
+    text-align: left; /* Alinha o texto do card à esquerda */
+}
+
+.hospital-info h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.hospital-info p {
+    margin: 4px 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #444;
+}
+
+/* Estilo do link do Google Maps */
+.hospital-info a {
+    color: #444; /* Mesma cor do texto */
+    text-decoration: none;
+    border-bottom: 1px dotted #58b4db; /* Destaque sutil com a cor do seu menu */
+    transition: color 0.3s, border-bottom 0.3s;
+}
+
+.hospital-info a:hover {
+    color: #58b4db; /* Muda a cor ao passar o mouse */
+    border-bottom-style: solid;
+}
+
+/* ======= REFINAMENTO: Estilos da Página de Hospitais ======= */
+
+/* Ajusta o container principal para centralizar e ter uma largura máxima */
+.hospital-list-container {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 20px 40px;
+    max-width: 700px; 
+    margin: 0 auto 40px; /* Centraliza e dá um espaço inferior */
+}
+
+.hospital-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.hospital-card {
+    display: flex;
+    align-items: center;
+    padding: 25px 0;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.3s ease; /* Efeito de hover suave */
+}
+
+/* Efeito de hover em todo o card */
+.hospital-card:hover {
+    background-color: #fcfcfc;
+}
+
+.hospital-card:last-child {
+    border-bottom: none;
+}
+
+.hospital-logo {
+    height: 70px;
+    width: 70px;
+    object-fit: contain;
+    margin-right: 25px;
+    flex-shrink: 0;
+}
+
+.hospital-info {
+    text-align: left;
+    width: 100%; /* Faz a info ocupar todo o espaço */
+}
+
+/* NOVO: Container para o título e a tag de cidade */
+.hospital-title {
+    display: flex;
+    justify-content: space-between; /* Joga o nome para a esquerda e a tag para a direita */
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.hospital-info h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* NOVO: Estilo da "Tag de Cidade" */
+.city-tag {
+    background-color: #eaf6fb; /* Fundo azul bem claro */
+    color: #58b4db; /* Cor do seu menu */
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 12px;
+    white-space: nowrap; /* Impede que o texto quebre a linha */
+}
+
+.hospital-info p {
+    margin: 4px 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #444;
+}
+
+/* Estilo do link do Google Maps */
+.hospital-info a {
+    color: #444;
+    text-decoration: none;
+    border-bottom: 1px dotted #58b4db;
+    transition: color 0.3s, border-bottom 0.3s;
+}
+
+.hospital-info a:hover {
+    color: #58b4db;
+    border-bottom-style: solid;
+}
