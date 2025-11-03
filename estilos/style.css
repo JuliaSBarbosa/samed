@@ -302,8 +302,8 @@ strong {
 }
 
 .hospital-logo {
-    height: 70px;
-    width: 70px;
+    height: 90px;
+    width: 90px;
     object-fit: contain; /* Garante que o logo não distorça */
     margin-right: 25px;
     flex-shrink: 0; /* Impede que o logo encolha */

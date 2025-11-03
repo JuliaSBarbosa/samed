@@ -39,7 +39,7 @@
             <ul class="hospital-list">
                 
                 <li class="hospital-card">
-                    <img src="img/logo-sc-itapira.png" alt="Logo Santa Casa de Itapira" class="hospital-logo">
+                    <img src="img/logo-santa-casa-itapira.png" alt="Logo Santa Casa de Itapira" class="hospital-logo">
                     <div class="hospital-info">
                         <div class="hospital-title">
                             <h3>SANTA CASA DE ITAPIRA</h3>
@@ -56,7 +56,7 @@
                 </li>
 
                 <li class="hospital-card">
-                    <img src="img/logo-hm-itapira.png" alt="Logo Hospital Municipal de Itapira" class="hospital-logo">
+                    <img src="img/logo-hospital-municipal-itapira.png" alt="Logo Hospital Municipal de Itapira" class="hospital-logo">
                     <div class="hospital-info">
                         <div class="hospital-title">
                             <h3>HOSPITAL MUNICIPAL DE ITAPIRA</h3>
@@ -73,7 +73,7 @@
                 </li>
                 
                 <li class="hospital-card">
-                    <img src="img/logo-sf.png" alt="Logo Hospital São Francisco" class="hospital-logo">
+                    <img src="img/logo-hospital-sao-francisco.png" alt="Logo Hospital São Francisco" class="hospital-logo">
                     <div class="hospital-info">
                         <div class="hospital-title">
                             <h3>HOSPITAL SÃO FRANCISCO</h3>
@@ -90,7 +90,7 @@
                 </li>
 
                 <li class="hospital-card">
-                    <img src="img/logo-sc.png" alt="Logo Hospital Santa Casa" class="hospital-logo">
+                    <img src="img/logo-santa-casa-mogiguacu.png" alt="Logo Hospital Santa Casa" class="hospital-logo">
                     <div class="hospital-info">
                         <div class="hospital-title">
                             <h3>HOSPITAL SANTA CASA</h3>
@@ -107,7 +107,7 @@
                 </li>
 
                 <li class="hospital-card">
-                    <img src="img/logo-h22.png" alt="Logo Hospital 22 de Outubro" class="hospital-logo">
+                    <img src="img/logo-hospital-22-outubro.png" alt="Logo Hospital 22 de Outubro" class="hospital-logo">
                     <div class="hospital-info">
                         <div class="hospital-title">
                             <h3>HOSPITAL 22 DE OUTUBRO</h3>
