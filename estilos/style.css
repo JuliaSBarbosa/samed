@@ -43,6 +43,19 @@ header.topo {
     gap: 15px;
 }
 
+/* Controlar espaçamento entre o menu e os botões*/
+.menu-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px; 
+}
+
+/* Espaçamento entre os botões */
+.botao-login,
+.botao-registrar {
+    margin-left: 6px;
+}
+
 .menu a {
     text-decoration: none;
     color: #9ad2ea;
@@ -80,10 +93,55 @@ header.topo {
     background-color: #6bbcd6;
 }
 
+.botao-login {
+    display: flex;
+    align-items: center;
+    background-color: #9ad2ea;
+    color: #fff;
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.botao-login img {
+    width: 18px;
+    margin-right: 6px;
+}
+
+.botao-login:hover {
+    background-color: #6bbcd6;
+}
+
+.botao-registrar {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    color: #9ad2ea;
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.botao-registrar img {
+    width: 18px;
+    margin-right: 6px;
+}
+
+.botao-registrar:hover {
+    background-color: #6bbcd6;
+}
+
+.botao-registrar {
+  border: 1px solid #6bbcd6;
+}
 /* ======= Conteúdo Principal ======= */
 main {
     text-align: center;
-    margin-top: 70px;
+    margin-top: 0; 
 }
 
 .titulo {
@@ -144,11 +202,11 @@ main {
 footer {
     background-color: #9ad2ea;
     color: #fff;
-    margin-top: 40px;
+    margin-top: 0; /* removido para evitar espaço em branco entre main e footer */
+    padding: 55px 0 15px; /* mantém espaçamento visual no topo do footer sem criar gap */
     display: flex;
     align-items: center;
     justify-content: space-around;
-    padding: 15px 0;
 }
 
 .footer-logo {
@@ -432,4 +490,120 @@ strong {
 .hospital-info a:hover {
     color: #58b4db;
     border-bottom-style: solid;
+}
+
+/*Estilo imagem tela inicio */
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header.topo,
+footer {
+    flex: 0 0 auto;
+}
+
+main.hero {
+    position: relative;
+    flex: 1 0 auto;            
+    display: flex;               
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;         
+    background-image: url("../img/inicio.svg"); 
+    background-size: cover;      
+    background-position: center;
+    background-repeat: no-repeat;
+    color: #fff;                
+}
+
+/*Overlay escuro para melhorar contraste do conteúdo */
+main.hero::before {
+    content: "";
+    display: block;
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.25);
+    pointer-events: none;
+    z-index: 1; 
+}
+
+/* Frase acima da imagem */
+.hero-content {
+    position: relative;
+    z-index: 2; /* acima da imagem */
+    text-align: center;
+    padding: 20px;
+}
+
+.hero-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #244357;
+
+}
+
+.hero-subtitle {
+    font-size: 1.05rem;
+    color: rgba(255,255,255,0.95);
+}
+
+/*Estilo tela de login*/
+
+.login-container {
+  position: relative;
+  z-index: 2;              
+  max-width: 420px;
+  width: 90%;
+  background: rgb(255, 255, 255); 
+  padding: 28px;
+  border-radius: 10px;
+  box-shadow: #58b4db;
+  color: #244357;
+  font-weight: 700; 
+  text-align: left; 
+  font-family: inherit;
+}
+
+/*Coloquei pra centralizar o login*/
+.login-container h2 {
+  text-align: center;
+  font-weight: 700;
+  margin: 0 0 16px; 
+}
+
+/*Para manter a esquerda*/
+.login-container label {
+  display: block;
+  text-align: left;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.login-container input[type="text"],
+.login-container input[type="password"] {
+  width: 100%;
+  padding: 10px 12px;
+  margin: 8px 0 14px;
+  border: 1px solid #d7eaf1;
+  border-radius: 6px;
+  box-sizing: border-box;
+
+  font-weight: 700;    /* negrito */
+  text-align: left;    /* alinhado à esquerda */
+  font-family: inherit; /* usa a mesma fonte da página */
+}
+
+.login-container input[type="submit"] {
+  width: 100%;
+  background: #9ad2ea;
+  color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
 }
