@@ -1,5 +1,5 @@
 -- Banco de dados SAMED
--- Execute este script no phpMyAdmin para criar o banco de dados e as tabelas
+
 
 CREATE DATABASE IF NOT EXISTS samed CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
