@@ -42,6 +42,17 @@
   <div class="login-container">
     <h2>LOGIN</h2>
     <br>
+    <?php
+    session_start();
+    if (isset($_SESSION['erro_login'])) {
+        echo '<div style="background-color: #fee; color: #c33; padding: 10px; border-radius: 6px; margin-bottom: 15px; text-align: center;">' . htmlspecialchars($_SESSION['erro_login']) . '</div>';
+        unset($_SESSION['erro_login']);
+    }
+    if (isset($_SESSION['sucesso'])) {
+        echo '<div style="background-color: #efe; color: #3c3; padding: 10px; border-radius: 6px; margin-bottom: 15px; text-align: center;">' . htmlspecialchars($_SESSION['sucesso']) . '</div>';
+        unset($_SESSION['sucesso']);
+    }
+    ?>
     <form action="login_process.php" method="post">
       <label for="username">NOME DO USUÁRIO</label>
       <input type="text" id="username" name="username" required placeholder="Digite seu usuário">
@@ -51,6 +62,10 @@
         <br>
       <input type="submit" value="ENTRAR">
     </form>
+    <br>
+    <p style="text-align: center; margin-top: 15px;">
+        Não tem uma conta? <a href="registrar.php" style="color: #9ad2ea; text-decoration: none;">Registre-se aqui</a>
+    </p>
   </div>
 </main>
 

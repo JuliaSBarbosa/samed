@@ -1,3 +1,4 @@
+<?php require_once 'verificar_login.php'; ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -35,7 +36,7 @@
 
     <!-- Conteúdo principal -->
     <main>
-        <h2 class="titulo">OLÁ, FULANO!</h2>
+        <h2 class="titulo">OLÁ, <?php echo strtoupper(htmlspecialchars($_SESSION['usuario_nome'])); ?>!</h2>
 
         <div class="opcoes">
             <a href="perfil.php" class="link-card">
