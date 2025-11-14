@@ -606,4 +606,193 @@ main.hero::before {
   border-radius: 6px;
   font-weight: 700;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-container input[type="submit"]:hover {
+  background: #7ab8d4;
+}
+
+/* Estilos para tela de registro - Card melhorado */
+.registro-container {
+  position: relative;
+  z-index: 2;
+  max-width: 480px;
+  width: 90%;
+  background: rgb(255, 255, 255);
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  color: #244357;
+  font-weight: 700;
+  text-align: left;
+  font-family: inherit;
+}
+
+.registro-container h2 {
+  text-align: center;
+  font-weight: 700;
+  margin: 0 0 24px;
+  color: #244357;
+  font-size: 1.7rem;
+}
+
+.registro-container label {
+  display: block;
+  text-align: left;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #244357;
+  font-size: 0.9rem;
+}
+
+.registro-container input[type="text"],
+.registro-container input[type="email"],
+.registro-container input[type="password"] {
+  width: 100%;
+  padding: 11px 14px;
+  margin: 8px 0 16px;
+  border: 2px solid #d7eaf1;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-weight: 600;
+  text-align: left;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: border-color 0.3s ease;
+}
+
+.registro-container input[type="text"]:focus,
+.registro-container input[type="email"]:focus,
+.registro-container input[type="password"]:focus {
+  outline: none;
+  border-color: #9ad2ea;
+}
+
+.registro-container input[type="submit"] {
+  width: 100%;
+  background: #9ad2ea;
+  color: #fff;
+  border: none;
+  padding: 13px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+  margin-top: 8px;
+}
+
+.registro-container input[type="submit"]:hover {
+  background: #7ab8d4;
+}
+
+/* Mensagens de erro e sucesso */
+.mensagem-erro {
+  background: #fee;
+  color: #c33;
+  padding: 12px 15px;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  border-left: 4px solid #c33;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.mensagem-erro p {
+  margin: 5px 0;
+}
+
+.mensagem-sucesso {
+  background: #efe;
+  color: #3c3;
+  padding: 12px 15px;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  border-left: 4px solid #3c3;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Link de login */
+.registro-container .link-login {
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e8e8e8;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.registro-container .link-login a {
+  color: #9ad2ea;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  font-weight: 700;
+}
+
+.registro-container .link-login a:hover {
+  color: #7ab8d4;
+  text-decoration: underline;
+}
+
+/* Opções de tipo de usuário - Botões visuais simples */
+.tipo-usuario-container {
+  margin: 8px 0 16px;
+}
+
+.tipo-opcoes {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.tipo-opcao {
+  flex: 1;
+  position: relative;
+}
+
+.tipo-opcao input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.tipo-opcao label {
+  display: block;
+  padding: 14px 18px;
+  border: 2px solid #d7eaf1;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #fff;
+  font-weight: 700;
+  color: #244357;
+  margin: 0;
+}
+
+.tipo-opcao input[type="radio"]:checked + label {
+  background: #9ad2ea;
+  color: #fff;
+  border-color: #9ad2ea;
+}
+
+.tipo-opcao label:hover {
+  border-color: #9ad2ea;
+  background: #f0f8fc;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .registro-container {
+    padding: 28px 22px;
+    max-width: 95%;
+  }
+
+  .tipo-opcoes {
+    flex-direction: column;
+    gap: 10px;
+  }
 }

@@ -39,24 +39,25 @@
     </header>
     
     <main class="hero">
-        <div class="login-container">
+        <div class="registro-container">
             <h2>REGISTRE-SE</h2>
-            <br>
+            
             <?php
             session_start();
             if (isset($_SESSION['erros'])) {
-                echo '<div style="background-color: #fee; color: #c33; padding: 10px; border-radius: 6px; margin-bottom: 15px;">';
+                echo '<div class="mensagem-erro">';
                 foreach ($_SESSION['erros'] as $erro) {
-                    echo '<p style="margin: 5px 0;">' . htmlspecialchars($erro) . '</p>';
+                    echo '<p>' . htmlspecialchars($erro) . '</p>';
                 }
                 echo '</div>';
                 unset($_SESSION['erros']);
             }
             if (isset($_SESSION['sucesso'])) {
-                echo '<div style="background-color: #efe; color: #3c3; padding: 10px; border-radius: 6px; margin-bottom: 15px; text-align: center;">' . htmlspecialchars($_SESSION['sucesso']) . '</div>';
+                echo '<div class="mensagem-sucesso">' . htmlspecialchars($_SESSION['sucesso']) . '</div>';
                 unset($_SESSION['sucesso']);
             }
             ?>
+            
             <form action="registrar_process.php" method="post">
                 <label for="nome">NOME COMPLETO</label>
                 <input type="text" id="nome" name="nome" required placeholder="Digite seu nome completo" value="<?php echo isset($_SESSION['dados_form']['nome']) ? htmlspecialchars($_SESSION['dados_form']['nome']) : ''; ?>">
@@ -68,21 +69,28 @@
                 <input type="text" id="username" name="username" required placeholder="Digite um nome de usuário" value="<?php echo isset($_SESSION['dados_form']['username']) ? htmlspecialchars($_SESSION['dados_form']['username']) : ''; ?>">
 
                 <label for="password">SENHA</label>
-                <input type="password" id="password" name="password" required placeholder="Digite sua senha">
+                <input type="password" id="password" name="password" required placeholder="Mínimo 6 caracteres">
 
-                <label for="tipo">EU SOU:</label>
-                <select id="tipo" name="tipo" required style="width: 100%; padding: 10px 12px; margin: 8px 0 14px; border: 1px solid #d7eaf1; border-radius: 6px; box-sizing: border-box; font-weight: 700; font-family: inherit;">
-                    <option value="">Selecione uma opção</option>
-                    <option value="paciente" <?php echo (isset($_SESSION['dados_form']['tipo']) && $_SESSION['dados_form']['tipo'] == 'paciente') ? 'selected' : ''; ?>>Paciente</option>
-                    <option value="medica" <?php echo (isset($_SESSION['dados_form']['tipo']) && $_SESSION['dados_form']['tipo'] == 'medica') ? 'selected' : ''; ?>>Médica</option>
-                </select>
-                <br>
-                <input type="submit" value="REGISTRAR">
+                <label>EU SOU:</label>
+                <div class="tipo-usuario-container">
+                    <div class="tipo-opcoes">
+                        <div class="tipo-opcao">
+                            <input type="radio" id="tipo_paciente" name="tipo" value="paciente" required <?php echo (isset($_SESSION['dados_form']['tipo']) && $_SESSION['dados_form']['tipo'] == 'paciente') ? 'checked' : ''; ?>>
+                            <label for="tipo_paciente">Paciente</label>
+                        </div>
+                        <div class="tipo-opcao">
+                            <input type="radio" id="tipo_medica" name="tipo" value="medica" required <?php echo (isset($_SESSION['dados_form']['tipo']) && $_SESSION['dados_form']['tipo'] == 'medica') ? 'checked' : ''; ?>>
+                            <label for="tipo_medica">Médica</label>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="submit" value="CRIAR CONTA">
             </form>
-            <br>
-            <p style="text-align: center; margin-top: 15px;">
-                Já tem uma conta? <a href="login.php" style="color: #9ad2ea; text-decoration: none;">Faça login aqui</a>
-            </p>
+            
+            <div class="link-login">
+                Já tem uma conta? <a href="login.php">Faça login aqui</a>
+            </div>
         </div>
     </main>
 
