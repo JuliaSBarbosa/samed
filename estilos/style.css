@@ -631,15 +631,6 @@ main.hero::before {
     border-radius: 2px;
     margin: 0 auto 20px;
 }
-
-.card-ficha {
-    background: #fff;
-    padding: 25px;
-    width: 1000px;
-    margin: 0 auto;
-    text-align: left;
-}
-
 /* Container do Formulário */
 .form-container {
     max-width: 1200px; 
