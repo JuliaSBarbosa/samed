@@ -588,12 +588,13 @@ main.hero::before {
 }
 
 .login-container input[type="text"],
+.login-container input[type="email"],
 .login-container input[type="password"] {
   width: 100%;
-  padding: 10px 12px;
+  padding: 11px 14px;
   margin: 8px 0 14px;
-  border: 1px solid #d7eaf1;
-  border-radius: 6px;
+  border: 2px solid #d7eaf1;
+  border-radius: 8px;
   box-sizing: border-box;
   font-weight: 700; 
   text-align: left;   
