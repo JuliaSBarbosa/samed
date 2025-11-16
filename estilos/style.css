@@ -584,17 +584,28 @@ main.hero::before {
 }
 
 .login-container input[type="text"],
+.login-container input[type="email"],
 .login-container input[type="password"] {
   width: 100%;
-  padding: 10px 12px;
+  padding: 11px 14px;
   margin: 8px 0 14px;
-  border: 1px solid #d7eaf1;
-  border-radius: 6px;
+  border: 2px solid #d7eaf1;
+  border-radius: 8px;
   box-sizing: border-box;
+  font-weight: 600;
+  text-align: left;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background-color: #fff;
+}
 
-  font-weight: 700;    /* negrito */
-  text-align: left;    /* alinhado à esquerda */
-  font-family: inherit; /* usa a mesma fonte da página */
+.login-container input[type="text"]:focus,
+.login-container input[type="email"]:focus,
+.login-container input[type="password"]:focus {
+  outline: none;
+  border-color: #9ad2ea;
+  box-shadow: 0 0 0 3px rgba(154, 210, 234, 0.1);
 }
 
 .login-container input[type="submit"] {

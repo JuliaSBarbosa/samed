@@ -49,15 +49,12 @@
             }
             ?>
             
-            <form action="registrar_process.php" method="post">
+            <form action="registrar_process.php" method="post" id="formRegistro">
                 <label for="nome">NOME COMPLETO</label>
                 <input type="text" id="nome" name="nome" required placeholder="Digite seu nome completo" value="<?php echo isset($_SESSION['dados_form']['nome']) ? htmlspecialchars($_SESSION['dados_form']['nome']) : ''; ?>">
 
                 <label for="email">E-MAIL</label>
                 <input type="email" id="email" name="email" required placeholder="Digite seu e-mail" value="<?php echo isset($_SESSION['dados_form']['email']) ? htmlspecialchars($_SESSION['dados_form']['email']) : ''; ?>">
-
-                <label for="username">NOME DO USUÁRIO</label>
-                <input type="text" id="username" name="username" required placeholder="Digite um nome de usuário" value="<?php echo isset($_SESSION['dados_form']['username']) ? htmlspecialchars($_SESSION['dados_form']['username']) : ''; ?>">
 
                 <label for="password">SENHA</label>
                 <input type="password" id="password" name="password" required placeholder="Mínimo 6 caracteres">
@@ -70,14 +67,70 @@
                             <label for="tipo_paciente">Paciente</label>
                         </div>
                         <div class="tipo-opcao">
-                            <input type="radio" id="tipo_medica" name="tipo" value="medica" required <?php echo (isset($_SESSION['dados_form']['tipo']) && $_SESSION['dados_form']['tipo'] == 'medica') ? 'checked' : ''; ?>>
-                            <label for="tipo_medica">Médica</label>
+                            <input type="radio" id="tipo_medico" name="tipo" value="medico" required <?php echo (isset($_SESSION['dados_form']['tipo']) && $_SESSION['dados_form']['tipo'] == 'medico') ? 'checked' : ''; ?>>
+                            <label for="tipo_medico">Médico</label>
+                        </div>
+                        <div class="tipo-opcao">
+                            <input type="radio" id="tipo_enfermeiro" name="tipo" value="enfermeiro" required <?php echo (isset($_SESSION['dados_form']['tipo']) && $_SESSION['dados_form']['tipo'] == 'enfermeiro') ? 'checked' : ''; ?>>
+                            <label for="tipo_enfermeiro">Enfermeiro</label>
                         </div>
                     </div>
                 </div>
 
+                <div id="campo_crm" style="display: none;">
+                    <label for="crm">CRM (Conselho Regional de Medicina)</label>
+                    <input type="text" id="crm" name="crm" placeholder="Digite seu CRM" value="<?php echo isset($_SESSION['dados_form']['crm']) ? htmlspecialchars($_SESSION['dados_form']['crm']) : ''; ?>">
+                </div>
+
+                <div id="campo_coren" style="display: none;">
+                    <label for="coren">COREN (Conselho Regional de Enfermagem)</label>
+                    <input type="text" id="coren" name="coren" placeholder="Digite seu COREN" value="<?php echo isset($_SESSION['dados_form']['coren']) ? htmlspecialchars($_SESSION['dados_form']['coren']) : ''; ?>">
+                </div>
+
                 <input type="submit" value="CRIAR CONTA">
             </form>
+
+            <script>
+                // Mostrar/ocultar campos CRM e COREN conforme o tipo selecionado
+                document.querySelectorAll('input[name="tipo"]').forEach(radio => {
+                    radio.addEventListener('change', function() {
+                        const tipo = this.value;
+                        const campoCRM = document.getElementById('campo_crm');
+                        const campoCOREN = document.getElementById('campo_coren');
+                        const inputCRM = document.getElementById('crm');
+                        const inputCOREN = document.getElementById('coren');
+
+                        if (tipo === 'medico') {
+                            campoCRM.style.display = 'block';
+                            inputCRM.required = true;
+                            campoCOREN.style.display = 'none';
+                            inputCOREN.required = false;
+                            inputCOREN.value = '';
+                        } else if (tipo === 'enfermeiro') {
+                            campoCOREN.style.display = 'block';
+                            inputCOREN.required = true;
+                            campoCRM.style.display = 'none';
+                            inputCRM.required = false;
+                            inputCRM.value = '';
+                        } else {
+                            campoCRM.style.display = 'none';
+                            inputCRM.required = false;
+                            inputCRM.value = '';
+                            campoCOREN.style.display = 'none';
+                            inputCOREN.required = false;
+                            inputCOREN.value = '';
+                        }
+                    });
+                });
+
+                // Verificar tipo selecionado ao carregar a página
+                document.addEventListener('DOMContentLoaded', function() {
+                    const tipoSelecionado = document.querySelector('input[name="tipo"]:checked');
+                    if (tipoSelecionado) {
+                        tipoSelecionado.dispatchEvent(new Event('change'));
+                    }
+                });
+            </script>
             
             <div class="link-login">
                 Já tem uma conta? <a href="login.php">Faça login aqui</a>
