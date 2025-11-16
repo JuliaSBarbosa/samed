@@ -54,12 +54,12 @@
     }
     ?>
     <form action="login_process.php" method="post">
-      <label for="username">NOME DO USUÁRIO</label>
-      <input type="text" id="username" name="username" required placeholder="Digite seu usuário">
+      <label for="email">E-MAIL</label>
+      <input type="email" id="email" name="email" required placeholder="Digite seu e-mail" autocomplete="email">
 
-      <label for="password">SENHA: </label>
-      <input type="password" id="password" name="password" required placeholder="Digite sua senha">
-        <br>
+      <label for="password">SENHA</label>
+      <input type="password" id="password" name="password" required placeholder="Digite sua senha" autocomplete="current-password">
+      
       <input type="submit" value="ENTRAR">
     </form>
     <br>
