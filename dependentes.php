@@ -35,7 +35,18 @@
 
     <!-- Conteúdo principal -->
     <main>
-        <h2 class="titulo">OLÁ, FULANO!</h2>
+        <section class="dependentes">
+            <h2>DEPENDENTES</h2>
+            <hr>
+            <div class="opcoes">
+                <a href="form_dependentes.php" class="link-card">
+                    <div class="card">
+                        <img src="img/mais.svg" alt="Adicionar" class="icone">
+                        <p>Adicionar dependente</p>
+                    </div>
+                </a>
+            </div>
+        </section>
     </main>
 
     <!-- Rodapé -->
@@ -50,6 +61,7 @@
             <img src="img/googleplay.png" alt="Google Play">
         </div>
     </footer>
+
 </body>
 
 </html>
