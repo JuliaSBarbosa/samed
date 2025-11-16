@@ -7,7 +7,7 @@
     <title>SAMED - Registro</title>
     <link rel="stylesheet" href="estilos/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Magra:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="icon" href="img/logo.png" type="image/png">
+    <link rel="icon" href="img/logo.svg" type="image/png">
 </head>
 
 <body>
@@ -19,15 +19,6 @@
         </div>
 
         <div class="menu-actions">
-            <nav class="menu">
-                <a href="index.php" class="ativo">INÍCIO</a>
-                <span class="divisor">|</span>
-                <a href="perfil.php">MEU PERFIL</a>
-                <span class="divisor">|</span>
-                <a href="dependentes.php">DEPENDENTES</a>
-                <span class="divisor">|</span>
-                <a href="hospital.php">UNIDADES DE SAÚDE</a>
-            </nav>
 
             <a href="login.php" class="botao-login">
                 LOGIN

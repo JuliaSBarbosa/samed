@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAMED - Início</title>
     <link rel="stylesheet" href="estilos/style.css">
-    <link rel="icon" href="img/logo.png" type="image/png">
+    <link rel="icon" href="img/logo.svg" type="image/png">
 </head>
 
 <body>

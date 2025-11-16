@@ -7,7 +7,7 @@
     <title>SAMED - Início</title>
     <link rel="stylesheet" href="estilos/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Magra:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="icon" href="img/logo.png" type="image/png">
+    <link rel="icon" href="img/logo.svg" type="image/png">
 </head>
 
 <body>
