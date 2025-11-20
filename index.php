@@ -46,17 +46,17 @@
                 </div>
             </a>
 
-            <a href="hospital.php" class="link-card">
-                <div class="card">
-                    <img src="img/local.svg" alt="Hospitais" class="icone">
-                    <p>Confira lista de hospitais próximos</p>
-                </div>
-            </a>
-
             <a href="dependentes.php" class="link-card">
                 <div class="card">
                     <img src="img/dependentes.svg" alt="Dependentes" class="icone">
                     <p>Dados dos Dependentes</p>
+                </div>
+            </a>
+            
+            <a href="hospital.php" class="link-card">
+                <div class="card">
+                    <img src="img/local.svg" alt="Hospitais" class="icone">
+                    <p>Confira lista de hospitais próximos</p>
                 </div>
             </a>
 

@@ -40,7 +40,7 @@
     <main class="hero">
         <div class="hero-content">
             <h2 class="hero-title">CUIDANDO DE QUEM VOCÊ AMA,</h2>
-                <h2 class="hero-title">MESMO QUANDO VOCÊ NÃO PODE FALAR</h2>
+            <h2 class="hero-title">MESMO QUANDO VOCÊ NÃO PODE FALAR</h2>
             <p class="hero-subtitle">Serviços de saúde integrados para toda a família</p>
         </div>
     </main>

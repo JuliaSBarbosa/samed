@@ -27,23 +27,23 @@ header.topo {
 .logo {
     display: flex;
     align-items: center;
-    gap: 10px;
 }
 
 .logo img {
-    width: 45px;
-    height: 45px;
+    width: 100px;
+    height: 100px;
 }
 
 .logo h1 {
     color: #9ad2ea;
-    font-size: 26px;
+    font-size: 30px;
 }
 
 .menu {
     display: flex;
     align-items: center;
     gap: 15px;
+    font-size: 24px;
 }
 
 /* Controlar espaçamento entre o menu e os botões*/
@@ -85,10 +85,11 @@ header.topo {
     font-weight: bold;
     text-decoration: none;
     transition: background-color 0.3s;
+    font-size: 25px;
 }
 
 .botao-sair img {
-    width: 18px;
+    width: 45px;
     margin-right: 6px;
 }
 
@@ -152,6 +153,8 @@ main {
     color: #7ec6e6;
     font-size: 38px;
     margin-bottom: 50px;
+    text-transform: uppercase;
+    margin-top: 20px;
 }
 
 .opcoes {
@@ -163,7 +166,7 @@ main {
 
 .card {
     width: 250px;
-    height: 140px;
+    height: 250px;
     background-color: #fff;
     border: 1px solid #bfe0ef;
     border-radius: 10px;
@@ -180,8 +183,8 @@ main {
 
 /*padronizar tamanho das imagens de icone das div na tela de inicio*/
 .card .icone {
-    width: 70px;
-    height: 70px;
+    width: 140px;
+    height: 140px;
     margin-bottom: 15px;
 }
 
@@ -220,7 +223,7 @@ footer {
 }
 
 .footer-logo img {
-    width: 45px;
+    width: 40px;
 }
 
 footer p {
@@ -258,7 +261,7 @@ footer p {
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     padding: 25px;
-    width: 800px;
+    width: 600px;
     margin: 0 auto;
     text-align: left;
 }
@@ -302,8 +305,7 @@ strong {
 /* Deixa o carrossel um pouco mais largo que o card, 
            para os controles não ficarem colados */
 #fichaCarousel {
-    max-width: 1000px;
-    /* ALTERADO: Aumentado de 600px para 1000px */
+    max-width: 900px;
     margin: 0 auto;
 }
 
@@ -358,18 +360,17 @@ strong {
     border-bottom: 1px solid #f0f0f0; /* Linha divisória sutil */
 }
 
+.hospital-card img{
+    height: 140px;
+    width: 140px;
+}
+
 /* Remove a linha do último item da lista */
 .hospital-card:last-child {
     border-bottom: none;
 }
 
-.hospital-logo {
-    height: 90px;
-    width: 90px;
-    object-fit: contain; /* Garante que o logo não distorça */
-    margin-right: 25px;
-    flex-shrink: 0; /* Impede que o logo encolha */
-}
+
 
 .hospital-info {
     text-align: left; /* Alinha o texto do card à esquerda */
