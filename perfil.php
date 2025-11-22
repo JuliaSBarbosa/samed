@@ -7,7 +7,7 @@
     <title>SAMED - Perfil</title>
     <link rel="stylesheet" href="estilos/style.css">
     <link rel="icon" href="img/logo.svg" type="image/png">
-    <!-- Bootstrap CSS -->
+
 </head>
 
 <body>
@@ -42,21 +42,8 @@
             <h2>FICHA MÉDICA</h2>
             <hr>
 
-            <!-- Início do Carrossel Bootstrap -->
-            <div id="fichaCarousel" class="carousel slide" data-bs-ride="false">
-                <!-- data-bs-ride="false" impede de girar sozinho -->
+            <div class="carousel" id="fichaCarousel">
 
-                <!-- Indicadores (barrinhas embaixo) -->
-                <div class="carousel-indicators">
-                    <button type="button" data-bs-target="#fichaCarousel" data-bs-slide-to="0" class="active"
-                        aria-current="true" aria-label="Slide 1"></button>
-                    <button type="button" data-bs-target="#fichaCarousel" data-bs-slide-to="1"
-                        aria-label="Slide 2"></button>
-                    <button type="button" data-bs-target="#fichaCarousel" data-bs-slide-to="2"
-                        aria-label="Slide 3"></button>
-                </div>
-
-                <!-- Wrapper dos Slides -->
                 <div class="carousel-inner">
 
                     <!-- Slide 1 -->
@@ -85,20 +72,18 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Fim do Slide 1 -->
 
                     <!-- Slide 2 -->
                     <div class="carousel-item">
                         <div class="card-ficha">
                             <div class="perfil">
-                            <img src="img/perfil.svg" alt="Foto do usuário">
+                                <img src="img/perfil.svg" alt="Foto do usuário">
                                 <div>
                                     <h3>JOANA DARK</h3>
                                     <p><strong>IDADE:</strong> 23 ANOS</p>
                                 </div>
                             </div>
                             <div class="info-basica">
-                                <!-- CORREÇÃO: Faltava fechar o H4 aqui -->
                                 <h4>INFORMAÇÕES MÉDICAS</h4>
                                 <p><strong>DOENÇAS CRÔNICAS:</strong> DIABETE TIPO 1 | HIPERTENSÃO</p>
                                 <p><strong>ALERGIA:</strong> AZITROMICINA</p>
@@ -110,13 +95,12 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Fim do Slide 2 -->
 
                     <!-- Slide 3 -->
                     <div class="carousel-item">
                         <div class="card-ficha">
                             <div class="perfil">
-                            <img src="img/perfil.svg" alt="Foto do usuário">
+                                <img src="img/perfil.svg" alt="Foto do usuário">
                                 <div>
                                     <h3>JOANA DARK</h3>
                                     <p><strong>IDADE:</strong> 23 ANOS</p>
@@ -128,28 +112,24 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Fim do Slide 3 -->
 
                 </div>
-                <!-- Fim do Wrapper dos Slides -->
 
-                <!-- Controles (Setas) -->
-                <button class="carousel-control-prev" type="button" data-bs-target="#fichaCarousel"
-                    data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#fichaCarousel"
-                    data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
+                <!-- Controles -->
+                <button class="carousel-control prev">❮</button>
+                <button class="carousel-control next">❯</button>
+
+                <!-- Indicadores -->
+                <div class="carousel-indicators">
+                    <span data-slide="0" class="active"></span>
+                    <span data-slide="1"></span>
+                    <span data-slide="2"></span>
+                </div>
 
             </div>
-            <!-- Fim do Carrossel Bootstrap -->
-
         </section>
     </main>
+
 
     <!-- Rodapé -->
     <footer>
@@ -163,6 +143,44 @@
             <img src="img/googleplay.png" alt="Google Play">
         </div>
     </footer>
+
+    <script>
+        const slides = document.querySelectorAll("#fichaCarousel .carousel-item");
+        const indicators = document.querySelectorAll("#fichaCarousel .carousel-indicators span");
+        const inner = document.querySelector("#fichaCarousel .carousel-inner");
+
+        let index = 0;
+
+        function updateCarousel() {
+            inner.style.transform = `translateX(-${index * 100}%)`;
+
+            // Atualiza os indicadores
+            indicators.forEach(ind => ind.classList.remove("active"));
+            indicators[index].classList.add("active");
+
+            // Atualiza a classe active nos slides
+            slides.forEach(slide => slide.classList.remove("active"));
+            slides[index].classList.add("active");
+        }
+
+        document.querySelector(".carousel-control.next").addEventListener("click", () => {
+            index = (index + 1) % slides.length;
+            updateCarousel();
+        });
+
+        document.querySelector(".carousel-control.prev").addEventListener("click", () => {
+            index = (index - 1 + slides.length) % slides.length;
+            updateCarousel();
+        });
+
+        indicators.forEach(ind => {
+            ind.addEventListener("click", () => {
+                index = Number(ind.dataset.slide);
+                updateCarousel();
+            });
+        });
+    </script>
+
 
 </body>
 

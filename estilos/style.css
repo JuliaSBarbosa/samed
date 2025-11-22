@@ -263,9 +263,11 @@ footer p {
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     padding: 25px;
-    width: 600px;
+    width: 700px;
     margin: 0 auto;
     text-align: left;
+    width: 100%;
+    max-width: 700px;    
 }
 
 .perfil {
@@ -302,40 +304,88 @@ strong {
     font-weight: 700;
 }
 
-/* ======= ESTILOS DO CARROSSEL BOOTSTRAP ======= */
 
-/* Deixa o carrossel um pouco mais largo que o card, 
-           para os controles não ficarem colados */
-#fichaCarousel {
+/* ======= CARROSSEL FICHA MÉDICA ======= */
+/* ======= CARROSSEL FICHA MÉDICA ======= */
+
+/* Container */
+.carousel {
+    position: relative;
+    width: 90%;
     max-width: 900px;
     margin: 0 auto;
+    overflow: hidden; /* Esconde os slides que estão fora da área visível */
 }
 
-/* Garante que os slides tenham uma altura mínima
-           para os cards não pularem visualmente */
-.carousel-item {
-    padding: 20px 0;
-}
-
-/*Força a altura mínima no container dos slides */
+/* Faixa dos slides */
 .carousel-inner {
-    min-height: 500px;
+    display: flex;
+    transition: transform 0.5s ease;
+    width: 100%;
 }
 
-/* Deixa as setas de controle (prev/next) escuras para ver no fundo branco */
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-    background-color: rgba(0, 0, 0, 0.4);
+/* Slide */
+.carousel-item {
+    min-width: 100%;
+    width: 100%;
+    flex-shrink: 0; /* Impede que os slides encolham */
+    flex-basis: 100%; /* Define a base de largura */
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+    box-sizing: border-box;
+}
+
+/* SETAS ÚNICAS */
+.carousel-control {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 45px;
+    height: 45px;
+    background: #6ec1e4;
     border-radius: 50%;
-    padding: 10px;
-    background-size: 60%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 20;
+    border: none;
+    font-size: 22px;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Deixa os indicadores (bolinhas) com a cor do tema do site */
-.carousel-indicators [data-bs-target] {
-    background-color: #9ad2ea;
-    height: 5px;
+/* seta esquerda */
+.carousel-control.prev {
+    left: 10px;
+}
+
+/* seta direita */
+.carousel-control.next {
+    right: 10px;
+}
+
+/* Indicadores */
+.carousel-indicators {
+    position: absolute;
+    bottom: -25px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.carousel-indicators span {
     width: 30px;
+    height: 6px;
+    background: #9ad2ea;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.carousel-indicators .active {
+    background: #6ec1e4;
 }
 
 /* ======= Estilos da Página de Hospitais ======= */
@@ -649,14 +699,6 @@ main.hero::before {
     border: 2px solid #6ec1e4;
     border-radius: 2px;
     margin: 0 auto 20px;
-}
-
-.card-ficha {
-    background: #fff;
-    padding: 25px;
-    width: 1000px;
-    margin: 0 auto;
-    text-align: left;
 }
 
 /* Container do Formulário */
