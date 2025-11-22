@@ -50,7 +50,7 @@ header.topo {
 .menu-actions {
     display: flex;
     align-items: center;
-    gap: 20px; 
+    gap: 20px;
 }
 
 /* Espaçamento entre os botões */
@@ -140,13 +140,15 @@ header.topo {
 }
 
 .botao-registrar {
-  border: 1px solid #6bbcd6;
+    border: 1px solid #6bbcd6;
 }
+
 /* ======= Conteúdo Principal ======= */
 main {
     text-align: center;
-    margin-top: 0; 
-    flex: 1; /* Faz o main ocupar o espaço restante, empurrando o footer para baixo */
+    margin-top: 0;
+    flex: 1;
+    /* Faz o main ocupar o espaço restante, empurrando o footer para baixo */
 }
 
 .titulo {
@@ -209,8 +211,8 @@ main {
 footer {
     background-color: #9ad2ea;
     color: #fff;
-    margin-top: 0; 
-    padding: 55px 0 15px; 
+    margin-top: 0;
+    padding: 55px 0 15px;
     display: flex;
     align-items: center;
     justify-content: space-around;
@@ -242,14 +244,14 @@ footer p {
     margin-top: 30px;
 }
 
-.ficha-medica h2 {
+.ficha-medica h2, .secao-historico h2 {
     color: #6ec1e4;
     font-weight: 700;
     font-size: 1.5em;
     margin-bottom: 5px;
 }
 
-.ficha-medica hr {
+.ficha-medica hr, .secao-historico hr {
     width: 120px;
     border: 2px solid #6ec1e4;
     border-radius: 2px;
@@ -343,12 +345,15 @@ strong {
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     padding: 20px 40px;
-    max-width: 700px; /* Define uma largura máxima para o card */
-    margin: 0 auto; /* Centraliza o card na tela */
+    max-width: 700px;
+    /* Define uma largura máxima para o card */
+    margin: 0 auto;
+    /* Centraliza o card na tela */
 }
 
 .hospital-list {
-    list-style: none; /* Remove as bolinhas da lista */
+    list-style: none;
+    /* Remove as bolinhas da lista */
     padding: 0;
     margin: 0;
 }
@@ -357,10 +362,11 @@ strong {
     display: flex;
     align-items: center;
     padding: 25px 0;
-    border-bottom: 1px solid #f0f0f0; /* Linha divisória sutil */
+    border-bottom: 1px solid #f0f0f0;
+    /* Linha divisória sutil */
 }
 
-.hospital-card img{
+.hospital-card img {
     height: 140px;
     width: 140px;
 }
@@ -373,7 +379,8 @@ strong {
 
 
 .hospital-info {
-    text-align: left; /* Alinha o texto do card à esquerda */
+    text-align: left;
+    /* Alinha o texto do card à esquerda */
 }
 
 .hospital-info h3 {
@@ -392,14 +399,17 @@ strong {
 
 /* Estilo do link do Google Maps */
 .hospital-info a {
-    color: #444; /* Mesma cor do texto */
+    color: #444;
+    /* Mesma cor do texto */
     text-decoration: none;
-    border-bottom: 1px dotted #58b4db; /* Destaque sutil com a cor do seu menu */
+    border-bottom: 1px dotted #58b4db;
+    /* Destaque sutil com a cor do seu menu */
     transition: color 0.3s, border-bottom 0.3s;
 }
 
 .hospital-info a:hover {
-    color: #58b4db; /* Muda a cor ao passar o mouse */
+    color: #58b4db;
+    /* Muda a cor ao passar o mouse */
     border-bottom-style: solid;
 }
 
@@ -411,8 +421,9 @@ strong {
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     padding: 20px 40px;
-    max-width: 700px; 
-    margin: 0 auto 40px; /* Centraliza e dá um espaço inferior */
+    max-width: 700px;
+    margin: 0 auto 40px;
+    /* Centraliza e dá um espaço inferior */
 }
 
 .hospital-list {
@@ -426,7 +437,8 @@ strong {
     align-items: center;
     padding: 25px 0;
     border-bottom: 1px solid #f0f0f0;
-    transition: background-color 0.3s ease; /* Efeito de hover suave */
+    transition: background-color 0.3s ease;
+    /* Efeito de hover suave */
 }
 
 /* Efeito de hover em todo o card */
@@ -448,13 +460,15 @@ strong {
 
 .hospital-info {
     text-align: left;
-    width: 100%; /* Faz a info ocupar todo o espaço */
+    width: 100%;
+    /* Faz a info ocupar todo o espaço */
 }
 
 /* NOVO: Container para o título e a tag de cidade */
 .hospital-title {
     display: flex;
-    justify-content: space-between; /* Joga o nome para a esquerda e a tag para a direita */
+    justify-content: space-between;
+    /* Joga o nome para a esquerda e a tag para a direita */
     align-items: center;
     margin-bottom: 8px;
 }
@@ -468,13 +482,16 @@ strong {
 
 /* NOVO: Estilo da "Tag de Cidade" */
 .city-tag {
-    background-color: #eaf6fb; /* Fundo azul bem claro */
-    color: #58b4db; /* Cor do seu menu */
+    background-color: #eaf6fb;
+    /* Fundo azul bem claro */
+    color: #58b4db;
+    /* Cor do seu menu */
     font-size: 0.8rem;
     font-weight: 600;
     padding: 4px 10px;
     border-radius: 12px;
-    white-space: nowrap; /* Impede que o texto quebre a linha */
+    white-space: nowrap;
+    /* Impede que o texto quebre a linha */
 }
 
 .hospital-info p {
@@ -512,16 +529,16 @@ footer {
 
 main.hero {
     position: relative;
-    flex: 1 0 auto;            
-    display: flex;               
+    flex: 1 0 auto;
+    display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 60vh;         
-    background-image: url("../img/inicio.svg"); 
-    background-size: cover;      
+    min-height: 60vh;
+    background-image: url("../img/inicio.svg");
+    background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    color: #fff;                
+    color: #fff;
 }
 
 /*Overlay escuro para melhorar contraste do conteúdo */
@@ -530,15 +547,16 @@ main.hero::before {
     display: block;
     position: absolute;
     inset: 0;
-    background: rgba(0,0,0,0.25);
+    background: rgba(0, 0, 0, 0.25);
     pointer-events: none;
-    z-index: 1; 
+    z-index: 1;
 }
 
 /* Frase acima da imagem */
 .hero-content {
     position: relative;
-    z-index: 2; /* acima da imagem */
+    z-index: 2;
+    /* acima da imagem */
     text-align: center;
     padding: 20px;
 }
@@ -553,64 +571,64 @@ main.hero::before {
 
 .hero-subtitle {
     font-size: 1.05rem;
-    color: rgba(255,255,255,0.95);
+    color: rgba(255, 255, 255, 0.95);
 }
 
 /*Estilo tela de login*/
 
 .login-container {
-  position: relative;
-  z-index: 2;              
-  max-width: 420px;
-  width: 90%;
-  background: rgb(255, 255, 255); 
-  padding: 28px;
-  border-radius: 10px;
-  box-shadow: #58b4db;
-  color: #244357;
-  font-weight: 700; 
-  text-align: left; 
-  font-family: inherit;
+    position: relative;
+    z-index: 2;
+    max-width: 420px;
+    width: 90%;
+    background: rgb(255, 255, 255);
+    padding: 28px;
+    border-radius: 10px;
+    box-shadow: #58b4db;
+    color: #244357;
+    font-weight: 700;
+    text-align: left;
+    font-family: inherit;
 }
 
 /*Coloquei pra centralizar o login*/
 .login-container h2 {
-  text-align: center;
-  font-weight: 700;
-  margin: 0 0 16px; 
+    text-align: center;
+    font-weight: 700;
+    margin: 0 0 16px;
 }
 
 /*Para manter a esquerda*/
 .login-container label {
-  display: block;
-  text-align: left;
-  font-weight: 700;
-  margin-bottom: 6px;
+    display: block;
+    text-align: left;
+    font-weight: 700;
+    margin-bottom: 6px;
 }
 
 .login-container input[type="text"],
 .login-container input[type="email"],
 .login-container input[type="password"] {
-  width: 100%;
-  padding: 11px 14px;
-  margin: 8px 0 14px;
-  border: 2px solid #d7eaf1;
-  border-radius: 8px;
-  box-sizing: border-box;
-  font-weight: 700; 
-  text-align: left;   
-  font-family: inherit; 
+    width: 100%;
+    padding: 11px 14px;
+    margin: 8px 0 14px;
+    border: 2px solid #d7eaf1;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-weight: 700;
+    text-align: left;
+    font-family: inherit;
 }
 
 .login-container input[type="submit"] {
-  width: 100%;
-  background: #9ad2ea;
-  color: #fff;
-  border: none;
-  padding: 10px;
-  border-radius: 6px;
-  font-weight: 700;
-  cursor: pointer;
+    width: 100%;
+    background: #9ad2ea;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
 }
 
 /* ESTILO TELA DEPENDENTES */
@@ -643,7 +661,7 @@ main.hero::before {
 
 /* Container do Formulário */
 .form-container {
-    max-width: 1200px; 
+    max-width: 1200px;
     margin: 20px auto;
     padding: 20px;
     background: white;
@@ -725,6 +743,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         max-width: 100%;
         padding: 12px;
     }
+
     .form-container form {
         padding: 18px;
         max-width: 100%;
@@ -812,8 +831,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 /* Layout */
@@ -895,4 +919,98 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .btn-proximo:hover,
 .submit-btn:hover {
     background-color: #6ec1e4;
+}
+
+/* ======= PAGINA HISTORICO ======= */
+/* Estilos adicionais para o layout do histórico (simulando classes utilitárias) */
+.secao-historico {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+
+.tabela-historico {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    /* Garante que o border-radius funcione */
+}
+
+.tabela-historico th,
+.tabela-historico td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.tabela-historico th {
+    background-color: #6ec1e4;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.tabela-historico tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.tabela-historico tr:hover {
+    background-color: #e9e9e9;
+}
+
+.mensagem-vazio {
+    text-align: center;
+    padding: 2rem;
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+    border-radius: 4px;
+}
+
+.filtro-historico {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    background: #ffffff;
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.campo-filtro {
+    display: flex;
+    flex-direction: column;
+}
+
+.campo-filtro label {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.campo-filtro input,
+.campo-filtro select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.btn-filtrar {
+    background: #6ec1e4;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 1.4rem;
+}
+
+.btn-filtrar:hover {
+    background: #5bb0d1;
 }

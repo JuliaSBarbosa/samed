@@ -23,6 +23,8 @@
             <span class="divisor">|</span>
             <a href="dependentes.php">DEPENDENTES</a>
             <span class="divisor">|</span>
+            <a href="historico.php">HISTÓRICO</a>
+            <span class="divisor">|</span>
             <a href="hospital.php" class="ativo">UNIDADES DE SAÚDE</a>
         </nav>
 

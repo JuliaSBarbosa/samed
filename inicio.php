@@ -26,6 +26,8 @@
                 <span class="divisor">|</span>
                 <a href="dependentes.php">DEPENDENTES</a>
                 <span class="divisor">|</span>
+                <a href="historico.php">HISTÓRICO</a>
+                <span class="divisor">|</span>
                 <a href="hospital.php">UNIDADES DE SAÚDE</a>
             </nav>
 
