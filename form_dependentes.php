@@ -1,3 +1,6 @@
+<?php
+require_once 'verificar_login.php';
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -36,6 +39,23 @@
     </header>
  <!-- Conteúdo principal -->
         <div class="form-container">
+            <?php
+            // Exibir mensagens de erro
+            if (isset($_SESSION['erros']) && !empty($_SESSION['erros'])) {
+                echo '<div class="mensagem-erro">';
+                foreach ($_SESSION['erros'] as $erro) {
+                    echo '<p>' . htmlspecialchars($erro) . '</p>';
+                }
+                echo '</div>';
+                unset($_SESSION['erros']);
+            }
+            
+            // Exibir mensagem de sucesso
+            if (isset($_SESSION['sucesso'])) {
+                echo '<div class="mensagem-sucesso">' . htmlspecialchars($_SESSION['sucesso']) . '</div>';
+                unset($_SESSION['sucesso']);
+            }
+            ?>
             <!-- Barra de progresso -->
             <div class="progress-bar">
                 <div class="step active" data-step="1">
