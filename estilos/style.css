@@ -681,6 +681,149 @@ main.hero::before {
     cursor: pointer;
 }
 
+/*Estilo tela de registro*/
+
+.registro-container {
+    position: relative;
+    z-index: 2;
+    max-width: 500px;
+    width: 90%;
+    background: rgb(255, 255, 255);
+    padding: 28px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    color: #244357;
+    font-weight: 700;
+    text-align: left;
+    font-family: inherit;
+}
+
+/*Coloquei pra centralizar o registro*/
+.registro-container h2 {
+    text-align: center;
+    font-weight: 700;
+    margin: 0 0 20px;
+}
+
+/*Para manter a esquerda*/
+.registro-container label {
+    display: block;
+    text-align: left;
+    font-weight: 700;
+    margin-bottom: 6px;
+    margin-top: 12px;
+}
+
+.registro-container label:first-of-type {
+    margin-top: 0;
+}
+
+.registro-container input[type="text"],
+.registro-container input[type="email"],
+.registro-container input[type="password"] {
+    width: 100%;
+    padding: 11px 14px;
+    margin: 8px 0 14px;
+    border: 2px solid #d7eaf1;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-weight: 700;
+    text-align: left;
+    font-family: inherit;
+}
+
+.registro-container input[type="submit"] {
+    width: 100%;
+    background: #9ad2ea;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s;
+}
+
+.registro-container input[type="submit"]:hover {
+    background: #6bbcd6;
+}
+
+/* Estilos para tipo de usuário */
+.tipo-usuario-container {
+    margin: 12px 0 20px;
+}
+
+.tipo-opcoes {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.tipo-opcao {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tipo-opcao input[type="radio"] {
+    width: auto;
+    margin: 0;
+    cursor: pointer;
+}
+
+.tipo-opcao label {
+    margin: 0;
+    font-weight: 600;
+    cursor: pointer;
+    color: #244357;
+}
+
+/* Mensagens de erro e sucesso */
+.mensagem-erro {
+    background-color: #fee;
+    color: #c33;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    border: 1px solid #fcc;
+}
+
+.mensagem-erro p {
+    margin: 4px 0;
+    font-size: 0.9em;
+}
+
+.mensagem-sucesso {
+    background-color: #efe;
+    color: #3c3;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    border: 1px solid #cfc;
+    font-size: 0.9em;
+}
+
+/* Link para login */
+.link-login {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.link-login a {
+    color: #9ad2ea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.link-login a:hover {
+    color: #6bbcd6;
+    text-decoration: underline;
+}
+
 /* ESTILO TELA DEPENDENTES */
 .dependentes {
     text-align: center;
