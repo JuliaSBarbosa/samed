@@ -176,16 +176,16 @@ require_once 'verificar_login.php';
     </section>
 </main>
 
-    <!-- Rodapé -->
+   <!-- Rodapé -->
     <footer>
         <div class="footer-logo">
-            <img src="img/logo.svg" alt="Logo SAMED">
+            <img src="img/logo-branco.png" alt="Logo SAMED">
             <h1>SAMED</h1>
         </div>
-        <p>DESENVOLVIDO POR GRUPO AINDA SEM NOME.</p>
+        <p>&copy; 2025 Grupo SAMED. Todos os direitos reservados.</p>
         <div class="lojas">
-            <img src="img/appstore.png" alt="App Store">
-            <img src="img/googleplay.png" alt="Google Play">
+            <img src="img/appstore.webp" alt="App Store">
+             <img src="img/googleplay.webp" alt="App Store">
         </div>
     </footer>
 
