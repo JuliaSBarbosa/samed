@@ -27,30 +27,30 @@ header.topo {
 .logo {
     display: flex;
     align-items: center;
-    gap: 10px;
 }
 
 .logo img {
-    width: 45px;
-    height: 45px;
+    width: 100px;
+    height: 100px;
 }
 
 .logo h1 {
     color: #9ad2ea;
-    font-size: 26px;
+    font-size: 30px;
 }
 
 .menu {
     display: flex;
     align-items: center;
     gap: 15px;
+    font-size: 24px;
 }
 
 /* Controlar espaçamento entre o menu e os botões*/
 .menu-actions {
     display: flex;
     align-items: center;
-    gap: 20px; 
+    gap: 20px;
 }
 
 /* Espaçamento entre os botões */
@@ -85,10 +85,11 @@ header.topo {
     font-weight: bold;
     text-decoration: none;
     transition: background-color 0.3s;
+    font-size: 25px;
 }
 
 .botao-sair img {
-    width: 18px;
+    width: 45px;
     margin-right: 6px;
 }
 
@@ -139,31 +140,41 @@ header.topo {
 }
 
 .botao-registrar {
-  border: 1px solid #6bbcd6;
+    border: 1px solid #6bbcd6;
 }
+
 /* ======= Conteúdo Principal ======= */
 main {
     text-align: center;
-    margin-top: 0; 
-    flex: 1; /* Faz o main ocupar o espaço restante, empurrando o footer para baixo */
+    margin-top: 0;
+    flex: 1;
+    /* Faz o main ocupar o espaço restante, empurrando o footer para baixo */
 }
 
 .titulo {
     color: #7ec6e6;
     font-size: 38px;
     margin-bottom: 50px;
+    text-transform: uppercase;
+    margin-top: 20px;
 }
 
 .opcoes {
     display: flex;
     justify-content: center;
     gap: 40px;
+    align-items: stretch; /* garante que os cards fiquem com mesma altura */
     margin-top: 40px;
 }
 
 .card {
     width: 250px;
-    height: 140px;
+    height: 250px;
+    min-height: 250px; /* reforça altura mínima para consistência */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* centraliza conteúdo verticalmente */
+    align-items: center; /* centraliza conteúdo horizontalmente */
     background-color: #fff;
     border: 1px solid #bfe0ef;
     border-radius: 10px;
@@ -178,16 +189,25 @@ main {
     box-shadow: 3px 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/*padronizar tamanho das imagens de icone das div na tela de inicio*/
-.card .icone {
-    width: 70px;
-    height: 70px;
+/* padronizar tamanho das imagens dentro das cards na tela de inicio */
+/* imagens que têm a classe `icone` ficam maiores; outras imagens ficam menores */
+.card img.icone {
+    width: 140px;
+    height: 140px;
     margin-bottom: 15px;
+    object-fit: contain;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.card img {
+.card img:not(.icone) {
     width: 50px;
     margin-bottom: 10px;
+    object-fit: contain;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .card p {
@@ -206,11 +226,12 @@ main {
 footer {
     background-color: #9ad2ea;
     color: #fff;
-    margin-top: 0; 
-    padding: 55px 0 15px; 
+    margin-top: 0;
+    padding: 30px 0px;
     display: flex;
     align-items: center;
     justify-content: space-around;
+    text-align: center;
 }
 
 .footer-logo {
@@ -220,17 +241,25 @@ footer {
 }
 
 .footer-logo img {
-    width: 45px;
+    width: 60px;
 }
 
 footer p {
-    font-size: 15px;
+    font-size: 17px;
+    margin: 0; 
+ 
+}
+
+footer h1 {
+    font-size: 38px;
+    margin: 0; 
 }
 
 .lojas img {
-    height: 35px;
+    height: 40px;
     margin-left: 10px;
 }
+
 
 
 /*======= TELA FICHA MEDICA DO USUARIO ======= */
@@ -239,14 +268,14 @@ footer p {
     margin-top: 30px;
 }
 
-.ficha-medica h2 {
+.ficha-medica h2, .secao-historico h2 {
     color: #6ec1e4;
     font-weight: 700;
     font-size: 1.5em;
     margin-bottom: 5px;
 }
 
-.ficha-medica hr {
+.ficha-medica hr, .secao-historico hr {
     width: 120px;
     border: 2px solid #6ec1e4;
     border-radius: 2px;
@@ -258,9 +287,11 @@ footer p {
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     padding: 25px;
-    width: 800px;
+    width: 700px;
     margin: 0 auto;
     text-align: left;
+    width: 100%;
+    max-width: 700px;    
 }
 
 .perfil {
@@ -297,41 +328,88 @@ strong {
     font-weight: 700;
 }
 
-/* ======= ESTILOS DO CARROSSEL BOOTSTRAP ======= */
 
-/* Deixa o carrossel um pouco mais largo que o card, 
-           para os controles não ficarem colados */
-#fichaCarousel {
-    max-width: 1000px;
-    /* ALTERADO: Aumentado de 600px para 1000px */
+/* ======= CARROSSEL FICHA MÉDICA ======= */
+/* ======= CARROSSEL FICHA MÉDICA ======= */
+
+/* Container */
+.carousel {
+    position: relative;
+    width: 90%;
+    max-width: 900px;
     margin: 0 auto;
+    overflow: hidden; /* Esconde os slides que estão fora da área visível */
 }
 
-/* Garante que os slides tenham uma altura mínima
-           para os cards não pularem visualmente */
-.carousel-item {
-    padding: 20px 0;
-}
-
-/*Força a altura mínima no container dos slides */
+/* Faixa dos slides */
 .carousel-inner {
-    min-height: 500px;
+    display: flex;
+    transition: transform 0.5s ease;
+    width: 100%;
 }
 
-/* Deixa as setas de controle (prev/next) escuras para ver no fundo branco */
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-    background-color: rgba(0, 0, 0, 0.4);
+/* Slide */
+.carousel-item {
+    min-width: 100%;
+    width: 100%;
+    flex-shrink: 0; /* Impede que os slides encolham */
+    flex-basis: 100%; /* Define a base de largura */
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+    box-sizing: border-box;
+}
+
+/* SETAS ÚNICAS */
+.carousel-control {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 45px;
+    height: 45px;
+    background: #6ec1e4;
     border-radius: 50%;
-    padding: 10px;
-    background-size: 60%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 20;
+    border: none;
+    font-size: 22px;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Deixa os indicadores (bolinhas) com a cor do tema do site */
-.carousel-indicators [data-bs-target] {
-    background-color: #9ad2ea;
-    height: 5px;
+/* seta esquerda */
+.carousel-control.prev {
+    left: 10px;
+}
+
+/* seta direita */
+.carousel-control.next {
+    right: 10px;
+}
+
+/* Indicadores */
+.carousel-indicators {
+    position: absolute;
+    bottom: -25px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.carousel-indicators span {
     width: 30px;
+    height: 6px;
+    background: #9ad2ea;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.carousel-indicators .active {
+    background: #6ec1e4;
 }
 
 /* ======= Estilos da Página de Hospitais ======= */
@@ -341,12 +419,15 @@ strong {
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     padding: 20px 40px;
-    max-width: 700px; /* Define uma largura máxima para o card */
-    margin: 0 auto; /* Centraliza o card na tela */
+    max-width: 700px;
+    /* Define uma largura máxima para o card */
+    margin: 0 auto;
+    /* Centraliza o card na tela */
 }
 
 .hospital-list {
-    list-style: none; /* Remove as bolinhas da lista */
+    list-style: none;
+    /* Remove as bolinhas da lista */
     padding: 0;
     margin: 0;
 }
@@ -355,7 +436,13 @@ strong {
     display: flex;
     align-items: center;
     padding: 25px 0;
-    border-bottom: 1px solid #f0f0f0; /* Linha divisória sutil */
+    border-bottom: 1px solid #f0f0f0;
+    /* Linha divisória sutil */
+}
+
+.hospital-card img {
+    height: 140px;
+    width: 140px;
 }
 
 /* Remove a linha do último item da lista */
@@ -363,16 +450,11 @@ strong {
     border-bottom: none;
 }
 
-.hospital-logo {
-    height: 90px;
-    width: 90px;
-    object-fit: contain; /* Garante que o logo não distorça */
-    margin-right: 25px;
-    flex-shrink: 0; /* Impede que o logo encolha */
-}
+
 
 .hospital-info {
-    text-align: left; /* Alinha o texto do card à esquerda */
+    text-align: left;
+    /* Alinha o texto do card à esquerda */
 }
 
 .hospital-info h3 {
@@ -391,14 +473,17 @@ strong {
 
 /* Estilo do link do Google Maps */
 .hospital-info a {
-    color: #444; /* Mesma cor do texto */
+    color: #444;
+    /* Mesma cor do texto */
     text-decoration: none;
-    border-bottom: 1px dotted #58b4db; /* Destaque sutil com a cor do seu menu */
+    border-bottom: 1px dotted #58b4db;
+    /* Destaque sutil com a cor do seu menu */
     transition: color 0.3s, border-bottom 0.3s;
 }
 
 .hospital-info a:hover {
-    color: #58b4db; /* Muda a cor ao passar o mouse */
+    color: #58b4db;
+    /* Muda a cor ao passar o mouse */
     border-bottom-style: solid;
 }
 
@@ -410,8 +495,9 @@ strong {
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     padding: 20px 40px;
-    max-width: 700px; 
-    margin: 0 auto 40px; /* Centraliza e dá um espaço inferior */
+    max-width: 900px;
+    margin: 0 auto 40px;
+    /* Centraliza e dá um espaço inferior */
 }
 
 .hospital-list {
@@ -425,7 +511,8 @@ strong {
     align-items: center;
     padding: 25px 0;
     border-bottom: 1px solid #f0f0f0;
-    transition: background-color 0.3s ease; /* Efeito de hover suave */
+    transition: background-color 0.3s ease;
+    /* Efeito de hover suave */
 }
 
 /* Efeito de hover em todo o card */
@@ -447,13 +534,15 @@ strong {
 
 .hospital-info {
     text-align: left;
-    width: 100%; /* Faz a info ocupar todo o espaço */
+    width: 100%;
+    /* Faz a info ocupar todo o espaço */
 }
 
 /* NOVO: Container para o título e a tag de cidade */
 .hospital-title {
     display: flex;
-    justify-content: space-between; /* Joga o nome para a esquerda e a tag para a direita */
+    justify-content: space-between;
+    /* Joga o nome para a esquerda e a tag para a direita */
     align-items: center;
     margin-bottom: 8px;
 }
@@ -467,13 +556,16 @@ strong {
 
 /* NOVO: Estilo da "Tag de Cidade" */
 .city-tag {
-    background-color: #eaf6fb; /* Fundo azul bem claro */
-    color: #58b4db; /* Cor do seu menu */
+    background-color: #eaf6fb;
+    /* Fundo azul bem claro */
+    color: #58b4db;
+    /* Cor do seu menu */
     font-size: 0.8rem;
     font-weight: 600;
     padding: 4px 10px;
     border-radius: 12px;
-    white-space: nowrap; /* Impede que o texto quebre a linha */
+    white-space: nowrap;
+    /* Impede que o texto quebre a linha */
 }
 
 .hospital-info p {
@@ -496,6 +588,235 @@ strong {
     border-bottom-style: solid;
 }
 
+/* ======= Filtro de Busca - Hospitais ======= */
+.hospital-filter-container {
+    max-width: 900px;
+    margin: 0 auto 30px;
+    padding: 0 20px;
+}
+
+.hospital-filter-wrapper {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.hospital-filter {
+    display: grid;
+    grid-template-columns: 2.5fr 1.8fr 1.8fr;
+    gap: 15px;
+    align-items: start;
+}
+
+.filtro-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.filtro-icon {
+    flex-shrink: 0;
+    color: #9ad2ea;
+    width: 22px;
+    height: 22px;
+    align-self: center;
+    transition: color 0.3s;
+}
+
+.filtro-input:focus {
+    outline: none;
+    border-color: #9ad2ea;
+    box-shadow: 0 0 0 3px rgba(154, 210, 234, 0.15);
+}
+
+.filtro-input-wrapper:focus-within .filtro-icon {
+    color: #6bbcd6;
+}
+
+.filtro-input {
+    flex: 1;
+    padding: 13px 40px 13px 16px;
+    border: 2px solid #d7eaf1;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    transition: all 0.3s;
+    background: #fff;
+    line-height: 1.4;
+    height: 48px;
+    box-sizing: border-box;
+}
+
+/* Ajustar padding quando o botão limpar está visível */
+.filtro-input-wrapper.has-clear-btn .filtro-input {
+    padding-right: 50px;
+}
+
+/* O ícone agora está ao lado, então não precisa de padding extra à esquerda */
+
+.filtro-input::placeholder {
+    color: #999;
+}
+
+.filtro-input-wrapper .btn-limpar-filtro {
+    position: absolute;
+    right: 6px;
+    padding: 6px;
+    background: transparent;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s;
+    z-index: 2;
+    width: 28px;
+    height: 28px;
+}
+
+.filtro-input-wrapper .btn-limpar-filtro:hover {
+    background: #f0f0f0;
+    color: #666;
+}
+
+.filtro-input-wrapper .btn-limpar-filtro svg {
+    width: 16px;
+    height: 16px;
+}
+
+.filtro-select {
+    width: 100%;
+    min-width: 220px;
+    padding: 13px 40px 13px 16px;
+    border: 2px solid #d7eaf1;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    font-weight: 600;
+    color: #333;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.3s;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ad2ea' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 12px;
+    height: 48px;
+    box-sizing: border-box;
+}
+
+.filtro-select:focus {
+    outline: none;
+    border-color: #9ad2ea;
+    box-shadow: 0 0 0 3px rgba(154, 210, 234, 0.15);
+}
+
+.filtro-select:hover {
+    border-color: #9ad2ea;
+}
+
+.resultado-busca {
+    margin-top: 16px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.resultado-busca.com-resultado {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.resultado-busca.sem-resultado {
+    background: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+}
+
+.filtro-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+
+.resultado-busca {
+    flex: 1;
+    margin-top: 0;
+}
+
+.btn-limpar-todos {
+    padding: 10px 18px;
+    background: #f5f5f5;
+    color: #666;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+    font-family: inherit;
+}
+
+.btn-limpar-todos:hover {
+    background: #e8e8e8;
+    border-color: #9ad2ea;
+    color: #333;
+}
+
+/* Animação para cards ao filtrar */
+.hospital-card {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.hospital-card[style*="display: none"] {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+/* Responsividade do filtro */
+@media (max-width: 768px) {
+    .hospital-filter {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .filtro-select {
+        width: 100%;
+    }
+
+    .filtro-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-limpar-todos {
+        width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .hospital-filter-wrapper {
+        padding: 15px;
+    }
+
+    .hospital-filter {
+        gap: 10px;
+    }
+}
+
 /*Estilo imagem tela inicio */
 
 body {
@@ -511,16 +832,16 @@ footer {
 
 main.hero {
     position: relative;
-    flex: 1 0 auto;            
-    display: flex;               
+    flex: 1 0 auto;
+    display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 60vh;         
-    background-image: url("../img/inicio.svg"); 
-    background-size: cover;      
+    min-height: 60vh;
+    background-image: url("../img/inicio.svg");
+    background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    color: #fff;                
+    color: #fff;
 }
 
 /*Overlay escuro para melhorar contraste do conteúdo */
@@ -529,15 +850,16 @@ main.hero::before {
     display: block;
     position: absolute;
     inset: 0;
-    background: rgba(0,0,0,0.25);
+    background: rgba(0, 0, 0, 0.25);
     pointer-events: none;
-    z-index: 1; 
+    z-index: 1;
 }
 
 /* Frase acima da imagem */
 .hero-content {
     position: relative;
-    z-index: 2; /* acima da imagem */
+    z-index: 2;
+    /* acima da imagem */
     text-align: center;
     padding: 20px;
 }
@@ -552,64 +874,207 @@ main.hero::before {
 
 .hero-subtitle {
     font-size: 1.05rem;
-    color: rgba(255,255,255,0.95);
+    color: rgba(255, 255, 255, 0.95);
 }
 
 /*Estilo tela de login*/
 
 .login-container {
-  position: relative;
-  z-index: 2;              
-  max-width: 420px;
-  width: 90%;
-  background: rgb(255, 255, 255); 
-  padding: 28px;
-  border-radius: 10px;
-  box-shadow: #58b4db;
-  color: #244357;
-  font-weight: 700; 
-  text-align: left; 
-  font-family: inherit;
+    position: relative;
+    z-index: 2;
+    max-width: 420px;
+    width: 90%;
+    background: rgb(255, 255, 255);
+    padding: 28px;
+    border-radius: 10px;
+    box-shadow: #58b4db;
+    color: #244357;
+    font-weight: 700;
+    text-align: left;
+    font-family: inherit;
 }
 
 /*Coloquei pra centralizar o login*/
 .login-container h2 {
-  text-align: center;
-  font-weight: 700;
-  margin: 0 0 16px; 
+    text-align: center;
+    font-weight: 700;
+    margin: 0 0 16px;
 }
 
 /*Para manter a esquerda*/
 .login-container label {
-  display: block;
-  text-align: left;
-  font-weight: 700;
-  margin-bottom: 6px;
+    display: block;
+    text-align: left;
+    font-weight: 700;
+    margin-bottom: 6px;
 }
 
 .login-container input[type="text"],
 .login-container input[type="email"],
 .login-container input[type="password"] {
-  width: 100%;
-  padding: 11px 14px;
-  margin: 8px 0 14px;
-  border: 2px solid #d7eaf1;
-  border-radius: 8px;
-  box-sizing: border-box;
-  font-weight: 700; 
-  text-align: left;   
-  font-family: inherit; 
+    width: 100%;
+    padding: 11px 14px;
+    margin: 8px 0 14px;
+    border: 2px solid #d7eaf1;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-weight: 700;
+    text-align: left;
+    font-family: inherit;
 }
 
 .login-container input[type="submit"] {
-  width: 100%;
-  background: #9ad2ea;
-  color: #fff;
-  border: none;
-  padding: 10px;
-  border-radius: 6px;
-  font-weight: 700;
-  cursor: pointer;
+    width: 100%;
+    background: #9ad2ea;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/*Estilo tela de registro*/
+
+.registro-container {
+    position: relative;
+    z-index: 2;
+    max-width: 500px;
+    width: 90%;
+    background: rgb(255, 255, 255);
+    padding: 28px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    color: #244357;
+    font-weight: 700;
+    text-align: left;
+    font-family: inherit;
+}
+
+/*Coloquei pra centralizar o registro*/
+.registro-container h2 {
+    text-align: center;
+    font-weight: 700;
+    margin: 0 0 20px;
+}
+
+/*Para manter a esquerda*/
+.registro-container label {
+    display: block;
+    text-align: left;
+    font-weight: 700;
+    margin-bottom: 6px;
+    margin-top: 12px;
+}
+
+.registro-container label:first-of-type {
+    margin-top: 0;
+}
+
+.registro-container input[type="text"],
+.registro-container input[type="email"],
+.registro-container input[type="password"] {
+    width: 100%;
+    padding: 11px 14px;
+    margin: 8px 0 14px;
+    border: 2px solid #d7eaf1;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-weight: 700;
+    text-align: left;
+    font-family: inherit;
+}
+
+.registro-container input[type="submit"] {
+    width: 100%;
+    background: #9ad2ea;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s;
+}
+
+.registro-container input[type="submit"]:hover {
+    background: #6bbcd6;
+}
+
+/* Estilos para tipo de usuário */
+.tipo-usuario-container {
+    margin: 12px 0 20px;
+}
+
+.tipo-opcoes {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.tipo-opcao {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tipo-opcao input[type="radio"] {
+    width: auto;
+    margin: 0;
+    cursor: pointer;
+}
+
+.tipo-opcao label {
+    margin: 0;
+    font-weight: 600;
+    cursor: pointer;
+    color: #244357;
+}
+
+/* Mensagens de erro e sucesso */
+.mensagem-erro {
+    background-color: #fee;
+    color: #c33;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    border: 1px solid #fcc;
+}
+
+.mensagem-erro p {
+    margin: 4px 0;
+    font-size: 0.9em;
+}
+
+.mensagem-sucesso {
+    background-color: #efe;
+    color: #3c3;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    border: 1px solid #cfc;
+    font-size: 0.9em;
+}
+
+/* Link para login */
+.link-login {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.link-login a {
+    color: #9ad2ea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.link-login a:hover {
+    color: #6bbcd6;
+    text-decoration: underline;
 }
 
 /* ESTILO TELA DEPENDENTES */
@@ -633,7 +1098,7 @@ main.hero::before {
 }
 /* Container do Formulário */
 .form-container {
-    max-width: 1200px; 
+    max-width: 1200px;
     margin: 20px auto;
     padding: 20px;
     background: white;
@@ -715,6 +1180,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         max-width: 100%;
         padding: 12px;
     }
+
     .form-container form {
         padding: 18px;
         max-width: 100%;
@@ -802,8 +1268,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 /* Layout */
@@ -885,4 +1356,133 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .btn-proximo:hover,
 .submit-btn:hover {
     background-color: #6ec1e4;
+}
+
+/* Botões compactos usados em listas dinâmicas (ex.: adicionar/remover medicação) */
+.btn-small {
+    padding: 6px 10px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.08s ease;
+}
+
+.btn-small.add {
+    background-color: #6ec1e4;
+    color: #fff;
+}
+.btn-small.add:hover { background-color: #5bb6dc; }
+
+.btn-small.remove {
+    background-color: #666; /* mesma cor do .btn-anterior */
+    color: #fff;
+    border: none;
+}
+.btn-small.remove:hover { background-color: #555; }
+
+.medicacao-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.medicacao-input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* ======= PAGINA HISTORICO ======= */
+/* Estilos adicionais para o layout do histórico (simulando classes utilitárias) */
+.secao-historico {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+
+.tabela-historico {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    /* Garante que o border-radius funcione */
+}
+
+.tabela-historico th,
+.tabela-historico td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.tabela-historico th {
+    background-color: #6ec1e4;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.tabela-historico tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.tabela-historico tr:hover {
+    background-color: #e9e9e9;
+}
+
+.mensagem-vazio {
+    text-align: center;
+    padding: 2rem;
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+    border-radius: 4px;
+}
+
+.filtro-historico {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    background: #ffffff;
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.campo-filtro {
+    display: flex;
+    flex-direction: column;
+}
+
+.campo-filtro label {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.campo-filtro input,
+.campo-filtro select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.btn-filtrar {
+    background: #6ec1e4;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 1.4rem;
+}
+
+.btn-filtrar:hover {
+    background: #5bb0d1;
 }
