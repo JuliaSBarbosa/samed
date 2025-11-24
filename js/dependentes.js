@@ -1,5 +1,11 @@
+// === SCRIPT UNIFICADO, OTIMIZADO E SEM BUGS ===
+// Tudo em um único DOMContentLoaded
+
 document.addEventListener('DOMContentLoaded', function () {
-    // ===== Modal open/close (se existir) =====
+
+    // ==========================
+    // 1. MODAL (abrir/fechar)
+    // ==========================
     const abrirBtn = document.getElementById('abrir-form');
     const modal = document.getElementById('modal-dependente');
     const fecharBtn = document.getElementById('fechar-modal');
@@ -23,35 +29,19 @@ document.addEventListener('DOMContentLoaded', function () {
         if (abrirBtn) abrirBtn.focus();
     }
 
-    if (abrirBtn && modal) {
-        abrirBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            openModal();
-        });
-    }
+    if (abrirBtn && modal) abrirBtn.addEventListener('click', (e) => { e.preventDefault(); openModal(); });
+    if (fecharBtn) fecharBtn.addEventListener('click', (e) => { e.preventDefault(); closeModal(); });
+    if (overlay) overlay.addEventListener('click', () => closeModal());
+    if (cancelarLink) cancelarLink.addEventListener('click', (e) => { e.preventDefault(); closeModal(); });
 
-    if (fecharBtn) fecharBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-        closeModal();
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) closeModal();
     });
 
-    if (overlay) overlay.addEventListener('click', function () {
-        closeModal();
-    });
 
-    if (cancelarLink) cancelarLink.addEventListener('click', function (e) {
-        // se o cancelar estiver em modal, prevenir e fechar; se for link de página, ele já aponta para dependentes.php
-        e.preventDefault();
-        closeModal();
-    });
-
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
-            closeModal();
-        }
-    });
-
-    // ===== Multi-step initializer (reutilizável) =====
+    // ==========================
+    // 2. MULTI-STEP
+    // ==========================
     function initMultiStep(container) {
         if (!container) return;
         const form = container.querySelector('form');
@@ -68,13 +58,13 @@ document.addEventListener('DOMContentLoaded', function () {
         function validateCurrentStep() {
             const current = formSteps[activeStep];
             if (!current) return true;
-            const requiredFields = Array.from(current.querySelectorAll('[required]'));
-            for (const field of requiredFields) {
+            const required = Array.from(current.querySelectorAll('[required]'));
+
+            for (const field of required) {
                 if (field.disabled) continue;
-                const v = (field.value || '').trim();
-                if (!v) {
+                if (!field.value.trim()) {
+                    alert('Preencha o campo obrigatório: ' + (field.previousElementSibling?.textContent || field.name));
                     field.focus();
-                    alert('Por favor, preencha o campo obrigatório: ' + (field.previousElementSibling ? field.previousElementSibling.textContent : field.name));
                     return false;
                 }
             }
@@ -82,65 +72,194 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         function updateStepDisplay() {
-            formSteps.forEach((stepEl, idx) => {
-                stepEl.classList.toggle('active', idx === activeStep);
+            formSteps.forEach((s, i) => s.classList.toggle('active', i === activeStep));
+            progressSteps.forEach((s, i) => {
+                s.classList.toggle('active', i === activeStep);
+                s.classList.toggle('completed', i < activeStep);
             });
 
-            progressSteps.forEach((p, idx) => {
-                p.classList.toggle('active', idx === activeStep);
-                p.classList.toggle('completed', idx < activeStep);
-            });
+            const prevButtons = container.querySelectorAll(prevSelector);
+            const nextButtons = container.querySelectorAll(nextSelector);
 
-            // atualizar visibilidade consultando os seletores (mais robusto)
-            const prevButtons = Array.from(container.querySelectorAll(prevSelector));
-            const nextButtons = Array.from(container.querySelectorAll(nextSelector));
-
-            prevButtons.forEach((btn) => {
-                btn.style.display = activeStep === 0 ? 'none' : '';
-            });
-
-            nextButtons.forEach((btn) => {
-                btn.style.display = activeStep === formSteps.length - 1 ? 'none' : '';
-            });
-
+            prevButtons.forEach(btn => btn.style.display = activeStep === 0 ? 'none' : '');
+            nextButtons.forEach(btn => btn.style.display = activeStep === formSteps.length - 1 ? 'none' : '');
             if (submitButton) submitButton.style.display = activeStep === formSteps.length - 1 ? '' : 'none';
         }
 
-        // Delegação: capturar cliques nos botões mesmo que a NodeList mude
         container.addEventListener('click', function (e) {
             const nextBtn = e.target.closest(nextSelector);
             if (nextBtn) {
                 e.preventDefault();
                 if (!validateCurrentStep()) return;
-                if (activeStep < formSteps.length - 1) {
-                    activeStep++;
-                    updateStepDisplay();
-                }
+                if (activeStep < formSteps.length - 1) activeStep++;
+                updateStepDisplay();
                 return;
             }
 
             const prevBtn = e.target.closest(prevSelector);
             if (prevBtn) {
                 e.preventDefault();
-                if (activeStep > 0) {
-                    activeStep--;
-                    updateStepDisplay();
-                }
-                return;
+                if (activeStep > 0) activeStep--;
+                updateStepDisplay();
             }
         });
 
-        // inicializar visual
         updateStepDisplay();
     }
 
-    // Inicializa para formulário embutido na página
-    const pageFormContainer = document.querySelector('.form-container');
-    if (pageFormContainer) initMultiStep(pageFormContainer);
+    // Inicializa multi-step
+    initMultiStep(document.querySelector('.form-container'));
+    if (modal) initMultiStep(modal);
 
-    // Inicializa para modal (se existir)
-    if (modal) {
-        initMultiStep(modal);
+
+    // ==========================
+    // 3. DOENÇAS CRÔNICAS → campo "Outra"
+    // ==========================
+    function mostrarOutroCampo() {
+        const select = document.getElementById('doencas');
+        const div = document.getElementById('campoOutraDoenca');
+        const input = document.getElementById('outraDoenca');
+        if (!select || !div || !input) return;
+
+        if (select.value === 'outra_nao_listada') {
+            div.style.display = 'block';
+            input.required = true;
+        } else {
+            div.style.display = 'none';
+            input.required = false;
+            input.value = '';
+        }
     }
 
+    const selectDoencas = document.getElementById('doencas');
+    if (selectDoencas) {
+        selectDoencas.addEventListener('change', mostrarOutroCampo);
+        mostrarOutroCampo();
+    }
+
+
+    // ==========================
+    // 4. PARENTESCO → campo "Outro"
+    // ==========================
+    function mostrarOutroParentesco() {
+        const select = document.getElementById('parentesco');
+        const div = document.getElementById('campoOutroParentesco');
+        const input = document.getElementById('outroParentesco');
+        if (!select || !div || !input) return;
+
+        if (select.value === 'Outro') {
+            div.style.display = 'block';
+            input.required = true;
+        } else {
+            div.style.display = 'none';
+            input.required = false;
+            input.value = '';
+        }
+    }
+
+    const selectParentesco = document.getElementById('parentesco');
+    if (selectParentesco) {
+        selectParentesco.addEventListener('change', mostrarOutroParentesco);
+        mostrarOutroParentesco();
+    }
+
+
+    // ==========================
+    // 5. ALERGIAS → mostrar descrição
+    // ==========================
+    function mostrarCampoAlergia() {
+        const select = document.getElementById('alergias');
+        const campo = document.getElementById('campoDescricao');
+        if (!select || !campo) return;
+
+        campo.style.display = select.value !== '' ? 'block' : 'none';
+    }
+
+    const selectAlergia = document.getElementById('alergias');
+    if (selectAlergia) {
+        selectAlergia.addEventListener('change', mostrarCampoAlergia);
+        mostrarCampoAlergia();
+    }
+
+
+    // ==========================
+    // 6. DOENÇA MENTAL → campo "Outra"
+    // ==========================
+    function mostrarOutraDoencaMental() {
+        const select = document.getElementById('doenca_mental');
+        const div = document.getElementById('campoOutraDoencaMental');
+        const input = document.getElementById('outraDoencaMental');
+        if (!select || !div || !input) return;
+
+        if (select.value === 'outra') {
+            div.style.display = 'block';
+            input.required = true;
+        } else {
+            div.style.display = 'none';
+            input.required = false;
+            input.value = '';
+        }
+    }
+
+    const selectDM = document.getElementById('doenca_mental');
+    if (selectDM) {
+        selectDM.addEventListener('change', mostrarOutraDoencaMental);
+        mostrarOutraDoencaMental();
+    }
+
+
+    // ==========================
+    // 7. MEDICAÇÃO — campos dinâmicos
+    // ==========================
+    const medicacoesWrapper = document.getElementById('medicacoes-wrapper');
+    const adicionarMedicacaoBtn = document.getElementById('adicionar-medicacao');
+
+    function updateRemoverButtons() {
+        if (!medicacoesWrapper) return;
+        const items = medicacoesWrapper.querySelectorAll('.medicacao-item');
+        items.forEach((it) => {
+            const btn = it.querySelector('.remover-medicacao');
+            btn.style.display = items.length > 1 ? '' : 'none';
+        });
+    }
+
+    if (adicionarMedicacaoBtn && medicacoesWrapper) {
+        adicionarMedicacaoBtn.addEventListener('click', () => {
+            const item = document.createElement('div');
+            item.className = 'medicacao-item';
+            item.style.marginTop = '8px';
+            item.innerHTML = `
+                <input type="text" name="medicacao[]" class="medicacao-input" placeholder="Nome do medicamento">
+                <button type="button" class="remover-medicacao btn-small remove">Remover</button>
+            `;
+            medicacoesWrapper.appendChild(item);
+            updateRemoverButtons();
+        });
+
+        medicacoesWrapper.addEventListener('click', (e) => {
+            const rm = e.target.closest('.remover-medicacao');
+            if (rm) {
+                rm.closest('.medicacao-item').remove();
+                updateRemoverButtons();
+            }
+        });
+
+        updateRemoverButtons();
+    }
+
+});
+
+
+ // ==========================
+    // 6. DISPOSITIVO IMPLANTADO → campo "Outra"
+    // ==========================
+
+document.getElementById("dispositivo").addEventListener("change", function () {
+    const campoOutro = document.getElementById("campoOutroDispositivo");
+
+    if (this.value === "outro") {
+        campoOutro.style.display = "block";
+    } else {
+        campoOutro.style.display = "none";
+    }
 });
