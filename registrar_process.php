@@ -1,5 +1,6 @@
 <?php
 require_once 'config.php';
+require_once 'validar_registros.php';
 
 // Verificar se o formulário foi enviado
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -39,9 +40,15 @@ if ($tipo === 'medico') {
     if (empty($crm)) {
         $erros[] = "CRM é obrigatório para médicos.";
     } else {
-        // Validar formato básico do CRM (ex: 123456-SP)
-        if (!preg_match('/^[0-9]{4,10}-?[A-Z]{2}$/i', $crm)) {
-            $erros[] = "Formato de CRM inválido. Use o formato: 123456-SP";
+        // Validar CRM usando função de validação
+        $validacao_crm = validarCRM($crm);
+        if (!$validacao_crm['valido']) {
+            $erros[] = $validacao_crm['mensagem'];
+        } else {
+            // Se a validação retornou dados, usar o CRM formatado
+            if (isset($validacao_crm['dados']['crm_formatado'])) {
+                $crm = $validacao_crm['dados']['crm_formatado'];
+            }
         }
     }
 }
@@ -50,9 +57,15 @@ if ($tipo === 'enfermeiro') {
     if (empty($coren)) {
         $erros[] = "COREN é obrigatório para enfermeiros.";
     } else {
-        // Validar formato básico do COREN (ex: 123456-SP)
-        if (!preg_match('/^[0-9]{4,10}-?[A-Z]{2}$/i', $coren)) {
-            $erros[] = "Formato de COREN inválido. Use o formato: 123456-SP";
+        // Validar COREN usando função de validação
+        $validacao_coren = validarCOREN($coren);
+        if (!$validacao_coren['valido']) {
+            $erros[] = $validacao_coren['mensagem'];
+        } else {
+            // Se a validação retornou dados, usar o COREN formatado
+            if (isset($validacao_coren['dados']['coren_formatado'])) {
+                $coren = $validacao_coren['dados']['coren_formatado'];
+            }
         }
     }
 }
@@ -117,4 +130,3 @@ try {
     exit;
 }
 ?>
-
