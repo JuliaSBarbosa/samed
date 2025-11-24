@@ -8,6 +8,8 @@
     <title>SAMED - Início</title>
     <link rel="stylesheet" href="estilos/style.css">
     <link rel="icon" href="img/logo.svg" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 
 <body>
@@ -24,6 +26,8 @@
             <a href="perfil.php">MEU PERFIL</a>
             <span class="divisor">|</span>
              <a href="dependentes.php">DEPENDENTES</a>
+            <span class="divisor">|</span>
+            <a href="historico.php">HISTÓRICO</a>
             <span class="divisor">|</span>
             <a href="hospital.php">UNIDADES DE SAÚDE</a>
         </nav>
@@ -45,7 +49,13 @@
                     <p>Acesse a sua ficha de informações</p>
                 </div>
             </a>
-
+            <a href="dependentes.php" class="link-card">
+                <div class="card">
+                    <img src="img/dependentes.svg" alt="Dependentes" class="icone">
+                    <p>Dados dos Dependentes</p>
+                </div>
+            </a>
+            
             <a href="hospital.php" class="link-card">
                 <div class="card">
                     <img src="img/local.svg" alt="Hospitais" class="icone">
@@ -53,28 +63,21 @@
                 </div>
             </a>
 
-            <a href="dependentes.php" class="link-card">
-                <div class="card">
-                    <img src="img/dependentes.svg" alt="Dependentes" class="icone">
-                    <p>Dados dos Dependentes</p>
-                </div>
-            </a>
-
         </div>
     </main>
-
-    <!-- Rodapé -->
+  <!-- Rodapé -->
     <footer>
         <div class="footer-logo">
-            <img src="img/logo.svg" alt="Logo SAMED">
+            <img src="img/logo-branco.png" alt="Logo SAMED">
             <h1>SAMED</h1>
         </div>
-        <p>DESENVOLVIDO POR GRUPO AINDA SEM NOME.</p>
+        <p>&copy; 2025 Grupo SAMED. Todos os direitos reservados.</p>
         <div class="lojas">
-            <img src="img/appstore.png" alt="App Store">
-            <img src="img/googleplay.png" alt="Google Play">
+            <img src="img/appstore.webp" alt="App Store">
+             <img src="img/googleplay.webp" alt="App Store">
         </div>
     </footer>
+   
 </body>
 
 </html>
