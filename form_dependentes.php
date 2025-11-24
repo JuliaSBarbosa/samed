@@ -1,3 +1,6 @@
+<?php
+require_once 'verificar_login.php';
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -24,6 +27,8 @@
             <span class="divisor">|</span>
             <a href="dependentes.php" class="ativo">DEPENDENTES</a>
             <span class="divisor">|</span>
+            <a href="historico.php">HISTÓRICO</a>
+            <span class="divisor">|</span>
             <a href="hospital.php">UNIDADES DE SAÚDE</a>
         </nav>
 
@@ -32,141 +37,366 @@
             SAIR
         </a>
     </header>
- <!-- Conteúdo principal -->
-        <div class="form-container">
-            <!-- Barra de progresso -->
-            <div class="progress-bar">
-                <div class="step active" data-step="1">
-                    <span>1</span>
-                    <span class="step-title">Básicas</span>
-                </div>
-                <div class="step" data-step="2">
-                    <span>2</span>
-                    <span class="step-title">Emergência</span>
-                </div>
-                <div class="step" data-step="3">
-                    <span>3</span>
-                    <span class="step-title">Médicas</span>
-                </div>
-                <div class="step" data-step="4">
-                    <span>4</span>
-                    <span class="step-title">Histórico</span>
-                </div>
+    <!-- Conteúdo principal -->
+    <div class="form-container">
+        <?php
+        // Exibir mensagens de erro
+        if (isset($_SESSION['erros']) && !empty($_SESSION['erros'])) {
+            echo '<div class="mensagem-erro">';
+            foreach ($_SESSION['erros'] as $erro) {
+                echo '<p>' . htmlspecialchars($erro) . '</p>';
+            }
+            echo '</div>';
+            unset($_SESSION['erros']);
+        }
+
+        // Exibir mensagem de sucesso
+        if (isset($_SESSION['sucesso'])) {
+            echo '<div class="mensagem-sucesso">' . htmlspecialchars($_SESSION['sucesso']) . '</div>';
+            unset($_SESSION['sucesso']);
+        }
+        ?>
+        <!-- Barra de progresso -->
+        <div class="progress-bar">
+            <div class="step active" data-step="1">
+                <span>1</span>
+                <span class="step-title">Básicas</span>
+            </div>
+            <div class="step" data-step="2">
+                <span>2</span>
+                <span class="step-title">Emergência</span>
+            </div>
+            <div class="step" data-step="3">
+                <span>3</span>
+                <span class="step-title">Médicas</span>
+            </div>
+            <div class="step" data-step="4">
+                <span>4</span>
+                <span class="step-title">Histórico</span>
+            </div>
+        </div>
+
+        <form id="dependenteForm" action="registrar_dependente.php" method="post">
+            <!-- Etapa 1: Informações Básicas -->
+            <div class="form-step active" id="step1" data-step="1">
+                <h2>Informações básicas</h2> <br>
+                <label for="nome">Nome completo</label>
+                <input type="text" id="nome" name="nome" required>
+
+                <label for="data_nascimento">Data de nascimento</label>
+                <input type="date" id="data_nascimento" name="data_nascimento" required>
+
+                <label for="sexo">Sexo</label>
+                <select id="sexo" name="sexo" required>
+                    <option value="">Selecione</option>
+                    <option value="masculino">Masculino</option>
+                    <option value="feminino">Feminino</option>
+                    <option value="outro">Outro</option>
+                </select>
+
+                <label for="cpf">CPF</label>
+                <input type="text" id="cpf" name="cpf">
+
+                <label for="telefone">Telefone</label>
+                <input type="tel" id="telefone" name="telefone">
+
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email">
             </div>
 
-            <form id="dependenteForm" action="registrar_dependente.php" method="post" >
-                <!-- Etapa 1: Informações Básicas -->
-                <div class="form-step active" id="step1" data-step="1">
-                    <h2>Informações básicas</h2>
-                    <label for="nome">Nome completo</label>
-                    <input type="text" id="nome" name="nome" required>
+            <!-- Etapa 2: Contato de Emergência -->
+            <div class="form-step" id="step2" data-step="2">
+                <h2>CONTATO DE EMERGÊNCIA</h2> <br>
 
-                    <label for="data_nascimento">Data de nascimento</label>
-                    <input type="date" id="data_nascimento" name="data_nascimento" required>
+                <label for="contato_nome">Nome do contato</label>
+                <input type="text" id="contato_nome" name="contato_nome" required>
 
-                    <label for="sexo">Sexo</label>
-                    <select id="sexo" name="sexo" required>
-                        <option value="">Selecione</option>
-                        <option value="masculino">Masculino</option>
-                        <option value="feminino">Feminino</option>
-                        <option value="outro">Outro</option>
-                    </select>
+                <label for="parentesco">Parentesco</label>
+                <select id="parentesco" name="parentesco">
+                    <option value="">Selecione</option>
 
-                    <label for="cpf">CPF</label>
-                    <input type="text" id="cpf" name="cpf">
+                    <!-- Pais -->
+                    <option>Pai</option>
+                    <option>Mãe</option>
+                    <option>Padrasto</option>
+                    <option>Madrasta</option>
 
-                    <label for="telefone">Telefone</label>
-                    <input type="tel" id="telefone" name="telefone">
+                    <!-- Filhos -->
+                    <option>Filho</option>
+                    <option>Filha</option>
+                    <option>Enteado</option>
+                    <option>Enteada</option>
 
-                    <label for="email">E-mail</label>
-                    <input type="email" id="email" name="email">
+                    <!-- Cônjuges / Parceiros -->
+                    <option>Esposo</option>
+                    <option>Esposa</option>
+                    <option>Companheiro</option>
+                    <option>Companheira</option>
+
+                    <!-- Avós -->
+                    <option>Avô</option>
+                    <option>Avó</option>
+
+                    <!-- Netos -->
+                    <option>Neto</option>
+                    <option>Neta</option>
+
+                    <!-- Irmãos -->
+                    <option>Irmão</option>
+                    <option>Irmã</option>
+
+                    <!-- Tios -->
+                    <option>Tio</option>
+                    <option>Tia</option>
+
+                    <!-- Sobrinhos -->
+                    <option>Sobrinho</option>
+                    <option>Sobrinha</option>
+
+                    <!-- Primos -->
+                    <option>Primo</option>
+                    <option>Prima</option>
+
+                    <!-- Outros parentes -->
+                    <option>Cunhado</option>
+                    <option>Cunhada</option>
+                    <option>Genro</option>
+                    <option>Nora</option>
+                    <option>Sogro</option>
+                    <option>Sogra</option>
+
+                    <!-- Geral -->
+                    <option>Tutor</option>
+                    <option>Responsável</option>
+                    <option>Amigo</option>
+                    <option>Outro</option>
+                </select>
+
+                <div id="campoOutroParentesco" style="display: none; margin-top: 10px;">
+                    <label for="outroParentesco">Qual?</label>
+                    <input type="text" id="outroParentesco" name="outro_parentesco" placeholder="Descreva o parentesco">
                 </div>
 
-                <!-- Etapa 2: Contato de Emergência -->
-                <div class="form-step" id="step2" data-step="2">
-                        <h2>CONTATO DE EMERGÊNCIA</h2>
 
-                        <label for="contato_nome">Nome do contato</label>
-                        <input type="text" id="contato_nome" name="contato_nome" required>
+                <label for="contato_telefone">Telefone</label>
+                <input type="tel" id="contato_telefone" name="contato_telefone" required>
 
-                        <label for="parentesco">Parentesco</label>
-                        <input type="text" id="parentesco" name="parentesco">
+            </div>
 
-                        <label for="contato_telefone">Telefone</label>
-                        <input type="tel" id="contato_telefone" name="contato_telefone" required>
-                    
+            <!-- Etapa 3: Informações Médicas -->
+            <div class="form-step" id="step3" data-step="3">
+                <h2>INFORMAÇÕES MÉDICAS</h2> <br>
+
+                <label for="doencas">Doenças crônicas</label>
+                <select id="doencas" name="doencas">
+
+                    <option value="">Nenhuma</option>
+
+                    <optgroup label="Doenças Cardiovasculares">
+                        <option value="hipertensao">Hipertensão arterial</option>
+                        <option value="insuficiencia_cardiaca">Insuficiência cardíaca</option>
+                        <option value="arritmias_cronicas">Arritmias crônicas</option>
+                        <option value="doenca_arterial_coronariana">Doença arterial coronariana</option>
+                        <option value="aterosclerose">Aterosclerose</option>
+                        <option value="doenca_vascular_periferica">Doença vascular periférica</option>
+                    </optgroup>
+
+                    <optgroup label="Doenças Endócrinas e Metabólicas">
+                        <option value="diabetes_tipo1">Diabetes tipo 1</option>
+                        <option value="diabetes_tipo2">Diabetes tipo 2</option>
+                        <option value="hipotireoidismo">Hipotireoidismo</option>
+                        <option value="hipertireoidismo">Hipertireoidismo</option>
+                        <option value="obesidade_cronica">Obesidade crônica</option>
+                        <option value="sindrome_metabolica">Síndrome metabólica</option>
+                    </optgroup>
+
+                    <optgroup label="Doenças Respiratórias Crônicas">
+                        <option value="asma">Asma</option>
+                        <option value="dpoc">DPOC (Doença Pulmonar Obstrutiva Crônica)</option>
+                        <option value="bronquite_cronica">Bronquite crônica</option>
+                        <option value="enfisema">Enfisema</option>
+                        <option value="fibrose_pulmonar">Fibrose pulmonar</option>
+                    </optgroup>
+
+                    <optgroup label="Doenças Autoimunes">
+                        <option value="artrite_reumatoide">Artrite reumatoide</option>
+                        <option value="lupus">Lúpus (LES)</option>
+                        <option value="psoriase">Psoríase</option>
+                        <option value="doenca_celiaca">Doença celíaca</option>
+                        <option value="tireoidite_hashimoto">Tireoidite de Hashimoto</option>
+                        <option value="doenca_de_crohn">Doença de Crohn</option>
+                        <option value="retocolite_ulcerativa">Retocolite ulcerativa</option>
+                    </optgroup>
+
+                    <optgroup label="Doenças Neurológicas">
+                        <option value="epilepsia">Epilepsia</option>
+                        <option value="enxaqueca_cronica">Enxaqueca crônica</option>
+                        <option value="doenca_de_parkinson">Doença de Parkinson</option>
+                        <option value="esclerose_multipla">Esclerose múltipla</option>
+                        <option value="neuropatias_perifericas">Neuropatias periféricas</option>
+                    </optgroup>
+
+                    <optgroup label="Doenças Musculoesqueléticas">
+                        <option value="artrose_osteoartrite">Artrose / Osteoartrite</option>
+                        <option value="fibromialgia">Fibromialgia</option>
+                        <option value="lombalgia_cronica">Lombalgia crônica</option>
+                        <option value="osteoporose">Osteoporose</option>
+                    </optgroup>
+
+                    <optgroup label="Doenças Hepáticas e Renais">
+                        <option value="hepatite_cronica">Hepatite crônica</option>
+                        <option value="cirrose">Cirrose</option>
+                        <option value="esteatose_hepatica_cronica">Esteatose hepática (gordura no fígado) crônica
+                        </option>
+                        <option value="doenca_renal_cronica">Doença renal crônica</option>
+                        <option value="insuficiencia_renal">Insuficiência renal</option>
+                    </optgroup>
+
+                    <optgroup label="Doenças Gastrointestinais">
+                        <option value="refluxo_gastroesofagico_cronico">Refluxo gastroesofágico crônico (GERD)</option>
+                        <option value="sindrome_do_intestino_irritavel">Síndrome do intestino irritável (SII)</option>
+                        <option value="gastrite_cronica">Gastrite crônica</option>
+                    </optgroup>
+
+                    <optgroup label="Outras Condições Crônicas">
+                        <option value="cancer">Câncer (em acompanhamento ou histórico)</option>
+                        <option value="hiv">HIV</option>
+                        <option value="doencas_hematologicas">Doenças hematológicas</option>
+                    </optgroup>
+
+                    <option value="outra_nao_listada">Outra doença não listada acima</option>
+                </select>
+
+                <div id="campoOutraDoenca" style="display: none; margin-top: 10px;">
+                    <label for="outraDoenca">Qual?</label>
+                    <input type="text" id="outraDoenca" name="outraDoenca" placeholder="Digite o nome da doença">
                 </div>
 
-                <!-- Etapa 3: Informações Médicas -->
-                <div class="form-step" id="step3" data-step="3">
-                        <h2>INFORMAÇÕES MÉDICAS</h2>
 
-                        <label for="doencas">Doenças crônicas</label>
-                        <textarea id="doencas" name="doencas" rows="3"></textarea>
+                <label for="alergias">Tipo de alergia</label>
+                <select id="alergias" name="alergias" onchange="mostrarCampoAlergia()">
+                    <option value="">Nenhuma</option>
+                    <option value="alimentar">Alergia alimentar</option>
+                    <option value="medicamentos">Alergia medicamentosa</option>
+                    <option value="respiratoria">Alergia respiratória</option>
+                    <option value="dermatologica">Alergia dermatológica</option>
+                    <option value="inseto">Alergia a picada de inseto</option>
+                    <option value="quimica">Alergia química</option>
+                    <option value="fisica">Alergia física</option>
+                    <option value="outra">Outra</option>
+                </select>
 
-                        <label for="alergias">Alergias</label>
-                        <textarea id="alergias" name="alergias" rows="2"></textarea>
-
-                        <label for="tipo_sanguineo">Tipo sanguíneo</label>
-                        <select id="tipo_sanguineo" name="tipo_sanguineo">
-                            <option value="">Selecione</option>
-                            <option value="A+">A+</option>
-                            <option value="A-">A-</option>
-                            <option value="B+">B+</option>
-                            <option value="B-">B-</option>
-                            <option value="AB+">AB+</option>
-                            <option value="AB-">AB-</option>
-                            <option value="O+">O+</option>
-                            <option value="O-">O-</option>
-                        </select>
-
-                        <label for="medicacao">Medicação de uso contínuo</label>
-                        <textarea id="medicacao" name="medicacao" rows="2"></textarea>
-
-                        <label for="doenca_mental">Doença mental</label>
-                        <textarea id="doenca_mental" name="doenca_mental" rows="2"></textarea>
-
-                        <label for="dispositivo">Dispositivo implantado</label>
-                        <textarea id="dispositivo" name="dispositivo" rows="2"></textarea>
-
-                        <label for="info_relevantes">Informações relevantes</label>
-                        <textarea id="info_relevantes" name="info_relevantes" rows="3"></textarea>
-                
+                <!-- Campo aparece só quando tiver alergia -->
+                <div id="campoDescricao" style="display:none; margin-top:10px;">
+                    <label for="descricaoAlergia">Qual alergia?</label>
+                    <input type="text" id="descricaoAlergia" name="descricaoAlergia" placeholder="Descreva a alergia">
                 </div>
 
-                <!-- Etapa 4: Histórico Médico -->
-                <div class="form-step" id="step4" data-step="4">
-                        <h2>HISTÓRICO MÉDICO</h2>
+                <label for="tipo_sanguineo">Tipo sanguíneo</label>
+                <select id="tipo_sanguineo" name="tipo_sanguineo">
+                    <option value="">Selecione</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                </select>
 
-                        <label for="cirurgias">Cirurgias</label>
-                        <textarea id="cirurgias" name="cirurgias" rows="4"></textarea>
-                  
+                <label for="medicacao">Medicação de uso contínuo</label>
+                <div id="medicacoes-wrapper">
+                    <div class="medicacao-item">
+                        <input type="text" name="medicacao[]" class="medicacao-input" placeholder="Nome do medicamento">
+                        <button type="button" class="remover-medicacao btn-small remove">Remover</button>
+                    </div>
                 </div>
-                <!-- Botões de navegação -->
-                <div class="button-group">
-                    <button type="button" class="btn-anterior">Anterior</button>
-                    <div style="flex:1"></div>
-                    <button type="button" class="btn-proximo">Próximo</button>
-                    <button type="submit" class="submit-btn">Salvar Dependente</button>
+                <button type="button" id="adicionar-medicacao" class="btn-small add" style="margin-top:8px;">Adicionar
+                    medicação</button> <br>
+                <br>
+
+                <label for="doenca_mental">Doença mental</label>
+                <select id="doenca_mental" name="doenca_mental">
+                    <option value="">Nenhuma</option>
+                    <option value="depressao">Depressão</option>
+                    <option value="ansiedade">Transtorno de Ansiedade</option>
+                    <option value="bipolaridade">Transtorno Bipolar</option>
+                    <option value="esquizofrenia">Esquizofrenia</option>
+                    <option value="tdah">TDAH (Transtorno do Déficit de Atenção e Hiperatividade)</option>
+                    <option value="toc">TOC (Transtorno Obsessivo-Compulsivo)</option>
+                    <option value="transtorno_estresse_pos_traumatico">Transtorno de Estresse Pós-Traumático</option>
+                    <option value="outra">Outra</option>
+                </select>
+
+                <div id="campoOutraDoencaMental" style="display: none; margin-top: 10px;">
+                    <label for="outraDoencaMental">Qual?</label>
+                    <input type="text" id="outraDoencaMental" name="outraDoencaMental"
+                        placeholder="Digite o nome da doença">
                 </div>
-            </form>
-        </div>
+
+                <label for="dispositivo">Dispositivo implantado</label>
+                <select id="dispositivo" name="dispositivo">
+                    <option value="">Nenhum</option>
+                    <option value="marca_passo">Marca-passo</option>
+                    <option value="stent_cardiaco">Stent cardíaco</option>
+                    <option value="valvula_cardiaca">Prótese de válvula cardíaca</option>
+                    <option value="derivacao_cerebral">Derivação ventricular (shunt)</option>
+                    <option value="implante_cochlear">Implante coclear</option>
+                    <option value="proteses_ortopedicas">Próteses ortopédicas</option>
+                    <option value="dispositivo_contraceptivo">Dispositivo contraceptivo</option>
+                    <option value="outro">Outro</option>
+                </select>
+
+                <div id="campoOutroDispositivo" style="display: none; margin-top: 10px;">
+                    <label for="outroDispositivo">Qual?</label>
+                    <input type="text" id="outroDispositivo" name="outroDispositivo"
+                        placeholder="Digite o nome do dispositivo">
+                </div>
+
+                <label for="info_relevantes">Informações relevantes</label>
+                <textarea id="info_relevantes" name="info_relevantes" rows="3"></textarea>
+
+            </div>
+
+            <!-- Etapa 4: Histórico Médico -->
+            <div class="form-step" id="step4" data-step="4">
+                <h2>HISTÓRICO MÉDICO</h2> <br>
+
+                <label for="cirurgias">Cirurgias</label>
+                <textarea id="cirurgias" name="cirurgias" rows="4"></textarea>
+
+                <label for="emergencia">Histórico de emergências</label>
+                <textarea id="emergencia" name="emergencia" rows="4"></textarea>
+
+                <label for="habitos">Hábitos importantes</label>
+                <textarea id="habitos" name="habitos" rows="4"></textarea>
+
+            </div>
+            <!-- Botões de navegação -->
+            <div class="button-group">
+                <button type="button" class="btn-anterior">Anterior</button>
+                <div style="flex:1"></div>
+                <button type="button" class="btn-proximo">Próximo</button>
+                <button type="submit" class="submit-btn">Salvar Dependente</button>
+            </div>
+        </form>
+    </div>
     </section>
-</main>
+    </main>
 
     <!-- Rodapé -->
     <footer>
         <div class="footer-logo">
-            <img src="img/logo.svg" alt="Logo SAMED">
+            <img src="img/logo-branco.png" alt="Logo SAMED">
             <h1>SAMED</h1>
         </div>
-        <p>DESENVOLVIDO POR GRUPO AINDA SEM NOME.</p>
+        <p>&copy; 2025 Grupo SAMED. Todos os direitos reservados.</p>
         <div class="lojas">
-            <img src="img/appstore.png" alt="App Store">
-            <img src="img/googleplay.png" alt="Google Play">
+            <img src="img/appstore.webp" alt="App Store">
+            <img src="img/googleplay.webp" alt="App Store">
         </div>
     </footer>
-
     <script src="js/dependentes.js"></script>
 </body>
 
