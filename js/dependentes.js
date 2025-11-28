@@ -145,28 +145,193 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     // ==========================
-    // 3. DOENÇAS CRÔNICAS → campo "Outra"
+    // 3. DOENÇAS CRÔNICAS — campos dinâmicos
     // ==========================
-    function mostrarOutroCampo() {
-        const select = document.getElementById('doencas');
-        const div = document.getElementById('campoOutraDoenca');
-        const input = document.getElementById('outraDoenca');
-        if (!select || !div || !input) return;
+    const doencasWrapper = document.getElementById('doencas-wrapper');
+    const adicionarDoencaBtn = document.getElementById('adicionar-doenca');
 
-        if (select.value === 'outra_nao_listada') {
-            div.style.display = 'block';
-            input.required = true;
+    function mostrarOutroCampoDoenca(selectElement) {
+        const doencaItem = selectElement.closest('.doenca-item');
+        if (!doencaItem) return;
+        
+        const campoOutra = doencaItem.querySelector('.campo-outra-doenca');
+        const inputOutra = doencaItem.querySelector('.outra-doenca-input');
+        
+        if (!campoOutra || !inputOutra) return;
+
+        if (selectElement.value === 'outra_nao_listada') {
+            campoOutra.style.display = 'block';
+            inputOutra.required = true;
         } else {
-            div.style.display = 'none';
-            input.required = false;
-            input.value = '';
+            campoOutra.style.display = 'none';
+            inputOutra.required = false;
+            inputOutra.value = '';
         }
     }
 
-    const selectDoencas = document.getElementById('doencas');
-    if (selectDoencas) {
-        selectDoencas.addEventListener('change', mostrarOutroCampo);
-        mostrarOutroCampo();
+    function updateRemoverDoencaButtons() {
+        if (!doencasWrapper) return;
+        const items = doencasWrapper.querySelectorAll('.doenca-item');
+        items.forEach((it) => {
+            const btn = it.querySelector('.remover-doenca');
+            if (btn) btn.style.display = items.length > 1 ? '' : 'none';
+        });
+    }
+
+    function updateAdicionarDoencaButton() {
+        if (!doencasWrapper || !adicionarDoencaBtn) return;
+        const items = doencasWrapper.querySelectorAll('.doenca-item');
+        let temSelecao = false;
+        
+        items.forEach((item) => {
+            const select = item.querySelector('.doenca-select');
+            if (select && select.value !== '') {
+                temSelecao = true;
+            }
+        });
+        
+        adicionarDoencaBtn.style.display = temSelecao ? '' : 'none';
+    }
+
+    function criarSelectDoencas() {
+        return `
+            <option value="">Nenhuma</option>
+
+            <optgroup label="Doenças Cardiovasculares">
+                <option value="hipertensao">Hipertensão arterial</option>
+                <option value="insuficiencia_cardiaca">Insuficiência cardíaca</option>
+                <option value="arritmias_cronicas">Arritmias crônicas</option>
+                <option value="doenca_arterial_coronariana">Doença arterial coronariana</option>
+                <option value="aterosclerose">Aterosclerose</option>
+                <option value="doenca_vascular_periferica">Doença vascular periférica</option>
+            </optgroup>
+
+            <optgroup label="Doenças Endócrinas e Metabólicas">
+                <option value="diabetes_tipo1">Diabetes tipo 1</option>
+                <option value="diabetes_tipo2">Diabetes tipo 2</option>
+                <option value="hipotireoidismo">Hipotireoidismo</option>
+                <option value="hipertireoidismo">Hipertireoidismo</option>
+                <option value="obesidade_cronica">Obesidade crônica</option>
+                <option value="sindrome_metabolica">Síndrome metabólica</option>
+            </optgroup>
+
+            <optgroup label="Doenças Respiratórias Crônicas">
+                <option value="asma">Asma</option>
+                <option value="dpoc">DPOC (Doença Pulmonar Obstrutiva Crônica)</option>
+                <option value="bronquite_cronica">Bronquite crônica</option>
+                <option value="enfisema">Enfisema</option>
+                <option value="fibrose_pulmonar">Fibrose pulmonar</option>
+            </optgroup>
+
+            <optgroup label="Doenças Autoimunes">
+                <option value="artrite_reumatoide">Artrite reumatoide</option>
+                <option value="lupus">Lúpus (LES)</option>
+                <option value="psoriase">Psoríase</option>
+                <option value="doenca_celiaca">Doença celíaca</option>
+                <option value="tireoidite_hashimoto">Tireoidite de Hashimoto</option>
+                <option value="doenca_de_crohn">Doença de Crohn</option>
+                <option value="retocolite_ulcerativa">Retocolite ulcerativa</option>
+            </optgroup>
+
+            <optgroup label="Doenças Neurológicas">
+                <option value="epilepsia">Epilepsia</option>
+                <option value="enxaqueca_cronica">Enxaqueca crônica</option>
+                <option value="doenca_de_parkinson">Doença de Parkinson</option>
+                <option value="esclerose_multipla">Esclerose múltipla</option>
+                <option value="neuropatias_perifericas">Neuropatias periféricas</option>
+            </optgroup>
+
+            <optgroup label="Doenças Musculoesqueléticas">
+                <option value="artrose_osteoartrite">Artrose / Osteoartrite</option>
+                <option value="fibromialgia">Fibromialgia</option>
+                <option value="lombalgia_cronica">Lombalgia crônica</option>
+                <option value="osteoporose">Osteoporose</option>
+            </optgroup>
+
+            <optgroup label="Doenças Hepáticas e Renais">
+                <option value="hepatite_cronica">Hepatite crônica</option>
+                <option value="cirrose">Cirrose</option>
+                <option value="esteatose_hepatica_cronica">Esteatose hepática (gordura no fígado) crônica</option>
+                <option value="doenca_renal_cronica">Doença renal crônica</option>
+                <option value="insuficiencia_renal">Insuficiência renal</option>
+            </optgroup>
+
+            <optgroup label="Doenças Gastrointestinais">
+                <option value="refluxo_gastroesofagico_cronico">Refluxo gastroesofágico crônico (GERD)</option>
+                <option value="sindrome_do_intestino_irritavel">Síndrome do intestino irritável (SII)</option>
+                <option value="gastrite_cronica">Gastrite crônica</option>
+            </optgroup>
+
+            <optgroup label="Outras Condições Crônicas">
+                <option value="cancer">Câncer (em acompanhamento ou histórico)</option>
+                <option value="hiv">HIV</option>
+                <option value="doencas_hematologicas">Doenças hematológicas</option>
+            </optgroup>
+
+            <option value="outra_nao_listada">Outra doença não listada acima</option>
+        `;
+    }
+
+    if (adicionarDoencaBtn && doencasWrapper) {
+        adicionarDoencaBtn.addEventListener('click', () => {
+            const item = document.createElement('div');
+            item.className = 'doenca-item';
+            item.style.marginTop = '8px';
+            item.innerHTML = `
+                <div class="doenca-select-wrapper">
+                    <select name="doencas[]" class="doenca-select">
+                        ${criarSelectDoencas()}
+                    </select>
+                    <button type="button" class="remover-doenca btn-small remove">Remover</button>
+                </div>
+                <div class="campo-outra-doenca" style="display: none; margin-top: 10px;">
+                    <input type="text" name="outraDoenca[]" class="outra-doenca-input" placeholder="Digite o nome da doença">
+                </div>
+            `;
+            doencasWrapper.appendChild(item);
+            
+            // Adicionar listener ao novo select
+            const novoSelect = item.querySelector('.doenca-select');
+            if (novoSelect) {
+                novoSelect.addEventListener('change', function() {
+                    mostrarOutroCampoDoenca(this);
+                    updateAdicionarDoencaButton();
+                });
+            }
+            
+            updateRemoverDoencaButtons();
+            updateAdicionarDoencaButton();
+        });
+
+        // Delegar eventos para selects existentes e futuros
+        doencasWrapper.addEventListener('change', (e) => {
+            if (e.target.classList.contains('doenca-select')) {
+                mostrarOutroCampoDoenca(e.target);
+                updateAdicionarDoencaButton();
+            }
+        });
+
+        doencasWrapper.addEventListener('click', (e) => {
+            const rm = e.target.closest('.remover-doenca');
+            if (rm) {
+                rm.closest('.doenca-item').remove();
+                updateRemoverDoencaButtons();
+                updateAdicionarDoencaButton();
+            }
+        });
+
+        // Inicializar para o primeiro item
+        const primeiroSelect = doencasWrapper.querySelector('.doenca-select');
+        if (primeiroSelect) {
+            primeiroSelect.addEventListener('change', function() {
+                mostrarOutroCampoDoenca(this);
+                updateAdicionarDoencaButton();
+            });
+            mostrarOutroCampoDoenca(primeiroSelect);
+        }
+
+        updateRemoverDoencaButtons();
+        updateAdicionarDoencaButton();
     }
 
 
@@ -197,46 +362,252 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     // ==========================
-    // 5. ALERGIAS → mostrar descrição
+    // 5. ALERGIAS — campos dinâmicos
     // ==========================
-    function mostrarCampoAlergia() {
-        const select = document.getElementById('alergias');
-        const campo = document.getElementById('campoDescricao');
-        if (!select || !campo) return;
+    const alergiasWrapper = document.getElementById('alergias-wrapper');
+    const adicionarAlergiaBtn = document.getElementById('adicionar-alergia');
 
-        campo.style.display = select.value !== '' ? 'block' : 'none';
-    }
+    function mostrarCampoAlergia(selectElement) {
+        const alergiaItem = selectElement.closest('.alergia-item');
+        if (!alergiaItem) return;
+        
+        const campoDescricao = alergiaItem.querySelector('.campo-descricao-alergia');
+        
+        if (!campoDescricao) return;
 
-    const selectAlergia = document.getElementById('alergias');
-    if (selectAlergia) {
-        selectAlergia.addEventListener('change', mostrarCampoAlergia);
-        mostrarCampoAlergia();
-    }
-
-
-    // ==========================
-    // 6. DOENÇA MENTAL → campo "Outra"
-    // ==========================
-    function mostrarOutraDoencaMental() {
-        const select = document.getElementById('doenca_mental');
-        const div = document.getElementById('campoOutraDoencaMental');
-        const input = document.getElementById('outraDoencaMental');
-        if (!select || !div || !input) return;
-
-        if (select.value === 'outra') {
-            div.style.display = 'block';
-            input.required = true;
+        if (selectElement.value !== '') {
+            campoDescricao.style.display = 'block';
         } else {
-            div.style.display = 'none';
-            input.required = false;
-            input.value = '';
+            campoDescricao.style.display = 'none';
+            const inputDescricao = alergiaItem.querySelector('.descricao-alergia-input');
+            if (inputDescricao) inputDescricao.value = '';
         }
     }
 
-    const selectDM = document.getElementById('doenca_mental');
-    if (selectDM) {
-        selectDM.addEventListener('change', mostrarOutraDoencaMental);
-        mostrarOutraDoencaMental();
+    function updateRemoverAlergiaButtons() {
+        if (!alergiasWrapper) return;
+        const items = alergiasWrapper.querySelectorAll('.alergia-item');
+        items.forEach((it) => {
+            const btn = it.querySelector('.remover-alergia');
+            if (btn) btn.style.display = items.length > 1 ? '' : 'none';
+        });
+    }
+
+    function updateAdicionarAlergiaButton() {
+        if (!alergiasWrapper || !adicionarAlergiaBtn) return;
+        const items = alergiasWrapper.querySelectorAll('.alergia-item');
+        let temSelecao = false;
+        
+        items.forEach((item) => {
+            const select = item.querySelector('.alergia-select');
+            if (select && select.value !== '') {
+                temSelecao = true;
+            }
+        });
+        
+        adicionarAlergiaBtn.style.display = temSelecao ? '' : 'none';
+    }
+
+    function criarSelectAlergias() {
+        return `
+            <option value="">Nenhuma</option>
+            <option value="alimentar">Alergia alimentar</option>
+            <option value="medicamentos">Alergia medicamentosa</option>
+            <option value="respiratoria">Alergia respiratória</option>
+            <option value="dermatologica">Alergia dermatológica</option>
+            <option value="inseto">Alergia a picada de inseto</option>
+            <option value="quimica">Alergia química</option>
+            <option value="fisica">Alergia física</option>
+            <option value="outra">Outra</option>
+        `;
+    }
+
+    if (adicionarAlergiaBtn && alergiasWrapper) {
+        adicionarAlergiaBtn.addEventListener('click', () => {
+            const item = document.createElement('div');
+            item.className = 'alergia-item';
+            item.style.marginTop = '8px';
+            item.innerHTML = `
+                <div class="alergia-select-wrapper">
+                    <select name="alergias[]" class="alergia-select">
+                        ${criarSelectAlergias()}
+                    </select>
+                    <button type="button" class="remover-alergia btn-small remove">Remover</button>
+                </div>
+                <div class="campo-descricao-alergia" style="display: none; margin-top: 10px;">
+                    <input type="text" name="descricaoAlergia[]" class="descricao-alergia-input" placeholder="Descreva a alergia">
+                </div>
+            `;
+            alergiasWrapper.appendChild(item);
+            
+            // Adicionar listener ao novo select
+            const novoSelect = item.querySelector('.alergia-select');
+            if (novoSelect) {
+                novoSelect.addEventListener('change', function() {
+                    mostrarCampoAlergia(this);
+                    updateAdicionarAlergiaButton();
+                });
+            }
+            
+            updateRemoverAlergiaButtons();
+            updateAdicionarAlergiaButton();
+        });
+
+        // Delegar eventos para selects existentes e futuros
+        alergiasWrapper.addEventListener('change', (e) => {
+            if (e.target.classList.contains('alergia-select')) {
+                mostrarCampoAlergia(e.target);
+                updateAdicionarAlergiaButton();
+            }
+        });
+
+        alergiasWrapper.addEventListener('click', (e) => {
+            const rm = e.target.closest('.remover-alergia');
+            if (rm) {
+                rm.closest('.alergia-item').remove();
+                updateRemoverAlergiaButtons();
+                updateAdicionarAlergiaButton();
+            }
+        });
+
+        // Inicializar para o primeiro item
+        const primeiroSelect = alergiasWrapper.querySelector('.alergia-select');
+        if (primeiroSelect) {
+            primeiroSelect.addEventListener('change', function() {
+                mostrarCampoAlergia(this);
+                updateAdicionarAlergiaButton();
+            });
+            mostrarCampoAlergia(primeiroSelect);
+        }
+
+        updateRemoverAlergiaButtons();
+        updateAdicionarAlergiaButton();
+    }
+
+
+    // ==========================
+    // 6. DOENÇA MENTAL — campos dinâmicos
+    // ==========================
+    const doencasMentaisWrapper = document.getElementById('doencas-mentais-wrapper');
+    const adicionarDoencaMentalBtn = document.getElementById('adicionar-doenca-mental');
+
+    function mostrarOutraDoencaMental(selectElement) {
+        const doencaMentalItem = selectElement.closest('.doenca-mental-item');
+        if (!doencaMentalItem) return;
+        
+        const campoOutra = doencaMentalItem.querySelector('.campo-outra-doenca-mental');
+        const inputOutra = doencaMentalItem.querySelector('.outra-doenca-mental-input');
+        
+        if (!campoOutra || !inputOutra) return;
+
+        if (selectElement.value === 'outra') {
+            campoOutra.style.display = 'block';
+            inputOutra.required = true;
+        } else {
+            campoOutra.style.display = 'none';
+            inputOutra.required = false;
+            inputOutra.value = '';
+        }
+    }
+
+    function updateRemoverDoencaMentalButtons() {
+        if (!doencasMentaisWrapper) return;
+        const items = doencasMentaisWrapper.querySelectorAll('.doenca-mental-item');
+        items.forEach((it) => {
+            const btn = it.querySelector('.remover-doenca-mental');
+            if (btn) btn.style.display = items.length > 1 ? '' : 'none';
+        });
+    }
+
+    function updateAdicionarDoencaMentalButton() {
+        if (!doencasMentaisWrapper || !adicionarDoencaMentalBtn) return;
+        const items = doencasMentaisWrapper.querySelectorAll('.doenca-mental-item');
+        let temSelecao = false;
+        
+        items.forEach((item) => {
+            const select = item.querySelector('.doenca-mental-select');
+            if (select && select.value !== '') {
+                temSelecao = true;
+            }
+        });
+        
+        adicionarDoencaMentalBtn.style.display = temSelecao ? '' : 'none';
+    }
+
+    function criarSelectDoencasMentais() {
+        return `
+            <option value="">Nenhuma</option>
+            <option value="depressao">Depressão</option>
+            <option value="ansiedade">Transtorno de Ansiedade</option>
+            <option value="bipolaridade">Transtorno Bipolar</option>
+            <option value="esquizofrenia">Esquizofrenia</option>
+            <option value="tdah">TDAH (Transtorno do Déficit de Atenção e Hiperatividade)</option>
+            <option value="toc">TOC (Transtorno Obsessivo-Compulsivo)</option>
+            <option value="transtorno_estresse_pos_traumatico">Transtorno de Estresse Pós-Traumático</option>
+            <option value="outra">Outra</option>
+        `;
+    }
+
+    if (adicionarDoencaMentalBtn && doencasMentaisWrapper) {
+        adicionarDoencaMentalBtn.addEventListener('click', () => {
+            const item = document.createElement('div');
+            item.className = 'doenca-mental-item';
+            item.style.marginTop = '8px';
+            item.innerHTML = `
+                <div class="doenca-mental-select-wrapper">
+                    <select name="doenca_mental[]" class="doenca-mental-select">
+                        ${criarSelectDoencasMentais()}
+                    </select>
+                    <button type="button" class="remover-doenca-mental btn-small remove">Remover</button>
+                </div>
+                <div class="campo-outra-doenca-mental" style="display: none; margin-top: 10px;">
+                    <input type="text" name="outraDoencaMental[]" class="outra-doenca-mental-input" placeholder="Digite o nome da doença">
+                </div>
+            `;
+            doencasMentaisWrapper.appendChild(item);
+            
+            // Adicionar listener ao novo select
+            const novoSelect = item.querySelector('.doenca-mental-select');
+            if (novoSelect) {
+                novoSelect.addEventListener('change', function() {
+                    mostrarOutraDoencaMental(this);
+                    updateAdicionarDoencaMentalButton();
+                });
+            }
+            
+            updateRemoverDoencaMentalButtons();
+            updateAdicionarDoencaMentalButton();
+        });
+
+        // Delegar eventos para selects existentes e futuros
+        doencasMentaisWrapper.addEventListener('change', (e) => {
+            if (e.target.classList.contains('doenca-mental-select')) {
+                mostrarOutraDoencaMental(e.target);
+                updateAdicionarDoencaMentalButton();
+            }
+        });
+
+        doencasMentaisWrapper.addEventListener('click', (e) => {
+            const rm = e.target.closest('.remover-doenca-mental');
+            if (rm) {
+                rm.closest('.doenca-mental-item').remove();
+                updateRemoverDoencaMentalButtons();
+                updateAdicionarDoencaMentalButton();
+            }
+        });
+
+        // Inicializar para o primeiro item
+        const primeiroSelect = doencasMentaisWrapper.querySelector('.doenca-mental-select');
+        if (primeiroSelect) {
+            primeiroSelect.addEventListener('change', function() {
+                mostrarOutraDoencaMental(this);
+                updateAdicionarDoencaMentalButton();
+            });
+            mostrarOutraDoencaMental(primeiroSelect);
+        }
+
+        updateRemoverDoencaMentalButtons();
+        updateAdicionarDoencaMentalButton();
     }
 
 
@@ -255,6 +626,21 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    function updateAdicionarMedicacaoButton() {
+        if (!medicacoesWrapper || !adicionarMedicacaoBtn) return;
+        const items = medicacoesWrapper.querySelectorAll('.medicacao-item');
+        let temValor = false;
+        
+        items.forEach((item) => {
+            const input = item.querySelector('.medicacao-input');
+            if (input && input.value.trim() !== '') {
+                temValor = true;
+            }
+        });
+        
+        adicionarMedicacaoBtn.style.display = temValor ? '' : 'none';
+    }
+
     if (adicionarMedicacaoBtn && medicacoesWrapper) {
         adicionarMedicacaoBtn.addEventListener('click', () => {
             const item = document.createElement('div');
@@ -265,7 +651,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 <button type="button" class="remover-medicacao btn-small remove">Remover</button>
             `;
             medicacoesWrapper.appendChild(item);
+            
+            // Adicionar listener ao novo input
+            const novoInput = item.querySelector('.medicacao-input');
+            if (novoInput) {
+                novoInput.addEventListener('input', function() {
+                    updateAdicionarMedicacaoButton();
+                });
+            }
+            
             updateRemoverButtons();
+            updateAdicionarMedicacaoButton();
+        });
+
+        // Delegar eventos para inputs existentes e futuros
+        medicacoesWrapper.addEventListener('input', (e) => {
+            if (e.target.classList.contains('medicacao-input')) {
+                updateAdicionarMedicacaoButton();
+            }
         });
 
         medicacoesWrapper.addEventListener('click', (e) => {
@@ -273,25 +676,145 @@ document.addEventListener('DOMContentLoaded', function () {
             if (rm) {
                 rm.closest('.medicacao-item').remove();
                 updateRemoverButtons();
+                updateAdicionarMedicacaoButton();
             }
         });
 
+        // Inicializar para o primeiro item
+        const primeiroInput = medicacoesWrapper.querySelector('.medicacao-input');
+        if (primeiroInput) {
+            primeiroInput.addEventListener('input', function() {
+                updateAdicionarMedicacaoButton();
+            });
+        }
+
         updateRemoverButtons();
+        updateAdicionarMedicacaoButton();
     }
 
     // ==========================
-    // DISPOSITIVO IMPLANTADO → campo "Outra"
+    // DISPOSITIVO IMPLANTADO — campos dinâmicos
     // ==========================
-    const selectDispositivo = document.getElementById("dispositivo");
-    if (selectDispositivo) {
-        selectDispositivo.addEventListener("change", function () {
-            const campoOutro = document.getElementById("campoOutroDispositivo");
-            if (this.value === "outro") {
-                campoOutro.style.display = "block";
-            } else {
-                campoOutro.style.display = "none";
+    const dispositivosWrapper = document.getElementById('dispositivos-wrapper');
+    const adicionarDispositivoBtn = document.getElementById('adicionar-dispositivo');
+
+    function mostrarOutroDispositivo(selectElement) {
+        const dispositivoItem = selectElement.closest('.dispositivo-item');
+        if (!dispositivoItem) return;
+        
+        const campoOutro = dispositivoItem.querySelector('.campo-outro-dispositivo');
+        const inputOutro = dispositivoItem.querySelector('.outro-dispositivo-input');
+        
+        if (!campoOutro || !inputOutro) return;
+
+        if (selectElement.value === 'outro') {
+            campoOutro.style.display = 'block';
+            inputOutro.required = true;
+        } else {
+            campoOutro.style.display = 'none';
+            inputOutro.required = false;
+            inputOutro.value = '';
+        }
+    }
+
+    function updateRemoverDispositivoButtons() {
+        if (!dispositivosWrapper) return;
+        const items = dispositivosWrapper.querySelectorAll('.dispositivo-item');
+        items.forEach((it) => {
+            const btn = it.querySelector('.remover-dispositivo');
+            if (btn) btn.style.display = items.length > 1 ? '' : 'none';
+        });
+    }
+
+    function updateAdicionarDispositivoButton() {
+        if (!dispositivosWrapper || !adicionarDispositivoBtn) return;
+        const items = dispositivosWrapper.querySelectorAll('.dispositivo-item');
+        let temSelecao = false;
+        
+        items.forEach((item) => {
+            const select = item.querySelector('.dispositivo-select');
+            if (select && select.value !== '') {
+                temSelecao = true;
             }
         });
+        
+        adicionarDispositivoBtn.style.display = temSelecao ? '' : 'none';
+    }
+
+    function criarSelectDispositivos() {
+        return `
+            <option value="">Nenhum</option>
+            <option value="marca_passo">Marca-passo</option>
+            <option value="stent_cardiaco">Stent cardíaco</option>
+            <option value="valvula_cardiaca">Prótese de válvula cardíaca</option>
+            <option value="derivacao_cerebral">Derivação ventricular (shunt)</option>
+            <option value="implante_cochlear">Implante coclear</option>
+            <option value="proteses_ortopedicas">Próteses ortopédicas</option>
+            <option value="dispositivo_contraceptivo">Dispositivo contraceptivo</option>
+            <option value="outro">Outro</option>
+        `;
+    }
+
+    if (adicionarDispositivoBtn && dispositivosWrapper) {
+        adicionarDispositivoBtn.addEventListener('click', () => {
+            const item = document.createElement('div');
+            item.className = 'dispositivo-item';
+            item.style.marginTop = '8px';
+            item.innerHTML = `
+                <div class="dispositivo-select-wrapper">
+                    <select name="dispositivo[]" class="dispositivo-select">
+                        ${criarSelectDispositivos()}
+                    </select>
+                    <button type="button" class="remover-dispositivo btn-small remove">Remover</button>
+                </div>
+                <div class="campo-outro-dispositivo" style="display: none; margin-top: 10px;">
+                    <input type="text" name="outroDispositivo[]" class="outro-dispositivo-input" placeholder="Digite o nome do dispositivo">
+                </div>
+            `;
+            dispositivosWrapper.appendChild(item);
+            
+            // Adicionar listener ao novo select
+            const novoSelect = item.querySelector('.dispositivo-select');
+            if (novoSelect) {
+                novoSelect.addEventListener('change', function() {
+                    mostrarOutroDispositivo(this);
+                    updateAdicionarDispositivoButton();
+                });
+            }
+            
+            updateRemoverDispositivoButtons();
+            updateAdicionarDispositivoButton();
+        });
+
+        // Delegar eventos para selects existentes e futuros
+        dispositivosWrapper.addEventListener('change', (e) => {
+            if (e.target.classList.contains('dispositivo-select')) {
+                mostrarOutroDispositivo(e.target);
+                updateAdicionarDispositivoButton();
+            }
+        });
+
+        dispositivosWrapper.addEventListener('click', (e) => {
+            const rm = e.target.closest('.remover-dispositivo');
+            if (rm) {
+                rm.closest('.dispositivo-item').remove();
+                updateRemoverDispositivoButtons();
+                updateAdicionarDispositivoButton();
+            }
+        });
+
+        // Inicializar para o primeiro item
+        const primeiroSelect = dispositivosWrapper.querySelector('.dispositivo-select');
+        if (primeiroSelect) {
+            primeiroSelect.addEventListener('change', function() {
+                mostrarOutroDispositivo(this);
+                updateAdicionarDispositivoButton();
+            });
+            mostrarOutroDispositivo(primeiroSelect);
+        }
+
+        updateRemoverDispositivoButtons();
+        updateAdicionarDispositivoButton();
     }
 
     // ==========================

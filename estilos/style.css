@@ -1393,6 +1393,126 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     border-radius: 4px;
 }
 
+.doenca-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.doenca-item .doenca-select-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.doenca-select {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.doenca-item .remover-doenca {
+    flex-shrink: 0;
+}
+.doenca-item .campo-outra-doenca {
+    width: 100%;
+}
+.doenca-item .outra-doenca-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.alergia-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.alergia-item .alergia-select-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.alergia-select {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.alergia-item .remover-alergia {
+    flex-shrink: 0;
+}
+.alergia-item .campo-descricao-alergia {
+    width: 100%;
+}
+.alergia-item .descricao-alergia-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.doenca-mental-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.doenca-mental-item .doenca-mental-select-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.doenca-mental-select {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.doenca-mental-item .remover-doenca-mental {
+    flex-shrink: 0;
+}
+.doenca-mental-item .campo-outra-doenca-mental {
+    width: 100%;
+}
+.doenca-mental-item .outra-doenca-mental-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.dispositivo-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.dispositivo-item .dispositivo-select-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.dispositivo-select {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.dispositivo-item .remover-dispositivo {
+    flex-shrink: 0;
+}
+.dispositivo-item .campo-outro-dispositivo {
+    width: 100%;
+}
+.dispositivo-item .outro-dispositivo-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
 /* Configurações de Privacidade - acesso a dados */
 #config-acesso {
     margin-top: 12px;

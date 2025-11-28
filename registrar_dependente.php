@@ -32,11 +32,187 @@ $contato_telefone = trim($_POST['contato_telefone'] ?? '');
 
 // Dados médicos
 $tipo_sanguineo = $_POST['tipo_sanguineo'] ?? null;
-$doencas_cronicas = trim($_POST['doencas'] ?? '');
-$alergias = trim($_POST['alergias'] ?? '');
-$medicacao_continua = trim($_POST['medicacao'] ?? '');
-$doenca_mental = trim($_POST['doenca_mental'] ?? '');
-$dispositivo_implantado = trim($_POST['dispositivo'] ?? '');
+
+// Processar doenças crônicas (array)
+$doencas_array = $_POST['doencas'] ?? [];
+$outras_doencas = $_POST['outraDoenca'] ?? [];
+$doencas_lista = [];
+
+if (is_array($doencas_array)) {
+    foreach ($doencas_array as $index => $doenca) {
+        $doenca = trim($doenca);
+        if (!empty($doenca) && $doenca !== '') {
+            if ($doenca === 'outra_nao_listada') {
+                // Se for "outra", usar o texto do campo correspondente
+                $outra_texto = isset($outras_doencas[$index]) ? trim($outras_doencas[$index]) : '';
+                if (!empty($outra_texto)) {
+                    $doencas_lista[] = $outra_texto;
+                }
+            } else {
+                // Mapear valores para nomes legíveis
+                $doencas_nomes = [
+                    'hipertensao' => 'Hipertensão arterial',
+                    'insuficiencia_cardiaca' => 'Insuficiência cardíaca',
+                    'arritmias_cronicas' => 'Arritmias crônicas',
+                    'doenca_arterial_coronariana' => 'Doença arterial coronariana',
+                    'aterosclerose' => 'Aterosclerose',
+                    'doenca_vascular_periferica' => 'Doença vascular periférica',
+                    'diabetes_tipo1' => 'Diabetes tipo 1',
+                    'diabetes_tipo2' => 'Diabetes tipo 2',
+                    'hipotireoidismo' => 'Hipotireoidismo',
+                    'hipertireoidismo' => 'Hipertireoidismo',
+                    'obesidade_cronica' => 'Obesidade crônica',
+                    'sindrome_metabolica' => 'Síndrome metabólica',
+                    'asma' => 'Asma',
+                    'dpoc' => 'DPOC (Doença Pulmonar Obstrutiva Crônica)',
+                    'bronquite_cronica' => 'Bronquite crônica',
+                    'enfisema' => 'Enfisema',
+                    'fibrose_pulmonar' => 'Fibrose pulmonar',
+                    'artrite_reumatoide' => 'Artrite reumatoide',
+                    'lupus' => 'Lúpus (LES)',
+                    'psoriase' => 'Psoríase',
+                    'doenca_celiaca' => 'Doença celíaca',
+                    'tireoidite_hashimoto' => 'Tireoidite de Hashimoto',
+                    'doenca_de_crohn' => 'Doença de Crohn',
+                    'retocolite_ulcerativa' => 'Retocolite ulcerativa',
+                    'epilepsia' => 'Epilepsia',
+                    'enxaqueca_cronica' => 'Enxaqueca crônica',
+                    'doenca_de_parkinson' => 'Doença de Parkinson',
+                    'esclerose_multipla' => 'Esclerose múltipla',
+                    'neuropatias_perifericas' => 'Neuropatias periféricas',
+                    'artrose_osteoartrite' => 'Artrose / Osteoartrite',
+                    'fibromialgia' => 'Fibromialgia',
+                    'lombalgia_cronica' => 'Lombalgia crônica',
+                    'osteoporose' => 'Osteoporose',
+                    'hepatite_cronica' => 'Hepatite crônica',
+                    'cirrose' => 'Cirrose',
+                    'esteatose_hepatica_cronica' => 'Esteatose hepática (gordura no fígado) crônica',
+                    'doenca_renal_cronica' => 'Doença renal crônica',
+                    'insuficiencia_renal' => 'Insuficiência renal',
+                    'refluxo_gastroesofagico_cronico' => 'Refluxo gastroesofágico crônico (GERD)',
+                    'sindrome_do_intestino_irritavel' => 'Síndrome do intestino irritável (SII)',
+                    'gastrite_cronica' => 'Gastrite crônica',
+                    'cancer' => 'Câncer (em acompanhamento ou histórico)',
+                    'hiv' => 'HIV',
+                    'doencas_hematologicas' => 'Doenças hematológicas'
+                ];
+                $doencas_lista[] = $doencas_nomes[$doenca] ?? $doenca;
+            }
+        }
+    }
+}
+$doencas_cronicas = !empty($doencas_lista) ? implode(', ', $doencas_lista) : '';
+
+// Processar medicações (array)
+$medicacoes_array = $_POST['medicacao'] ?? [];
+$medicacao_continua = '';
+if (is_array($medicacoes_array)) {
+    $medicacoes_filtradas = array_filter(array_map('trim', $medicacoes_array), function($m) {
+        return !empty($m);
+    });
+    $medicacao_continua = !empty($medicacoes_filtradas) ? implode(', ', $medicacoes_filtradas) : '';
+}
+
+// Processar alergias (array)
+$alergias_array = $_POST['alergias'] ?? [];
+$descricoes_alergias = $_POST['descricaoAlergia'] ?? [];
+$alergias_lista = [];
+
+if (is_array($alergias_array)) {
+    foreach ($alergias_array as $index => $alergia) {
+        $alergia = trim($alergia);
+        if (!empty($alergia) && $alergia !== '') {
+            // Mapear valores para nomes legíveis
+            $alergias_nomes = [
+                'alimentar' => 'Alergia alimentar',
+                'medicamentos' => 'Alergia medicamentosa',
+                'respiratoria' => 'Alergia respiratória',
+                'dermatologica' => 'Alergia dermatológica',
+                'inseto' => 'Alergia a picada de inseto',
+                'quimica' => 'Alergia química',
+                'fisica' => 'Alergia física',
+                'outra' => 'Outra'
+            ];
+            
+            $tipo_alergia = $alergias_nomes[$alergia] ?? $alergia;
+            
+            // Se houver descrição, adicionar
+            $descricao = isset($descricoes_alergias[$index]) ? trim($descricoes_alergias[$index]) : '';
+            if (!empty($descricao)) {
+                $alergias_lista[] = $tipo_alergia . ': ' . $descricao;
+            } else {
+                $alergias_lista[] = $tipo_alergia;
+            }
+        }
+    }
+}
+$alergias = !empty($alergias_lista) ? implode('; ', $alergias_lista) : '';
+
+// Processar doenças mentais (array)
+$doencas_mentais_array = $_POST['doenca_mental'] ?? [];
+$outras_doencas_mentais = $_POST['outraDoencaMental'] ?? [];
+$doencas_mentais_lista = [];
+
+if (is_array($doencas_mentais_array)) {
+    foreach ($doencas_mentais_array as $index => $doenca_mental) {
+        $doenca_mental = trim($doenca_mental);
+        if (!empty($doenca_mental) && $doenca_mental !== '') {
+            if ($doenca_mental === 'outra') {
+                // Se for "outra", usar o texto do campo correspondente
+                $outra_texto = isset($outras_doencas_mentais[$index]) ? trim($outras_doencas_mentais[$index]) : '';
+                if (!empty($outra_texto)) {
+                    $doencas_mentais_lista[] = $outra_texto;
+                }
+            } else {
+                // Mapear valores para nomes legíveis
+                $doencas_mentais_nomes = [
+                    'depressao' => 'Depressão',
+                    'ansiedade' => 'Transtorno de Ansiedade',
+                    'bipolaridade' => 'Transtorno Bipolar',
+                    'esquizofrenia' => 'Esquizofrenia',
+                    'tdah' => 'TDAH (Transtorno do Déficit de Atenção e Hiperatividade)',
+                    'toc' => 'TOC (Transtorno Obsessivo-Compulsivo)',
+                    'transtorno_estresse_pos_traumatico' => 'Transtorno de Estresse Pós-Traumático'
+                ];
+                $doencas_mentais_lista[] = $doencas_mentais_nomes[$doenca_mental] ?? $doenca_mental;
+            }
+        }
+    }
+}
+$doenca_mental = !empty($doencas_mentais_lista) ? implode(', ', $doencas_mentais_lista) : '';
+
+// Processar dispositivos implantados (array)
+$dispositivos_array = $_POST['dispositivo'] ?? [];
+$outros_dispositivos = $_POST['outroDispositivo'] ?? [];
+$dispositivos_lista = [];
+
+if (is_array($dispositivos_array)) {
+    foreach ($dispositivos_array as $index => $dispositivo) {
+        $dispositivo = trim($dispositivo);
+        if (!empty($dispositivo) && $dispositivo !== '') {
+            if ($dispositivo === 'outro') {
+                // Se for "outro", usar o texto do campo correspondente
+                $outro_texto = isset($outros_dispositivos[$index]) ? trim($outros_dispositivos[$index]) : '';
+                if (!empty($outro_texto)) {
+                    $dispositivos_lista[] = $outro_texto;
+                }
+            } else {
+                // Mapear valores para nomes legíveis
+                $dispositivos_nomes = [
+                    'marca_passo' => 'Marca-passo',
+                    'stent_cardiaco' => 'Stent cardíaco',
+                    'valvula_cardiaca' => 'Prótese de válvula cardíaca',
+                    'derivacao_cerebral' => 'Derivação ventricular (shunt)',
+                    'implante_cochlear' => 'Implante coclear',
+                    'proteses_ortopedicas' => 'Próteses ortopédicas',
+                    'dispositivo_contraceptivo' => 'Dispositivo contraceptivo'
+                ];
+                $dispositivos_lista[] = $dispositivos_nomes[$dispositivo] ?? $dispositivo;
+            }
+        }
+    }
+}
+$dispositivo_implantado = !empty($dispositivos_lista) ? implode(', ', $dispositivos_lista) : '';
 $info_relevantes = trim($_POST['info_relevantes'] ?? '');
 $cirurgias = trim($_POST['cirurgias'] ?? '');
 
