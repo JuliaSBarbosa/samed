@@ -1393,6 +1393,46 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     border-radius: 4px;
 }
 
+/* Configurações de Privacidade - acesso a dados */
+#config-acesso {
+    margin-top: 12px;
+}
+.opcao-acesso {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid #e6e6e6;
+    border-radius: 8px;
+    background: #fff;
+    margin-bottom: 10px;
+}
+.opcao-acesso input[type="radio"] {
+    margin-top: 6px;
+}
+.opcao-acesso label {
+    cursor: pointer;
+    display: block;
+    flex: 1;
+}
+.opcao-acesso .descricao {
+    color: #666;
+    font-size: 13px;
+    margin-top: 6px;
+}
+.opcao-acesso strong { display:block; font-weight:700; color:#333; }
+
+.acesso-comum {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px dashed #e0e0e0;
+    border-radius: 8px;
+    background: #fafafa;
+    margin-bottom: 14px;
+}
+
 /* ======= PAGINA HISTORICO ======= */
 /* Estilos adicionais para o layout do histórico (simulando classes utilitárias) */
 .secao-historico {

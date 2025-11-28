@@ -74,6 +74,14 @@ require_once 'verificar_login.php';
                 <span>4</span>
                 <span class="step-title">Histórico</span>
             </div>
+            <div class="step" data-step="5">
+                <span>5</span>
+                <span class="step-title">Privacidade</span>
+            </div>
+            <div class="step" data-step="6">
+                <span>6</span>
+                <span class="step-title">Termo</span>
+            </div>
         </div>
 
         <form id="dependenteForm" action="registrar_dependente.php" method="post">
@@ -81,7 +89,10 @@ require_once 'verificar_login.php';
             <div class="form-step active" id="step1" data-step="1">
                 <h2>Informações básicas</h2> <br>
                 <label for="nome">Nome completo</label>
-                <input type="text" id="nome" name="nome" required>
+                <input type="text" id="nome" name="nome" placeholder="Digite o seu nome completo" required>
+
+                <label for="nome_social">Nome social (opcional)</label>
+                <input type="text" id="nome_social" name="nome_social" placeholder="Como você prefere ser chamado(a)?">
 
                 <label for="data_nascimento">Data de nascimento</label>
                 <input type="date" id="data_nascimento" name="data_nascimento" required>
@@ -91,17 +102,58 @@ require_once 'verificar_login.php';
                     <option value="">Selecione</option>
                     <option value="masculino">Masculino</option>
                     <option value="feminino">Feminino</option>
-                    <option value="outro">Outro</option>
+                    <option value="intersexo">Intersexo</option>
+                </select>
+
+                <label for="genero">Identidade de gênero (opcional)</label>
+                <select id="genero" name="genero">
+                    <option value="">Selecione</option>
+                    <option value="mulher_cis">Mulher (cisgênero)</option>
+                    <option value="homem_cis">Homem (cisgênero)</option>
+                    <option value="mulher_trans">Mulher trans</option>
+                    <option value="homem_trans">Homem trans</option>
+                    <option value="nao_binario">Pessoa não-binária</option>
+                    <option value="nao_informar">Prefiro não informar</option>
                 </select>
 
                 <label for="cpf">CPF</label>
-                <input type="text" id="cpf" name="cpf">
+                <input type="text" id="cpf" name="cpf" placeholder="Digite o número do seu CPF">
+
+                <label for="sus">Cartão do SUS</label>
+                <input type="text" id="sus" name="sus" placeholder="Digite o número do seu cartão do sus">
+
+                <label for="plano_saude">Possui plano de saúde?</label>
+                <select id="plano_saude" name="plano_saude" required onchange="mostrarCampoPlano()">
+                    <option value="">Selecione</option>
+                    <option value="sim">Sim</option>
+                    <option value="nao">Não</option>
+                </select>
+
+                <div id="campoPlano" style="display:none; margin-top:10px;">
+                    <label for="nome_plano">Qual plano?</label>
+                    <input type="text" id="nome_plano" name="nome_plano" list="lista_planos"
+                        placeholder="Ex: Unimed, Amil...">
+                    <datalist id="lista_planos">
+                        <option value="Unimed">
+                        <option value="Amil">
+                        <option value="SulAmérica">
+                        <option value="Bradesco Saúde">
+                        <option value="Itaú Saúde"></option>
+                        <option value="Porto Seguro Saúde">
+                        <option value="Bupa">
+                        <option value="Hapvida">
+                        <option value="Caixa Seguro Saúde">
+                        <option value="Viva Saúde">
+                        <option value="Intermédica">
+                        <option value="Golden Cross">
+                    </datalist>
+                </div>
 
                 <label for="telefone">Telefone</label>
-                <input type="tel" id="telefone" name="telefone">
+                <input type="tel" id="telefone" name="telefone" placeholder="Digite o número do seu telefone">
 
                 <label for="email">E-mail</label>
-                <input type="email" id="email" name="email">
+                <input type="email" id="email" name="email" placeholder="Digite o seu e-mail">
             </div>
 
             <!-- Etapa 2: Contato de Emergência -->
@@ -303,6 +355,8 @@ require_once 'verificar_login.php';
                     <option value="AB-">AB-</option>
                     <option value="O+">O+</option>
                     <option value="O-">O-</option>
+                    <option value="RH-NULO">RH NULO</option>
+
                 </select>
 
                 <label for="medicacao">Medicação de uso contínuo</label>
@@ -354,8 +408,33 @@ require_once 'verificar_login.php';
                         placeholder="Digite o nome do dispositivo">
                 </div>
 
+                <label for="doador_orgaos">É doador(a) de órgãos?</label>
+                <select id="doador_orgaos" name="doador_orgaos" required>
+                    <option value="">Selecione</option>
+                    <option value="sim">Sim</option>
+                    <option value="nao">Não</option>
+                    <option value="nao_informar">Prefiro não informar</option>
+                </select>
+
+                <label for="ressuscitacao">Você autoriza procedimentos de reanimação em caso de emergência?</label>
+                <select id="ressuscitacao" name="ressuscitacao">
+                    <option value="">Selecione</option>
+                    <option value="sim">Sim, autorizo</option>
+                    <option value="nao">Não autorizo</option>
+                    <option value="nao_informar">Prefiro não informar</option>
+                </select>
+
+                <label for="transfusao">Em caso de necessidade, autoriza receber transfusão de sangue?</label>
+                <select id="transfusao" name="transfusao" required>
+                    <option value="">Selecione</option>
+                    <option value="sim">Sim</option>
+                    <option value="nao">Não</option>
+                    <option value="nao_informar">Prefiro não informar</option>
+                </select>
+
                 <label for="info_relevantes">Informações relevantes</label>
                 <textarea id="info_relevantes" name="info_relevantes" rows="3"></textarea>
+
 
             </div>
 
@@ -373,7 +452,56 @@ require_once 'verificar_login.php';
                 <textarea id="habitos" name="habitos" rows="4"></textarea>
 
             </div>
+
+            <!-- Etapa 5: Configurações de privacidade -->
+            <div class="form-step" id="step5" data-step="5">
+                <h2>CONFIGURAÇÕES DE PRIVACIDADE</h2> <br>
+
+                <label for="compartilhar_localizacao">Autoriza o compartilhamento da localização?</label>
+                <select id="compartilhar_localizacao" name="compartilhar_localizacao" required>
+                    <option value="">Selecione</option>
+                    <option value="sim">Sim, autorizo</option>
+                    <option value="nao">Não autorizo</option>
+                </select>
+
+                <label for="autorizacao_usuario">Autoriza usuários comuns consultar informações básicas (nome, telefone, contato de emergência)?</label>
+                <select id="autorizacao_usuario" name="autorizacao_usuario" required>
+                 <option value="">Selecione</option>
+                    <option value="sim">Sim, autorizo</option>
+                    <option value="nao">Não autorizo</option>
+                </select>
+
+            </div>
+
+            <!-- Etapa 6: Termo de Consentimento -->
+            <div class="form-step" id="step6" data-step="6">
+                <h2>TERMO DE CONSENTIMENTO</h2> <br>
+
+                <div>
+                    <p>Eu, abaixo assinado, declaro que:</p>
+                        <li>Tenho conhecimento e autorizo o uso dos meus dados pessoais e de saúde no sistema SAMED.
+                        </li>
+                        <li>Autorizo o compartilhamento dessas informações com profissionais de saúde quando necessário
+                            para meu atendimento.</li>
+                        <li>Compreendo que essas informações são armazenadas de forma segura e protegidas por lei.</li>
+                        <li>Tenho o direito de solicitar acesso, retificação ou exclusão de meus dados a qualquer
+                            momento.</li>
+                        <li>Fui informado(a) sobre meus direitos e responsabilidades conforme a Lei de Proteção de Dados
+                            (LGPD).</li>
+                        <li>Declaro que todas as informações fornecidas são verdadeiras e de minha responsabilidade.
+                        </li>
+                    </ul>
+                </div>
+                <div style="margin-top: 20px;">
+                    <label style="display: flex; align-items: flex-start; gap: 10px;">
+                        <input type="checkbox" id="aceitar_termo" name="aceitar_termo" required>
+                        <span style="font-size: 14px;">Eu li e concordo com os termos acima e autorizo o armazenamento e
+                            uso de meus dados de saúde no SAMED.</span>
+                    </label>
+                </div>
+            </div>
             <!-- Botões de navegação -->
+
             <div class="button-group">
                 <button type="button" class="btn-anterior">Anterior</button>
                 <div style="flex:1"></div>

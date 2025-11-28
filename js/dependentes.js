@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!form || formSteps.length === 0) return;
 
         let activeStep = 0;
+        console.log('[multi-step] init: found', formSteps.length, 'steps');
 
         function validateCurrentStep() {
             const current = formSteps[activeStep];
@@ -62,7 +63,32 @@ document.addEventListener('DOMContentLoaded', function () {
 
             for (const field of required) {
                 if (field.disabled) continue;
-                if (!field.value.trim()) {
+
+                // Handle radio groups
+                if (field.type === 'radio') {
+                    const group = form.querySelectorAll('input[name="' + field.name + '"]');
+                    let someChecked = false;
+                    group.forEach(g => { if (g.checked) someChecked = true; });
+                    if (!someChecked) {
+                        alert('Selecione: ' + (field.previousElementSibling?.textContent || field.name));
+                        group[0].focus();
+                        return false;
+                    }
+                    continue;
+                }
+
+                // Handle checkboxes (single required checkbox)
+                if (field.type === 'checkbox') {
+                    if (!field.checked) {
+                        alert('Marque o campo obrigatório: ' + (field.previousElementSibling?.textContent || field.name));
+                        field.focus();
+                        return false;
+                    }
+                    continue;
+                }
+
+                // Default text/select/textarea validation
+                if (!String(field.value || '').trim()) {
                     alert('Preencha o campo obrigatório: ' + (field.previousElementSibling?.textContent || field.name));
                     field.focus();
                     return false;
@@ -72,6 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         function updateStepDisplay() {
+            console.log('[multi-step] updateStepDisplay activeStep=', activeStep);
             formSteps.forEach((s, i) => s.classList.toggle('active', i === activeStep));
             progressSteps.forEach((s, i) => {
                 s.classList.toggle('active', i === activeStep);
@@ -90,8 +117,12 @@ document.addEventListener('DOMContentLoaded', function () {
             const nextBtn = e.target.closest(nextSelector);
             if (nextBtn) {
                 e.preventDefault();
+                console.log('[multi-step] click next (before validation) activeStep=', activeStep);
                 if (!validateCurrentStep()) return;
-                if (activeStep < formSteps.length - 1) activeStep++;
+                if (activeStep < formSteps.length - 1) {
+                    activeStep++;
+                    console.log('[multi-step] advanced to', activeStep);
+                }
                 updateStepDisplay();
                 return;
             }
@@ -99,6 +130,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const prevBtn = e.target.closest(prevSelector);
             if (prevBtn) {
                 e.preventDefault();
+                console.log('[multi-step] click prev (before) activeStep=', activeStep);
                 if (activeStep > 0) activeStep--;
                 updateStepDisplay();
             }
@@ -247,19 +279,34 @@ document.addEventListener('DOMContentLoaded', function () {
         updateRemoverButtons();
     }
 
-});
-
-
- // ==========================
-    // 6. DISPOSITIVO IMPLANTADO → campo "Outra"
     // ==========================
-
-document.getElementById("dispositivo").addEventListener("change", function () {
-    const campoOutro = document.getElementById("campoOutroDispositivo");
-
-    if (this.value === "outro") {
-        campoOutro.style.display = "block";
-    } else {
-        campoOutro.style.display = "none";
+    // DISPOSITIVO IMPLANTADO → campo "Outra"
+    // ==========================
+    const selectDispositivo = document.getElementById("dispositivo");
+    if (selectDispositivo) {
+        selectDispositivo.addEventListener("change", function () {
+            const campoOutro = document.getElementById("campoOutroDispositivo");
+            if (this.value === "outro") {
+                campoOutro.style.display = "block";
+            } else {
+                campoOutro.style.display = "none";
+            }
+        });
     }
+
+    // ==========================
+    // PLANO DE SAÚDE → campo "Qual plano?"
+    // ==========================
+    const selectPlano = document.getElementById("plano_saude");
+    if (selectPlano) {
+        selectPlano.addEventListener("change", function () {
+            const campo = document.getElementById("campoPlano");
+            if (this.value === "sim") {
+                campo.style.display = "block";
+            } else {
+                campo.style.display = "none";
+            }
+        });
+    }
+
 });
