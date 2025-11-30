@@ -114,6 +114,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         container.addEventListener('click', function (e) {
+            // Não interceptar cliques no botão submit
+            const submitBtn = e.target.closest('.submit-btn');
+            if (submitBtn) {
+                // Deixar o submit funcionar normalmente
+                return;
+            }
+            
             const nextBtn = e.target.closest(nextSelector);
             if (nextBtn) {
                 e.preventDefault();

@@ -94,6 +94,9 @@ $cirurgias = trim($_POST['cirurgias'] ?? '');
 // Configurações de privacidade
 $autorizacao_usuario = $_POST['autorizacao_usuario'] ?? 'nao';
 
+// Validar termo de consentimento
+$aceitar_termo = isset($_POST['aceitar_termo']) && $_POST['aceitar_termo'] === 'on';
+
 // Validações básicas
 $erros = [];
 
@@ -115,6 +118,10 @@ if (empty($contato_nome)) {
 
 if (empty($contato_telefone)) {
     $erros[] = "Telefone do contato de emergência é obrigatório.";
+}
+
+if (!$aceitar_termo) {
+    $erros[] = "Você deve aceitar o termo de consentimento para continuar.";
 }
 
 // Validar CPF se fornecido

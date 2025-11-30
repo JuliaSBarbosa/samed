@@ -124,6 +124,14 @@ if (isset($_SESSION['dados_form'])) {
                 <span>4</span>
                 <span class="step-title">Histórico</span>
             </div>
+            <div class="step" data-step="5">
+                <span>5</span>
+                <span class="step-title">Privacidade</span>
+            </div>
+            <div class="step" data-step="6">
+                <span>6</span>
+                <span class="step-title">Termo</span>
+            </div>
         </div>
 
         <form id="perfilForm" action="salvar_perfil.php" method="post" enctype="multipart/form-data">
@@ -631,6 +639,83 @@ if (isset($_SESSION['dados_form'])) {
     </footer>
 
     <script src="js/dependentes.js"></script>
+    
+    <script>
+        // Garantir que o formulário seja submetido quando clicar em Salvar
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('perfilForm');
+            const submitBtn = document.querySelector('.submit-btn');
+            
+            if (submitBtn && form) {
+                // Event listener para o botão submit - usar mousedown para capturar antes do multi-step
+                submitBtn.addEventListener('mousedown', function(e) {
+                    e.stopPropagation();
+                }, true);
+                
+                submitBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Verificar se está no último step (step 6 - Termo)
+                    const currentStep = document.querySelector('.form-step.active');
+                    const stepNumber = currentStep ? parseInt(currentStep.getAttribute('data-step')) : 0;
+                    
+                    // Se não estiver no último step, navegar até ele primeiro
+                    if (stepNumber < 6) {
+                        e.preventDefault();
+                        
+                        // Navegar até o último step
+                        const allSteps = document.querySelectorAll('.form-step');
+                        const lastStep = allSteps[allSteps.length - 1];
+                        if (lastStep) {
+                            document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+                            lastStep.classList.add('active');
+                            
+                            // Atualizar barra de progresso
+                            document.querySelectorAll('.progress-bar .step').forEach((s, i) => {
+                                s.classList.remove('active');
+                                if (i === 5) s.classList.add('active');
+                            });
+                            
+                            // Mostrar botão salvar e esconder próximo
+                            submitBtn.style.display = '';
+                            document.querySelectorAll('.btn-proximo').forEach(btn => btn.style.display = 'none');
+                        }
+                        return false;
+                    }
+                    
+                    // Validar checkbox do termo ANTES de submeter
+                    const aceitarTermo = document.getElementById('aceitar_termo');
+                    if (!aceitarTermo || !aceitarTermo.checked) {
+                        e.preventDefault();
+                        alert('Você deve aceitar o termo de consentimento para continuar.');
+                        aceitarTermo.focus();
+                        return false;
+                    }
+                    
+                    // Validar todos os campos obrigatórios antes de submeter
+                    if (!form.checkValidity()) {
+                        e.preventDefault();
+                        form.reportValidity();
+                        return false;
+                    }
+                    
+                    // Se tudo estiver OK, submeter o formulário programaticamente
+                    form.submit();
+                }, true);
+                
+                // Validação no submit do formulário
+                form.addEventListener('submit', function(e) {
+                    const aceitarTermo = document.getElementById('aceitar_termo');
+                    if (aceitarTermo && !aceitarTermo.checked) {
+                        e.preventDefault();
+                        alert('Você deve aceitar o termo de consentimento para continuar.');
+                        aceitarTermo.focus();
+                        return false;
+                    }
+                });
+            }
+        });
+    </script>
     
     <?php if ($editar && $perfil): ?>
     <script>
