@@ -1,5 +1,45 @@
 <?php
 require_once 'verificar_login.php';
+require_once 'config.php';
+
+$usuario_id = $_SESSION['usuario_id'] ?? null;
+$editar = isset($_GET['editar']) && $_GET['editar'];
+$dependente_id = $editar ? (int)$_GET['editar'] : null;
+$dependente = null;
+$perfil_dependente = null;
+$contato_emergencia = null;
+
+// Carregar dados existentes se estiver editando
+if ($editar && $dependente_id && $pdo && $usuario_id) {
+    try {
+        // Buscar dependente (verificar se pertence ao usuário)
+        $stmt = $pdo->prepare("SELECT * FROM dependentes WHERE id = ? AND paciente_id = ?");
+        $stmt->execute([$dependente_id, $usuario_id]);
+        $dependente = $stmt->fetch();
+        
+        if ($dependente) {
+            // Buscar perfil médico
+            $stmt = $pdo->prepare("SELECT * FROM perfis_medicos WHERE dependente_id = ?");
+            $stmt->execute([$dependente_id]);
+            $perfil_dependente = $stmt->fetch();
+            
+            // Buscar contato de emergência
+            $stmt = $pdo->prepare("SELECT * FROM contatos_emergencia WHERE dependente_id = ?");
+            $stmt->execute([$dependente_id]);
+            $contato_emergencia = $stmt->fetch();
+        }
+    } catch(PDOException $e) {
+        // Erro ao buscar dados
+    }
+}
+
+// Se houver dados salvos na sessão (após erro), usar eles
+if (isset($_SESSION['dados_form'])) {
+    $dados_form = $_SESSION['dados_form'];
+    unset($_SESSION['dados_form']);
+} else {
+    $dados_form = null;
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -84,12 +124,34 @@ require_once 'verificar_login.php';
             </div>
         </div>
 
-        <form id="dependenteForm" action="registrar_dependente.php" method="post">
+        <form id="dependenteForm" action="registrar_dependente.php" method="post" enctype="multipart/form-data">
+            <?php if ($editar && $dependente_id): ?>
+                <input type="hidden" name="dependente_id" value="<?= $dependente_id ?>">
+            <?php endif; ?>
             <!-- Etapa 1: Informações Básicas -->
             <div class="form-step active" id="step1" data-step="1">
                 <h2>Informações básicas</h2> <br>
+                
+                <label for="foto_perfil">Foto de Perfil</label>
+                <div style="margin-bottom: 15px;">
+                    <?php 
+                    $foto_atual = null;
+                    if ($dependente && $dependente['foto_perfil']) {
+                        $foto_atual = 'uploads/fotos/' . $dependente['foto_perfil'];
+                    }
+                    ?>
+                    <?php if ($foto_atual && file_exists($foto_atual)): ?>
+                        <div style="margin-bottom: 10px;">
+                            <img src="<?= htmlspecialchars($foto_atual) ?>" alt="Foto atual" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid #6ec1e4;">
+                            <p style="font-size: 0.85rem; color: #666; margin-top: 5px;">Foto atual</p>
+                        </div>
+                    <?php endif; ?>
+                    <input type="file" id="foto_perfil" name="foto_perfil" accept="image/*" style="padding: 8px;">
+                    <p style="font-size: 0.85rem; color: #666; margin-top: 5px;">Formatos aceitos: JPG, PNG, GIF (máx. 2MB)</p>
+                </div>
+                
                 <label for="nome">Nome completo</label>
-                <input type="text" id="nome" name="nome" placeholder="Digite o seu nome completo" required>
+                <input type="text" id="nome" name="nome" placeholder="Digite o nome completo" value="<?= htmlspecialchars($dados_form['nome'] ?? $dependente['nome'] ?? '') ?>" required>
 
                 <label for="nome_social">Nome social (opcional)</label>
                 <input type="text" id="nome_social" name="nome_social" placeholder="Como você prefere ser chamado(a)?">

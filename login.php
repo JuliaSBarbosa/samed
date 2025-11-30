@@ -17,9 +17,7 @@
             <img src="img/logo.svg" alt="Logo SAMED">
             <h1>SAMED</h1>
         </div>
-            <a href="login.php" class="botao-login">
-                LOGIN
-            </a>
+        
             <a href="registrar.php" class="botao-registrar">
                 REGISTRE-SE
             </a>

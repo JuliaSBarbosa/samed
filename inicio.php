@@ -19,17 +19,7 @@
         </div>
 
         <div class="menu-actions">
-            <nav class="menu">
-                <a href="index.php" class="ativo">INÍCIO</a>
-                <span class="divisor">|</span>
-                <a href="perfil.php">MEU PERFIL</a>
-                <span class="divisor">|</span>
-                <a href="dependentes.php">DEPENDENTES</a>
-                <span class="divisor">|</span>
-                <a href="historico.php">HISTÓRICO</a>
-                <span class="divisor">|</span>
-                <a href="hospital.php">UNIDADES DE SAÚDE</a>
-            </nav>
+            
 
             <a href="login.php" class="botao-login">
                 LOGIN

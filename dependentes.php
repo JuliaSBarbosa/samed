@@ -1,3 +1,29 @@
+<?php
+require_once 'verificar_login.php';
+require_once 'config.php';
+
+$usuario_id = $_SESSION['usuario_id'] ?? null;
+$dependentes = [];
+
+// Buscar dependentes do banco
+if ($pdo && $usuario_id) {
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM dependentes WHERE paciente_id = ? ORDER BY nome");
+        $stmt->execute([$usuario_id]);
+        $dependentes = $stmt->fetchAll();
+    } catch(PDOException $e) {
+        // Erro ao buscar dados
+    }
+}
+
+// Calcular idade
+function calcularIdade($data_nascimento) {
+    if (!$data_nascimento) return null;
+    $data_nasc = new DateTime($data_nascimento);
+    $hoje = new DateTime();
+    return $hoje->diff($data_nasc)->y;
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -40,6 +66,12 @@
         <section class="dependentes">
             <h2>DEPENDENTES</h2>
             <hr>
+            
+            <?php if (isset($_SESSION['sucesso'])): ?>
+                <div class="mensagem-sucesso"><?= htmlspecialchars($_SESSION['sucesso']) ?></div>
+                <?php unset($_SESSION['sucesso']); ?>
+            <?php endif; ?>
+            
             <div class="opcoes">
                 <a href="form_dependentes.php" class="link-card">
                     <div class="card">
@@ -47,6 +79,28 @@
                         <p>Adicionar dependente</p>
                     </div>
                 </a>
+                
+                <?php foreach ($dependentes as $dependente): 
+                    $idade = calcularIdade($dependente['data_nascimento']);
+                    $foto_perfil = $dependente['foto_perfil'] ?? null;
+                    $foto_src = $foto_perfil ? 'uploads/fotos/' . $foto_perfil : 'img/perfil.svg';
+                ?>
+                    <div class="card-dependente">
+                        <div class="card-dependente-header">
+                            <img src="<?= htmlspecialchars($foto_src) ?>" alt="Foto" class="foto-dependente" style="object-fit: cover;">
+                            <div class="info-dependente">
+                                <h3><?= htmlspecialchars($dependente['nome']) ?></h3>
+                                <?php if ($idade): ?>
+                                    <p><strong>Idade:</strong> <?= $idade ?> anos</p>
+                                <?php endif; ?>
+                                <?php if ($dependente['sexo']): ?>
+                                    <p><strong>Sexo:</strong> <?= ucfirst($dependente['sexo']) ?></p>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <a href="form_dependentes.php?editar=<?= $dependente['id'] ?>" class="btn-editar-dependente">✏️ Editar</a>
+                    </div>
+                <?php endforeach; ?>
             </div>
         </section>
     </main>

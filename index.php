@@ -55,7 +55,12 @@
                     <p>Dados dos Dependentes</p>
                 </div>
             </a>
-            
+            <a href="historico.php" class="link-card">
+                <div class="card">
+                    <img src="img/historico.svg" alt="Hospitais" class="icone">
+                    <p>Histórico de Acessos</p>
+                </div>
+            </a>
             <a href="hospital.php" class="link-card">
                 <div class="card">
                     <img src="img/local.svg" alt="Hospitais" class="icone">

@@ -1,3 +1,61 @@
+<?php
+require_once 'verificar_login.php';
+require_once 'config.php';
+
+$usuario_id = $_SESSION['usuario_id'] ?? null;
+$perfil = null;
+$contato_emergencia = null;
+$tem_dados = false;
+
+// Buscar dados do perfil médico
+if ($pdo && $usuario_id) {
+    try {
+        // Buscar perfil médico
+        $stmt = $pdo->prepare("
+            SELECT pm.*, u.nome as nome_usuario 
+            FROM perfis_medicos pm
+            INNER JOIN usuarios u ON pm.usuario_id = u.id
+            WHERE pm.usuario_id = ?
+        ");
+        $stmt->execute([$usuario_id]);
+        $perfil = $stmt->fetch();
+        
+        // Buscar contato de emergência
+        if ($perfil) {
+            $stmt = $pdo->prepare("SELECT * FROM contatos_emergencia WHERE usuario_id = ?");
+            $stmt->execute([$usuario_id]);
+            $contato_emergencia = $stmt->fetch();
+            $tem_dados = true;
+        }
+    } catch(PDOException $e) {
+        // Erro ao buscar dados
+    }
+}
+
+// Calcular idade
+$idade = null;
+if ($perfil && $perfil['data_nascimento']) {
+    $data_nasc = new DateTime($perfil['data_nascimento']);
+    $hoje = new DateTime();
+    $idade = $hoje->diff($data_nasc)->y;
+}
+
+// Formatar data
+function formatarData($data) {
+    if (!$data) return '';
+    return date('d/m/Y', strtotime($data));
+}
+
+// Formatar sexo
+function formatarSexo($sexo) {
+    $sexos = [
+        'masculino' => 'MASCULINO',
+        'feminino' => 'FEMININO',
+        'outro' => 'OUTRO'
+    ];
+    return $sexos[$sexo] ?? strtoupper($sexo);
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -39,37 +97,72 @@
     <!-- Conteúdo principal -->
     <main>
         <section class="ficha-medica">
-            <h2>FICHA MÉDICA</h2>
+            <div class="ficha-medica">
+                <h2>FICHA MÉDICA</h2>
+            </div>
             <hr>
 
+            <?php if ($tem_dados): ?>
+                    <a href="form_perfil.php?editar=1" class="btn-editar-perfil">✏️ Editar Perfil</a>
+            <?php endif; ?>
+            
+            <?php if (!$tem_dados): ?>
+                <!-- Mensagem quando não tem dados -->
+                <div class="mensagem-sem-dados">
+                    <div class="mensagem-icon">📋</div>
+                    <h3>Nenhum dado cadastrado</h3>
+                    <p>Você ainda não possui informações médicas cadastradas no sistema.</p>
+                    <p>Cadastre suas informações para que profissionais de saúde possam acessá-las em caso de emergência.</p>
+                    <a href="form_perfil.php" class="btn-cadastrar-perfil">➕ Cadastrar Meu Perfil</a>
+                </div>
+            <?php else: ?>
+
             <div class="carousel" id="fichaCarousel">
-
                 <div class="carousel-inner">
-
                     <!-- Slide 1 -->
                     <div class="carousel-item active">
                         <div class="card-ficha">
                             <div class="perfil">
-                                <img src="img/perfil.svg" alt="Foto do usuário">
+                                <?php 
+                                $foto_perfil = $perfil['foto_perfil'] ?? null;
+                                $foto_src = $foto_perfil ? 'uploads/fotos/' . $foto_perfil : 'img/perfil.svg';
+                                ?>
+                                <img src="<?= htmlspecialchars($foto_src) ?>" alt="Foto do usuário" style="object-fit: cover;">
                                 <div>
-                                    <h3>JOANA DARK</h3>
-                                    <p><strong>IDADE:</strong> 23 ANOS</p>
+                                    <h3><?= htmlspecialchars(strtoupper($perfil['nome_usuario'] ?? $_SESSION['usuario_nome'])) ?></h3>
+                                    <?php if ($idade): ?>
+                                        <p><strong>IDADE:</strong> <?= $idade ?> ANOS</p>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                             <div class="info-basica">
                                 <h4>INFORMAÇÕES BÁSICAS</h4>
-                                <p><strong>DATA DE NASCIMENTO:</strong> 03/04/2002</p>
-                                <p><strong>SEXO:</strong> FEMININO</p>
-                                <p><strong>CPF:</strong> 489.069.228-25</p>
-                                <p><strong>TELEFONE:</strong> (19) 97112-0245</p>
-                                <p><strong>E-MAIL:</strong> JOANA@GMAIL.COM</p>
+                                <?php if ($perfil['data_nascimento']): ?>
+                                    <p><strong>DATA DE NASCIMENTO:</strong> <?= formatarData($perfil['data_nascimento']) ?></p>
+                                <?php endif; ?>
+                                <?php if ($perfil['sexo']): ?>
+                                    <p><strong>SEXO:</strong> <?= formatarSexo($perfil['sexo']) ?></p>
+                                <?php endif; ?>
+                                <?php if ($perfil['cpf']): ?>
+                                    <p><strong>CPF:</strong> <?= htmlspecialchars($perfil['cpf']) ?></p>
+                                <?php endif; ?>
+                                <?php if ($perfil['telefone']): ?>
+                                    <p><strong>TELEFONE:</strong> <?= htmlspecialchars($perfil['telefone']) ?></p>
+                                <?php endif; ?>
+                                <?php if ($perfil['email']): ?>
+                                    <p><strong>E-MAIL:</strong> <?= htmlspecialchars(strtoupper($perfil['email'])) ?></p>
+                                <?php endif; ?>
                             </div>
+                            <?php if ($contato_emergencia): ?>
                             <div class="contato-emergencia">
                                 <h4>CONTATO DE EMERGÊNCIA</h4>
-                                <p><strong>CONTATO:</strong> PATRÍCIA</p>
-                                <p><strong>PARENTESCO:</strong> MÃE</p>
-                                <p><strong>TELEFONE:</strong> (19) 99695-1292</p>
+                                <p><strong>CONTATO:</strong> <?= htmlspecialchars(strtoupper($contato_emergencia['nome'])) ?></p>
+                                <?php if ($contato_emergencia['parentesco']): ?>
+                                    <p><strong>PARENTESCO:</strong> <?= htmlspecialchars(strtoupper($contato_emergencia['parentesco'])) ?></p>
+                                <?php endif; ?>
+                                <p><strong>TELEFONE:</strong> <?= htmlspecialchars($contato_emergencia['telefone']) ?></p>
                             </div>
+                            <?php endif; ?>
                         </div>
                     </div>
 
@@ -77,21 +170,39 @@
                     <div class="carousel-item">
                         <div class="card-ficha">
                             <div class="perfil">
-                                <img src="img/perfil.svg" alt="Foto do usuário">
+                                <img src="<?= htmlspecialchars($foto_src) ?>" alt="Foto do usuário" style="object-fit: cover;">
                                 <div>
-                                    <h3>JOANA DARK</h3>
-                                    <p><strong>IDADE:</strong> 23 ANOS</p>
+                                    <h3><?= htmlspecialchars(strtoupper($perfil['nome_usuario'] ?? $_SESSION['usuario_nome'])) ?></h3>
+                                    <?php if ($idade): ?>
+                                        <p><strong>IDADE:</strong> <?= $idade ?> ANOS</p>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                             <div class="info-basica">
                                 <h4>INFORMAÇÕES MÉDICAS</h4>
-                                <p><strong>DOENÇAS CRÔNICAS:</strong> DIABETE TIPO 1 | HIPERTENSÃO</p>
-                                <p><strong>ALERGIA:</strong> AZITROMICINA</p>
-                                <p><strong>TIPO SANGUÍNEO:</strong> A+</p>
-                                <p><strong>MEDICAÇÃO DE USO CONTÍNUO:</strong> CAPTOPRIL | INSULINA</p>
-                                <p><strong>DOENÇA MENTAL:</strong> NÃO</p>
-                                <p><strong>DISPOSITIVO IMPLANTADOS:</strong> MARCA PASSO | BOMBA DE INSULINA</p>
-                                <p><strong>INFORMAÇÕES RELEVANTES:</strong> GRÁVIDA</p>
+                                <?php if ($perfil['doencas_cronicas']): ?>
+                                    <p><strong>DOENÇAS CRÔNICAS:</strong> <?= htmlspecialchars(strtoupper($perfil['doencas_cronicas'])) ?></p>
+                                <?php endif; ?>
+                                <?php if ($perfil['alergias']): ?>
+                                    <p><strong>ALERGIA:</strong> <?= htmlspecialchars(strtoupper($perfil['alergias'])) ?></p>
+                                <?php endif; ?>
+                                <?php if ($perfil['tipo_sanguineo']): ?>
+                                    <p><strong>TIPO SANGUÍNEO:</strong> <?= htmlspecialchars($perfil['tipo_sanguineo']) ?></p>
+                                <?php endif; ?>
+                                <?php if ($perfil['medicacao_continua']): ?>
+                                    <p><strong>MEDICAÇÃO DE USO CONTÍNUO:</strong> <?= htmlspecialchars(strtoupper($perfil['medicacao_continua'])) ?></p>
+                                <?php endif; ?>
+                                <?php if ($perfil['doenca_mental']): ?>
+                                    <p><strong>DOENÇA MENTAL:</strong> <?= htmlspecialchars(strtoupper($perfil['doenca_mental'])) ?></p>
+                                <?php else: ?>
+                                    <p><strong>DOENÇA MENTAL:</strong> NÃO</p>
+                                <?php endif; ?>
+                                <?php if ($perfil['dispositivo_implantado']): ?>
+                                    <p><strong>DISPOSITIVO IMPLANTADOS:</strong> <?= htmlspecialchars(strtoupper($perfil['dispositivo_implantado'])) ?></p>
+                                <?php endif; ?>
+                                <?php if ($perfil['info_relevantes']): ?>
+                                    <p><strong>INFORMAÇÕES RELEVANTES:</strong> <?= htmlspecialchars(strtoupper($perfil['info_relevantes'])) ?></p>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -100,19 +211,24 @@
                     <div class="carousel-item">
                         <div class="card-ficha">
                             <div class="perfil">
-                                <img src="img/perfil.svg" alt="Foto do usuário">
+                                <img src="<?= htmlspecialchars($foto_src) ?>" alt="Foto do usuário" style="object-fit: cover;">
                                 <div>
-                                    <h3>JOANA DARK</h3>
-                                    <p><strong>IDADE:</strong> 23 ANOS</p>
+                                    <h3><?= htmlspecialchars(strtoupper($perfil['nome_usuario'] ?? $_SESSION['usuario_nome'])) ?></h3>
+                                    <?php if ($idade): ?>
+                                        <p><strong>IDADE:</strong> <?= $idade ?> ANOS</p>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                             <div class="info-basica">
                                 <h4>HISTÓRICO MÉDICO</h4>
-                                <p><strong>CIRURGIA:</strong> RETIRADA AMIDALA EM 2016</p>
+                                <?php if ($perfil['cirurgias']): ?>
+                                    <p><strong>CIRURGIA:</strong> <?= htmlspecialchars(strtoupper($perfil['cirurgias'])) ?></p>
+                                <?php else: ?>
+                                    <p><strong>CIRURGIA:</strong> NENHUMA REGISTRADA</p>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
-
                 </div>
 
                 <!-- Controles -->
@@ -127,6 +243,7 @@
                 </div>
 
             </div>
+            <?php endif; ?>
         </section>
     </main>
   <!-- Rodapé -->

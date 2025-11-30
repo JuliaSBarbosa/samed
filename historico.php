@@ -77,7 +77,7 @@ $valor_fim = htmlspecialchars($data_fim ?? '');
             <span class="divisor">|</span>
             <a href="dependentes.php">DEPENDENTES</a>
             <span class="divisor">|</span>
-            <a href="dependentes.php" class="ativo">HISTÓRICO</a>
+            <a href="historico.php" class="ativo">HISTÓRICO</a>
             <span class="divisor">|</span>
             <a href="hospital.php">UNIDADES DE SAÚDE</a>
         </nav>
@@ -98,64 +98,147 @@ $valor_fim = htmlspecialchars($data_fim ?? '');
 
             <!-- Formulário de Filtro -->
             <form method="GET" class="filtro-historico">
-
-                <div class="campo-filtro">
-                    <label for="data_inicio">Data Início:</label>
-                    <input type="date" id="data_inicio" name="data_inicio" value="<?= $valor_inicio ?>">
+                <div class="filtro-header">
+                    <h3>Filtros de Busca</h3>
+                    <?php if ($data_inicio || $data_fim || $paciente): ?>
+                        <a href="historico.php" class="btn-limpar-filtros">Limpar Filtros</a>
+                    <?php endif; ?>
                 </div>
 
-                <div class="campo-filtro">
-                    <label for="data_fim">Data Fim:</label>
-                    <input type="date" id="data_fim" name="data_fim" value="<?= $valor_fim ?>">
+                <div class="filtro-grid">
+                    <div class="campo-filtro">
+                        <label for="data_inicio">
+                            <span class="filtro-icon">📅</span>
+                            Data Início
+                        </label>
+                        <input type="date" id="data_inicio" name="data_inicio" value="<?= $valor_inicio ?>" class="filtro-input">
+                    </div>
+
+                    <div class="campo-filtro">
+                        <label for="data_fim">
+                            <span class="filtro-icon">📅</span>
+                            Data Fim
+                        </label>
+                        <input type="date" id="data_fim" name="data_fim" value="<?= $valor_fim ?>" class="filtro-input">
+                    </div>
+
+                    <div class="campo-filtro">
+                        <label for="paciente">
+                            <span class="filtro-icon">👤</span>
+                            Paciente
+                        </label>
+                        <select name="paciente" id="paciente" class="filtro-select">
+                            <option value="">Todos os pacientes</option>
+                            <?php
+                            // Gera lista única de pacientes dinamicamente
+                            $pacientes = array_unique(array_column($historico_acessos, 'paciente_consultado'));
+                            foreach ($pacientes as $p):
+                                $p_esc = htmlspecialchars($p);
+                                $selecionado = (isset($_GET['paciente']) && $_GET['paciente'] === $p) ? 'selected' : '';
+                                ?>
+                                <option value="<?= $p_esc ?>" <?= $selecionado ?>><?= $p_esc ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
                 </div>
 
-                <div class="campo-filtro">
-                    <label for="paciente">Paciente:</label>
-                    <select name="paciente" id="paciente">
-                        <option value="">Todos</option>
-
-                        <?php
-                        // Gera lista única de pacientes dinamicamente
-                        $pacientes = array_unique(array_column($historico_acessos, 'paciente_consultado'));
-                        foreach ($pacientes as $p):
-                            $p_esc = htmlspecialchars($p);
-                            $selecionado = (isset($_GET['paciente']) && $_GET['paciente'] === $p) ? 'selected' : '';
-                            ?>
-                            <option value="<?= $p_esc ?>" <?= $selecionado ?>><?= $p_esc ?></option>
-                        <?php endforeach; ?>
-                    </select>
+                <div class="filtro-actions-historico">
+                    <button type="submit" class="btn-filtrar">
+                        <span>🔍</span>
+                        Filtrar
+                    </button>
                 </div>
-
-                <button type="submit" class="btn-filtrar">FILTRAR</button>
             </form>
+
+            <!-- Contador de Resultados -->
+            <?php if (count($historico_filtrado) > 0): ?>
+                <div class="contador-resultados">
+                    <strong><?= count($historico_filtrado) ?></strong> 
+                    <?= count($historico_filtrado) == 1 ? 'registro encontrado' : 'registros encontrados' ?>
+                </div>
+            <?php endif; ?>
 
             <!-- Tabela de Histórico -->
             <?php if (count($historico_filtrado) > 0): ?>
-                <table class="tabela-historico">
-                    <thead>
-                        <tr>
-                            <th>Paciente Consultado</th>
-                            <th>Data e Hora</th>
-                            <th>Profissional</th>
-                            <th>Registro Profissional</th>
-                            <th>Tipo de Acesso</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($historico_filtrado as $acesso): ?>
+                <div class="tabela-wrapper">
+                    <table class="tabela-historico">
+                        <thead>
                             <tr>
-                                <td><?= htmlspecialchars($acesso['paciente_consultado']); ?></td>
-                                <td><?= date('d/m/Y H:i:s', strtotime($acesso['data_hora'])); ?></td>
-                                <td><?= htmlspecialchars($acesso['nome']); ?></td>
-                                <td><?= htmlspecialchars($acesso['registro']); ?></td>
-                                <td><?= htmlspecialchars($acesso['tipo']); ?></td>
+                                <th>Paciente</th>
+                                <th>Data e Hora</th>
+                                <th>Profissional</th>
+                                <th>Registro</th>
+                                <th>Tipo de Acesso</th>
                             </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($historico_filtrado as $acesso): 
+                                // Determina a classe do badge baseado no tipo
+                                $tipo_class = '';
+                                $tipo_icon = '';
+                                if (strpos($acesso['tipo'], 'Médico') !== false) {
+                                    $tipo_class = 'badge-medico';
+                                    $tipo_icon = '👨‍⚕️';
+                                } elseif (strpos($acesso['tipo'], 'Enfermeiro') !== false) {
+                                    $tipo_class = 'badge-enfermeiro';
+                                    $tipo_icon = '👩‍⚕️';
+                                } elseif (strpos($acesso['tipo'], 'Técnico') !== false) {
+                                    $tipo_class = 'badge-tecnico';
+                                    $tipo_icon = '💉';
+                                } elseif (strpos($acesso['tipo'], 'Emergência') !== false) {
+                                    $tipo_class = 'badge-emergencia';
+                                    $tipo_icon = '🚨';
+                                } else {
+                                    $tipo_class = 'badge-outro';
+                                    $tipo_icon = '📋';
+                                }
+                                
+                                // Verifica se é dependente
+                                $is_dependente = strpos($acesso['paciente_consultado'], '(Dependente)') !== false;
+                            ?>
+                                <tr>
+                                    <td>
+                                        <div class="paciente-info">
+                                            <?php if ($is_dependente): ?>
+                                                <span class="badge-dependente">👶 Dependente</span>
+                                            <?php else: ?>
+                                                <span class="badge-titular">👤 Titular</span>
+                                            <?php endif; ?>
+                                            <span class="paciente-nome"><?= htmlspecialchars($acesso['paciente_consultado']); ?></span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="data-hora">
+                                            <span class="data"><?= date('d/m/Y', strtotime($acesso['data_hora'])); ?></span>
+                                            <span class="hora"><?= date('H:i:s', strtotime($acesso['data_hora'])); ?></span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="profissional-info">
+                                            <strong><?= htmlspecialchars($acesso['nome']); ?></strong>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="registro"><?= htmlspecialchars($acesso['registro']); ?></span>
+                                    </td>
+                                    <td>
+                                        <span class="badge-tipo <?= $tipo_class ?>">
+                                            <?= $tipo_icon ?> <?= htmlspecialchars($acesso['tipo']); ?>
+                                        </span>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
             <?php else: ?>
                 <div class="mensagem-vazio">
-                    Nenhum registro de acesso encontrado para o período selecionado.
+                    <div class="mensagem-icon">📋</div>
+                    <h3>Nenhum registro encontrado</h3>
+                    <p>Não há registros de acesso para o período ou filtros selecionados.</p>
+                    <?php if ($data_inicio || $data_fim || $paciente): ?>
+                        <a href="historico.php" class="btn-limpar-filtros-inline">Limpar filtros e ver todos</a>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
 

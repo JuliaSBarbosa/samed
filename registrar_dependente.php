@@ -16,6 +16,8 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_tipo'] !== 'paciente')
 }
 
 $paciente_id = $_SESSION['usuario_id'];
+$dependente_id = isset($_POST['dependente_id']) ? (int)$_POST['dependente_id'] : null;
+$editar = $dependente_id !== null;
 
 // Receber e limpar dados do formulário
 $nome = trim($_POST['nome'] ?? '');
@@ -266,6 +268,40 @@ try {
         throw new Exception("Banco de dados não disponível.");
     }
 
+    // Processar upload de foto
+    $foto_perfil = null;
+    if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] === UPLOAD_ERR_OK) {
+        $upload_dir = 'uploads/fotos/';
+        
+        // Criar diretório se não existir
+        if (!file_exists($upload_dir)) {
+            mkdir($upload_dir, 0755, true);
+        }
+        
+        $file = $_FILES['foto_perfil'];
+        $file_ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $allowed_exts = ['jpg', 'jpeg', 'png', 'gif'];
+        
+        // Validar extensão
+        if (!in_array($file_ext, $allowed_exts)) {
+            throw new Exception("Formato de arquivo não permitido. Use JPG, PNG ou GIF.");
+        }
+        
+        // Validar tamanho (máx 2MB)
+        if ($file['size'] > 2 * 1024 * 1024) {
+            throw new Exception("Arquivo muito grande. Tamanho máximo: 2MB.");
+        }
+        
+        // Gerar nome único
+        $foto_perfil = uniqid('foto_') . '_' . time() . '.' . $file_ext;
+        $upload_path = $upload_dir . $foto_perfil;
+        
+        // Mover arquivo
+        if (!move_uploaded_file($file['tmp_name'], $upload_path)) {
+            throw new Exception("Erro ao fazer upload da foto.");
+        }
+    }
+
     // Iniciar transação
     $pdo->beginTransaction();
 
@@ -275,70 +311,175 @@ try {
     // Formatar CPF (com máscara)
     $cpf_formatado = !empty($cpf) ? substr($cpf, 0, 3) . '.' . substr($cpf, 3, 3) . '.' . substr($cpf, 6, 3) . '-' . substr($cpf, 9, 2) : null;
 
-    // Verificar se já existe dependente com mesmo CPF (se fornecido)
-    if (!empty($cpf_formatado)) {
-        $stmt = $pdo->prepare("SELECT id FROM dependentes WHERE cpf = ? AND paciente_id = ?");
-        $stmt->execute([$cpf_formatado, $paciente_id]);
-        if ($stmt->fetch()) {
-            throw new Exception("Já existe um dependente cadastrado com este CPF.");
+    if ($editar) {
+        // Verificar se o dependente pertence ao paciente
+        $stmt = $pdo->prepare("SELECT id FROM dependentes WHERE id = ? AND paciente_id = ?");
+        $stmt->execute([$dependente_id, $paciente_id]);
+        if (!$stmt->fetch()) {
+            throw new Exception("Dependente não encontrado ou não pertence a você.");
         }
+        
+        // Buscar foto antiga se houver
+        $stmt = $pdo->prepare("SELECT foto_perfil FROM dependentes WHERE id = ?");
+        $stmt->execute([$dependente_id]);
+        $foto_antiga = $stmt->fetchColumn();
+        
+        // Atualizar dependente
+        if ($foto_perfil) {
+            $stmt = $pdo->prepare("
+                UPDATE dependentes 
+                SET nome = ?, data_nascimento = ?, sexo = ?, cpf = ?, 
+                    telefone = ?, email = ?, foto_perfil = ?
+                WHERE id = ?
+            ");
+            $stmt->execute([
+                $nome, $data_nascimento_formatada, $sexo, $cpf_formatado,
+                $telefone, $email, $foto_perfil, $dependente_id
+            ]);
+            
+            // Deletar foto antiga se houver
+            if ($foto_antiga && file_exists('uploads/fotos/' . $foto_antiga)) {
+                unlink('uploads/fotos/' . $foto_antiga);
+            }
+        } else {
+            $stmt = $pdo->prepare("
+                UPDATE dependentes 
+                SET nome = ?, data_nascimento = ?, sexo = ?, cpf = ?, 
+                    telefone = ?, email = ?
+                WHERE id = ?
+            ");
+            $stmt->execute([
+                $nome, $data_nascimento_formatada, $sexo, $cpf_formatado,
+                $telefone, $email, $dependente_id
+            ]);
+        }
+    } else {
+        // Verificar se já existe dependente com mesmo CPF (se fornecido)
+        if (!empty($cpf_formatado)) {
+            $stmt = $pdo->prepare("SELECT id FROM dependentes WHERE cpf = ? AND paciente_id = ?");
+            $stmt->execute([$cpf_formatado, $paciente_id]);
+            if ($stmt->fetch()) {
+                throw new Exception("Já existe um dependente cadastrado com este CPF.");
+            }
+        }
+
+        // Inserir dependente
+        $stmt = $pdo->prepare("
+            INSERT INTO dependentes 
+            (paciente_id, nome, data_nascimento, sexo, cpf, telefone, email, foto_perfil) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->execute([
+            $paciente_id,
+            $nome,
+            $data_nascimento_formatada,
+            $sexo,
+            $cpf_formatado,
+            $telefone,
+            $email,
+            $foto_perfil
+        ]);
+
+        $dependente_id = $pdo->lastInsertId();
     }
 
-    // Inserir dependente
-    $stmt = $pdo->prepare("
-        INSERT INTO dependentes 
-        (paciente_id, nome, data_nascimento, sexo, cpf, telefone, email) 
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    ");
-    $stmt->execute([
-        $paciente_id,
-        $nome,
-        $data_nascimento_formatada,
-        $sexo,
-        $cpf_formatado,
-        $telefone,
-        $email
-    ]);
+    // Verificar se já existe perfil médico
+    $stmt = $pdo->prepare("SELECT id FROM perfis_medicos WHERE dependente_id = ?");
+    $stmt->execute([$dependente_id]);
+    $perfil_existente = $stmt->fetch();
+    
+    if ($perfil_existente) {
+        // Atualizar perfil médico
+        if ($foto_perfil) {
+            $stmt = $pdo->prepare("
+                UPDATE perfis_medicos 
+                SET data_nascimento = ?, sexo = ?, cpf = ?, telefone = ?, email = ?, 
+                    tipo_sanguineo = ?, doencas_cronicas = ?, alergias = ?, 
+                    medicacao_continua = ?, doenca_mental = ?, dispositivo_implantado = ?, 
+                    info_relevantes = ?, cirurgias = ?, foto_perfil = ?,
+                    data_atualizacao = CURRENT_TIMESTAMP
+                WHERE dependente_id = ?
+            ");
+            $stmt->execute([
+                $data_nascimento_formatada, $sexo, $cpf_formatado, $telefone, $email,
+                $tipo_sanguineo, $doencas_cronicas ?: null, $alergias ?: null,
+                $medicacao_continua ?: null, $doenca_mental ?: null, $dispositivo_implantado ?: null,
+                $info_relevantes ?: null, $cirurgias ?: null, $foto_perfil,
+                $dependente_id
+            ]);
+        } else {
+            $stmt = $pdo->prepare("
+                UPDATE perfis_medicos 
+                SET data_nascimento = ?, sexo = ?, cpf = ?, telefone = ?, email = ?, 
+                    tipo_sanguineo = ?, doencas_cronicas = ?, alergias = ?, 
+                    medicacao_continua = ?, doenca_mental = ?, dispositivo_implantado = ?, 
+                    info_relevantes = ?, cirurgias = ?,
+                    data_atualizacao = CURRENT_TIMESTAMP
+                WHERE dependente_id = ?
+            ");
+            $stmt->execute([
+                $data_nascimento_formatada, $sexo, $cpf_formatado, $telefone, $email,
+                $tipo_sanguineo, $doencas_cronicas ?: null, $alergias ?: null,
+                $medicacao_continua ?: null, $doenca_mental ?: null, $dispositivo_implantado ?: null,
+                $info_relevantes ?: null, $cirurgias ?: null,
+                $dependente_id
+            ]);
+        }
+    } else {
+        // Inserir perfil médico do dependente
+        $stmt = $pdo->prepare("
+            INSERT INTO perfis_medicos 
+            (dependente_id, data_nascimento, sexo, cpf, telefone, email, tipo_sanguineo, 
+             doencas_cronicas, alergias, medicacao_continua, doenca_mental, 
+             dispositivo_implantado, info_relevantes, cirurgias, foto_perfil) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->execute([
+            $dependente_id,
+            $data_nascimento_formatada,
+            $sexo,
+            $cpf_formatado,
+            $telefone,
+            $email,
+            $tipo_sanguineo,
+            $doencas_cronicas ?: null,
+            $alergias ?: null,
+            $medicacao_continua ?: null,
+            $doenca_mental ?: null,
+            $dispositivo_implantado ?: null,
+            $info_relevantes ?: null,
+            $cirurgias ?: null,
+            $foto_perfil
+        ]);
+    }
 
-    $dependente_id = $pdo->lastInsertId();
-
-    // Inserir perfil médico do dependente
-    $stmt = $pdo->prepare("
-        INSERT INTO perfis_medicos 
-        (dependente_id, data_nascimento, sexo, cpf, telefone, email, tipo_sanguineo, 
-         doencas_cronicas, alergias, medicacao_continua, doenca_mental, 
-         dispositivo_implantado, info_relevantes, cirurgias) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ");
-    $stmt->execute([
-        $dependente_id,
-        $data_nascimento_formatada,
-        $sexo,
-        $cpf_formatado,
-        $telefone,
-        $email,
-        $tipo_sanguineo,
-        $doencas_cronicas ?: null,
-        $alergias ?: null,
-        $medicacao_continua ?: null,
-        $doenca_mental ?: null,
-        $dispositivo_implantado ?: null,
-        $info_relevantes ?: null,
-        $cirurgias ?: null
-    ]);
-
-    // Inserir contato de emergência do dependente
-    $stmt = $pdo->prepare("
-        INSERT INTO contatos_emergencia (dependente_id, nome, parentesco, telefone) 
-        VALUES (?, ?, ?, ?)
-    ");
-    $stmt->execute([$dependente_id, $contato_nome, $parentesco, $contato_telefone]);
+    // Verificar se já existe contato de emergência
+    $stmt = $pdo->prepare("SELECT id FROM contatos_emergencia WHERE dependente_id = ?");
+    $stmt->execute([$dependente_id]);
+    $contato_existente = $stmt->fetch();
+    
+    if ($contato_existente) {
+        // Atualizar contato de emergência
+        $stmt = $pdo->prepare("
+            UPDATE contatos_emergencia 
+            SET nome = ?, parentesco = ?, telefone = ? 
+            WHERE dependente_id = ?
+        ");
+        $stmt->execute([$contato_nome, $parentesco, $contato_telefone, $dependente_id]);
+    } else {
+        // Inserir contato de emergência do dependente
+        $stmt = $pdo->prepare("
+            INSERT INTO contatos_emergencia (dependente_id, nome, parentesco, telefone) 
+            VALUES (?, ?, ?, ?)
+        ");
+        $stmt->execute([$dependente_id, $contato_nome, $parentesco, $contato_telefone]);
+    }
 
     // Confirmar transação
     $pdo->commit();
 
     // Sucesso
-    $_SESSION['sucesso'] = "Dependente cadastrado com sucesso!";
+    $_SESSION['sucesso'] = $editar ? "Dependente atualizado com sucesso!" : "Dependente cadastrado com sucesso!";
     header('Location: dependentes.php');
     exit;
 
