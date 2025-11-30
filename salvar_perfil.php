@@ -17,13 +17,73 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_tipo'] !== 'paciente')
 
 $usuario_id = $_SESSION['usuario_id'];
 
+// Verificar se o usuário existe no banco de dados
+if (!$pdo) {
+    $_SESSION['erros'] = ["Banco de dados não disponível. Não é possível salvar o perfil."];
+    $_SESSION['dados_form'] = $_POST;
+    header('Location: form_perfil.php');
+    exit;
+}
+
+try {
+    $stmt = $pdo->prepare("SELECT id FROM usuarios WHERE id = ?");
+    $stmt->execute([$usuario_id]);
+    $usuario_existe = $stmt->fetch();
+    
+    if (!$usuario_existe) {
+        // Usuário não existe no banco - pode estar usando usuário padrão
+        // Tentar encontrar pelo email ou criar novo registro
+        $email_usuario = $_SESSION['usuario_email'] ?? $email ?? '';
+        
+        if (!empty($email_usuario)) {
+            $stmt = $pdo->prepare("SELECT id FROM usuarios WHERE email = ?");
+            $stmt->execute([$email_usuario]);
+            $usuario_email = $stmt->fetch();
+            
+            if ($usuario_email) {
+                // Usar o ID existente
+                $usuario_id = $usuario_email['id'];
+                $_SESSION['usuario_id'] = $usuario_id;
+            } else {
+                // Criar novo usuário no banco
+                $nome_usuario = $_SESSION['usuario_nome'] ?? $nome ?? 'Usuário';
+                $tipo_usuario = $_SESSION['usuario_tipo'] ?? 'paciente';
+                $senha_hash = password_hash('temp123', PASSWORD_DEFAULT);
+                
+                $stmt = $pdo->prepare("
+                    INSERT INTO usuarios (nome, email, senha, tipo) 
+                    VALUES (?, ?, ?, ?)
+                ");
+                $stmt->execute([$nome_usuario, $email_usuario, $senha_hash, $tipo_usuario]);
+                $usuario_id = $pdo->lastInsertId();
+                $_SESSION['usuario_id'] = $usuario_id;
+            }
+        } else {
+            throw new Exception("Não foi possível identificar o usuário. Faça login novamente.");
+        }
+    }
+} catch(PDOException $e) {
+    $_SESSION['erros'] = ["Erro ao verificar usuário no banco de dados: " . $e->getMessage()];
+    $_SESSION['dados_form'] = $_POST;
+    header('Location: form_perfil.php');
+    exit;
+} catch(Exception $e) {
+    $_SESSION['erros'] = [$e->getMessage()];
+    $_SESSION['dados_form'] = $_POST;
+    header('Location: form_perfil.php');
+    exit;
+}
+
 // Receber e limpar dados do formulário
 $nome = trim($_POST['nome'] ?? '');
 $data_nascimento = $_POST['data_nascimento'] ?? null;
 $sexo = $_POST['sexo'] ?? null;
 $cpf = trim($_POST['cpf'] ?? '');
 $telefone = trim($_POST['telefone'] ?? '');
-$email = trim($_POST['email'] ?? '');
+
+// Email: usar o do formulário se preenchido, senão usar o email do login
+$email_form = trim($_POST['email'] ?? '');
+$email = !empty($email_form) ? $email_form : ($_SESSION['usuario_email'] ?? '');
 
 // Dados de contato de emergência
 $contato_nome = trim($_POST['contato_nome'] ?? '');

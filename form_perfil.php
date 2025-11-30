@@ -227,8 +227,16 @@ if (isset($_SESSION['dados_form'])) {
                 <label for="telefone">Telefone</label>
                 <input type="tel" id="telefone" name="telefone" placeholder="Digite o número do seu telefone" value="<?= htmlspecialchars($dados_form['telefone'] ?? $perfil['telefone'] ?? '') ?>">
 
-                <label for="email">E-mail</label>
-                <input type="email" id="email" name="email" placeholder="Digite o seu e-mail" value="<?= htmlspecialchars($dados_form['email'] ?? $perfil['email'] ?? '') ?>">
+                <label for="email">E-mail de contato (opcional)</label>
+                <?php 
+                // Usar email do perfil se existir, senão usar email do login
+                $email_valor = $dados_form['email'] ?? $perfil['email'] ?? $_SESSION['usuario_email'] ?? '';
+                ?>
+                <input type="email" id="email" name="email" placeholder="Deixe em branco para usar o email do login" value="<?= htmlspecialchars($email_valor) ?>">
+                <p style="font-size: 0.85rem; color: #666; margin-top: 5px;">
+                    Email do login: <strong><?= htmlspecialchars($_SESSION['usuario_email'] ?? 'Não informado') ?></strong>
+                    <br>Se deixar em branco, será usado o email do login automaticamente.
+                </p>
             </div>
 
             <!-- Etapa 2: Contato de Emergência -->
