@@ -1,15 +1,80 @@
 <?php
 require_once 'verificar_login.php';
+require_once 'config.php';
 
-// --- SIMULAÇÃO DE DADOS (Substituir pela busca REAL no banco de dados) ---
-$historico_acessos = [
-    ['nome' => 'Dr. João Silva', 'registro' => 'CRM-SP 123456', 'data_hora' => '2025-10-25 09:30:00', 'tipo' => 'Médico', 'paciente_consultado' => htmlspecialchars($_SESSION['usuario_nome'])],
-    ['nome' => 'Enf. Maria Oliveira', 'registro' => 'COREN-SP 98765', 'data_hora' => '2025-10-25 14:00:00', 'tipo' => 'Enfermeiro(a)', 'paciente_consultado' => 'Pedro Oliveira (Dependente)'],
-    ['nome' => 'Téc. Paulo Santos', 'registro' => 'COREN-SP 32165', 'data_hora' => '2025-10-26 11:45:00', 'tipo' => 'Técnico de Enfermagem', 'paciente_consultado' => htmlspecialchars($_SESSION['usuario_nome'])],
-    ['nome' => 'Dr. Ana Costa', 'registro' => 'CRM-SP 654321', 'data_hora' => '2025-11-01 19:15:00', 'tipo' => 'Médico', 'paciente_consultado' => 'Sofia Pereira (Dependente)'],
-    ['nome' => 'Soc. Anderson Barbosa', 'registro' => 'COREN-SP 12345', 'data_hora' => '2025-11-02 08:00:00', 'tipo' => 'Acesso de Emergência', 'paciente_consultado' => htmlspecialchars($_SESSION['usuario_nome'])],
-    ['nome' => 'Dr. Lucas Pereira', 'registro' => 'CRM-SP 778899', 'data_hora' => '2025-11-03 10:20:00', 'tipo' => 'Médico', 'paciente_consultado' => 'Pedro Oliveira (Dependente)'],
-];
+$usuario_id = $_SESSION['usuario_id'] ?? null;
+$historico_acessos = [];
+
+// Buscar histórico de acessos do banco de dados
+if ($pdo && $usuario_id) {
+    try {
+        // Buscar acessos ao próprio paciente e seus dependentes
+        // Inclui tanto profissionais quanto pacientes comuns que visualizaram
+        $stmt = $pdo->prepare("
+            SELECT 
+                ha.*,
+                u_prof.nome as nome_profissional,
+                u_prof.tipo as tipo_profissional,
+                u_prof.crm,
+                u_prof.coren,
+                u_pac.nome as nome_paciente,
+                d.nome as nome_dependente,
+                ha.registro_profissional,
+                ha.tipo_acesso
+            FROM historico_acessos ha
+            INNER JOIN usuarios u_prof ON ha.profissional_id = u_prof.id
+            INNER JOIN usuarios u_pac ON ha.paciente_id = u_pac.id
+            LEFT JOIN dependentes d ON ha.dependente_id = d.id
+            WHERE ha.paciente_id = ?
+            ORDER BY ha.data_hora DESC
+        ");
+        $stmt->execute([$usuario_id]);
+        $acessos = $stmt->fetchAll();
+        
+        foreach ($acessos as $acesso) {
+            $tipo_prof = '';
+            $registro = '';
+            
+            // Determinar tipo baseado no tipo de usuário e tipo de acesso
+            if ($acesso['tipo_profissional'] === 'medico') {
+                $tipo_prof = 'Médico';
+                $registro = $acesso['crm'] ?? $acesso['registro_profissional'] ?? '';
+            } elseif ($acesso['tipo_profissional'] === 'enfermeiro') {
+                $tipo_prof = 'Enfermeiro(a)';
+                $registro = $acesso['coren'] ?? $acesso['registro_profissional'] ?? '';
+            } elseif ($acesso['tipo_profissional'] === 'paciente') {
+                $tipo_prof = 'Usuário Comum';
+                $registro = '';
+            } else {
+                $tipo_prof = 'Profissional de Saúde';
+                $registro = $acesso['registro_profissional'] ?? '';
+            }
+            
+            // Usar tipo_acesso se disponível
+            if (!empty($acesso['tipo_acesso']) && $acesso['tipo_acesso'] !== 'Consulta') {
+                $tipo_prof = $acesso['tipo_acesso'];
+            }
+            
+            $paciente_nome = '';
+            if ($acesso['dependente_id']) {
+                $paciente_nome = $acesso['nome_dependente'] . ' (Dependente)';
+            } else {
+                $paciente_nome = $acesso['nome_paciente'];
+            }
+            
+            $historico_acessos[] = [
+                'nome' => $acesso['nome_profissional'],
+                'registro' => $registro,
+                'data_hora' => $acesso['data_hora'],
+                'tipo' => $tipo_prof,
+                'paciente_consultado' => $paciente_nome
+            ];
+        }
+    } catch(PDOException $e) {
+        // Erro ao buscar dados
+        error_log("Erro ao buscar histórico: " . $e->getMessage());
+    }
+}
 
 // --- LÓGICA DE FILTRAGEM ---
 $data_inicio = $_GET['data_inicio'] ?? null;
@@ -19,7 +84,6 @@ $historico_filtrado = $historico_acessos;
 
 if ($data_inicio || $data_fim || $paciente) {
     $historico_filtrado = array_filter($historico_acessos, function($acesso) use ($data_inicio, $data_fim, $paciente) {
-
         $data_acesso = date('Y-m-d', strtotime($acesso['data_hora']));
         $ok_inicio = true;
         $ok_fim = true;
@@ -40,7 +104,6 @@ if ($data_inicio || $data_fim || $paciente) {
         return $ok_inicio && $ok_fim && $ok_paciente;
     });
 }
-
 
 // Para manter os dados de filtro no formulário
 $valor_inicio = htmlspecialchars($data_inicio ?? '');

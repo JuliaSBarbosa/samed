@@ -218,6 +218,9 @@ $dispositivo_implantado = !empty($dispositivos_lista) ? implode(', ', $dispositi
 $info_relevantes = trim($_POST['info_relevantes'] ?? '');
 $cirurgias = trim($_POST['cirurgias'] ?? '');
 
+// Configurações de privacidade
+$autorizacao_usuario = $_POST['autorizacao_usuario'] ?? 'nao';
+
 // Validações básicas
 $erros = [];
 
@@ -388,53 +391,67 @@ try {
     $stmt->execute([$dependente_id]);
     $perfil_existente = $stmt->fetch();
     
+    // Verificar se a coluna autorizacao_usuario existe
+    $coluna_autorizacao_existe = false;
+    try {
+        $stmt = $pdo->query("SHOW COLUMNS FROM perfis_medicos LIKE 'autorizacao_usuario'");
+        $coluna_autorizacao_existe = $stmt->rowCount() > 0;
+    } catch(PDOException $e) {
+        $coluna_autorizacao_existe = false;
+    }
+    
     if ($perfil_existente) {
         // Atualizar perfil médico
+        $set_parts = [
+            'data_nascimento = ?',
+            'sexo = ?',
+            'cpf = ?',
+            'telefone = ?',
+            'email = ?',
+            'tipo_sanguineo = ?',
+            'doencas_cronicas = ?',
+            'alergias = ?',
+            'medicacao_continua = ?',
+            'doenca_mental = ?',
+            'dispositivo_implantado = ?',
+            'info_relevantes = ?',
+            'cirurgias = ?'
+        ];
+        
+        $valores_update = [
+            $data_nascimento_formatada, $sexo, $cpf_formatado, $telefone, $email,
+            $tipo_sanguineo, $doencas_cronicas ?: null, $alergias ?: null,
+            $medicacao_continua ?: null, $doenca_mental ?: null, $dispositivo_implantado ?: null,
+            $info_relevantes ?: null, $cirurgias ?: null
+        ];
+        
         if ($foto_perfil) {
-            $stmt = $pdo->prepare("
-                UPDATE perfis_medicos 
-                SET data_nascimento = ?, sexo = ?, cpf = ?, telefone = ?, email = ?, 
-                    tipo_sanguineo = ?, doencas_cronicas = ?, alergias = ?, 
-                    medicacao_continua = ?, doenca_mental = ?, dispositivo_implantado = ?, 
-                    info_relevantes = ?, cirurgias = ?, foto_perfil = ?,
-                    data_atualizacao = CURRENT_TIMESTAMP
-                WHERE dependente_id = ?
-            ");
-            $stmt->execute([
-                $data_nascimento_formatada, $sexo, $cpf_formatado, $telefone, $email,
-                $tipo_sanguineo, $doencas_cronicas ?: null, $alergias ?: null,
-                $medicacao_continua ?: null, $doenca_mental ?: null, $dispositivo_implantado ?: null,
-                $info_relevantes ?: null, $cirurgias ?: null, $foto_perfil,
-                $dependente_id
-            ]);
-        } else {
-            $stmt = $pdo->prepare("
-                UPDATE perfis_medicos 
-                SET data_nascimento = ?, sexo = ?, cpf = ?, telefone = ?, email = ?, 
-                    tipo_sanguineo = ?, doencas_cronicas = ?, alergias = ?, 
-                    medicacao_continua = ?, doenca_mental = ?, dispositivo_implantado = ?, 
-                    info_relevantes = ?, cirurgias = ?,
-                    data_atualizacao = CURRENT_TIMESTAMP
-                WHERE dependente_id = ?
-            ");
-            $stmt->execute([
-                $data_nascimento_formatada, $sexo, $cpf_formatado, $telefone, $email,
-                $tipo_sanguineo, $doencas_cronicas ?: null, $alergias ?: null,
-                $medicacao_continua ?: null, $doenca_mental ?: null, $dispositivo_implantado ?: null,
-                $info_relevantes ?: null, $cirurgias ?: null,
-                $dependente_id
-            ]);
+            $set_parts[] = 'foto_perfil = ?';
+            $valores_update[] = $foto_perfil;
         }
+        
+        if ($coluna_autorizacao_existe) {
+            $set_parts[] = 'autorizacao_usuario = ?';
+            $valores_update[] = $autorizacao_usuario;
+        }
+        
+        $set_parts[] = 'data_atualizacao = CURRENT_TIMESTAMP';
+        $valores_update[] = $dependente_id;
+        
+        $set_clause = implode(', ', $set_parts);
+        
+        $stmt = $pdo->prepare("
+            UPDATE perfis_medicos 
+            SET $set_clause
+            WHERE dependente_id = ?
+        ");
+        $stmt->execute($valores_update);
     } else {
         // Inserir perfil médico do dependente
-        $stmt = $pdo->prepare("
-            INSERT INTO perfis_medicos 
-            (dependente_id, data_nascimento, sexo, cpf, telefone, email, tipo_sanguineo, 
-             doencas_cronicas, alergias, medicacao_continua, doenca_mental, 
-             dispositivo_implantado, info_relevantes, cirurgias, foto_perfil) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ");
-        $stmt->execute([
+        $campos_insert = ['dependente_id', 'data_nascimento', 'sexo', 'cpf', 'telefone', 'email', 'tipo_sanguineo', 
+                         'doencas_cronicas', 'alergias', 'medicacao_continua', 'doenca_mental', 
+                         'dispositivo_implantado', 'info_relevantes', 'cirurgias'];
+        $valores_insert = [
             $dependente_id,
             $data_nascimento_formatada,
             $sexo,
@@ -448,9 +465,27 @@ try {
             $doenca_mental ?: null,
             $dispositivo_implantado ?: null,
             $info_relevantes ?: null,
-            $cirurgias ?: null,
-            $foto_perfil
-        ]);
+            $cirurgias ?: null
+        ];
+        
+        if ($foto_perfil) {
+            $campos_insert[] = 'foto_perfil';
+            $valores_insert[] = $foto_perfil;
+        }
+        
+        if ($coluna_autorizacao_existe) {
+            $campos_insert[] = 'autorizacao_usuario';
+            $valores_insert[] = $autorizacao_usuario;
+        }
+        
+        $placeholders = str_repeat('?, ', count($valores_insert) - 1) . '?';
+        $campos_str = implode(', ', $campos_insert);
+        
+        $stmt = $pdo->prepare("
+            INSERT INTO perfis_medicos ($campos_str) 
+            VALUES ($placeholders)
+        ");
+        $stmt->execute($valores_insert);
     }
 
     // Verificar se já existe contato de emergência

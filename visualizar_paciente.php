@@ -1,62 +1,165 @@
 <?php
 require_once 'verificar_login.php';
+require_once 'config.php';
 
 // Verificar se é profissional de saúde
 $eh_profissional = false;
-if (isset($_SESSION['usuario_tipo']) && in_array($_SESSION['usuario_tipo'], ['medico', 'enfermeiro', 'tecnico'])) {
+if (isset($_SESSION['usuario_tipo']) && in_array($_SESSION['usuario_tipo'], ['medico', 'enfermeiro'])) {
     $eh_profissional = true;
 }
 
-if (!$eh_profissional) {
+// Verificar se é usuário comum (paciente)
+$eh_paciente = isset($_SESSION['usuario_tipo']) && $_SESSION['usuario_tipo'] === 'paciente';
+
+if (!$eh_profissional && !$eh_paciente) {
     header('Location: index.php');
     exit;
 }
 
-// Receber código da pulseira
+// Receber ID da ficha ou código da pulseira
+$id_ficha = isset($_GET['id_ficha']) ? (int)$_GET['id_ficha'] : null;
 $codigo_pulseira = $_GET['codigo_pulseira'] ?? '';
 
-if (empty($codigo_pulseira)) {
-    header('Location: inicio-med.php');
+if (empty($id_ficha) && empty($codigo_pulseira)) {
+    if ($eh_profissional) {
+        header('Location: inicio-med.php');
+    } else {
+        header('Location: index.php');
+    }
     exit;
 }
 
-// TODO: Buscar dados do paciente no banco de dados usando o código da pulseira
-// Por enquanto, vamos simular dados de exemplo
-$paciente_encontrado = null;
+$paciente_encontrado = false;
 $dados_paciente = null;
+$perfil_id = null;
+$usuario_id_paciente = null;
+$dependente_id = null;
+$eh_dependente = false;
+$autorizacao_usuario = 'nao';
 
-// Simulação: se o código começar com "SAMED-", vamos mostrar dados de exemplo
-if (preg_match('/^SAMED-\d+$/i', $codigo_pulseira)) {
-    $paciente_encontrado = true;
-    
-    // Dados simulados do paciente
-    $dados_paciente = [
-        'nome' => 'Joana Dark',
-        'idade' => 23,
-        'data_nascimento' => '03/04/2002',
-        'sexo' => 'Feminino',
-        'cpf' => '489.069.228-25',
-        'telefone' => '(19) 97112-0245',
-        'email' => 'joana@gmail.com',
-        'contato_emergencia' => 'Patrícia',
-        'parentesco' => 'Mãe',
-        'telefone_emergencia' => '(19) 99695-1292',
-        'doencas_cronicas' => 'Diabete Tipo 1 | Hipertensão',
-        'alergias' => 'Azitromicina',
-        'tipo_sanguineo' => 'A+',
-        'medicacoes' => 'Captopril | Insulina',
-        'doenca_mental' => 'Não',
-        'dispositivos' => 'Marca Passo | Bomba de Insulina',
-        'informacoes_relevantes' => 'Grávida',
-        'historico_cirurgias' => 'Retirada Amídala em 2016'
-    ];
-    
-    // TODO: Registrar acesso no histórico
-    // Registrar que este profissional acessou os dados deste paciente
-    // Isso deve ser salvo no banco de dados para aparecer no histórico.php
+if ($pdo) {
+    try {
+        // Buscar por ID da ficha
+        if ($id_ficha) {
+            $stmt = $pdo->prepare("
+                SELECT pm.*, u.nome as nome_usuario, u.id as usuario_id_paciente, pm.dependente_id
+                FROM perfis_medicos pm
+                LEFT JOIN usuarios u ON pm.usuario_id = u.id
+                WHERE pm.id = ?
+            ");
+            $stmt->execute([$id_ficha]);
+            $perfil = $stmt->fetch();
+            
+            if ($perfil) {
+                $paciente_encontrado = true;
+                $perfil_id = $id_ficha;
+                $usuario_id_paciente = $perfil['usuario_id_paciente'];
+                $dependente_id = $perfil['dependente_id'];
+                $eh_dependente = !empty($dependente_id);
+                
+                // Buscar contato de emergência
+                $contato_emergencia = null;
+                if ($eh_dependente) {
+                    $stmt = $pdo->prepare("SELECT * FROM contatos_emergencia WHERE dependente_id = ?");
+                    $stmt->execute([$dependente_id]);
+                    $contato_emergencia = $stmt->fetch();
+                    
+                    // Buscar dados do dependente
+                    $stmt = $pdo->prepare("SELECT * FROM dependentes WHERE id = ?");
+                    $stmt->execute([$dependente_id]);
+                    $dependente = $stmt->fetch();
+                    $nome_paciente = $dependente['nome'] ?? $perfil['nome_usuario'];
+                } else {
+                    $stmt = $pdo->prepare("SELECT * FROM contatos_emergencia WHERE usuario_id = ?");
+                    $stmt->execute([$usuario_id_paciente]);
+                    $contato_emergencia = $stmt->fetch();
+                    $nome_paciente = $perfil['nome_usuario'];
+                }
+                
+                // Calcular idade
+                $idade = null;
+                if ($perfil['data_nascimento']) {
+                    $data_nasc = new DateTime($perfil['data_nascimento']);
+                    $hoje = new DateTime();
+                    $idade = $hoje->diff($data_nasc)->y;
+                }
+                
+                // Verificar autorização para usuários comuns
+                $pode_ver_dados_completos = $eh_profissional;
+                $autorizacao_usuario = $perfil['autorizacao_usuario'] ?? 'nao';
+                if ($eh_paciente && $autorizacao_usuario === 'nao') {
+                    $pode_ver_dados_completos = false;
+                }
+                
+                // Montar dados do paciente
+                $dados_paciente = [
+                    'nome' => $nome_paciente,
+                    'idade' => $idade,
+                    'data_nascimento' => $perfil['data_nascimento'] ? date('d/m/Y', strtotime($perfil['data_nascimento'])) : '',
+                    'sexo' => ucfirst($perfil['sexo'] ?? ''),
+                    'cpf' => $perfil['cpf'] ?? '',
+                    'telefone' => $perfil['telefone'] ?? '',
+                    'email' => $perfil['email'] ?? '',
+                    'contato_emergencia' => $contato_emergencia['nome'] ?? '',
+                    'parentesco' => $contato_emergencia['parentesco'] ?? '',
+                    'telefone_emergencia' => $contato_emergencia['telefone'] ?? '',
+                    'doencas_cronicas' => $pode_ver_dados_completos ? ($perfil['doencas_cronicas'] ?? '') : '',
+                    'alergias' => $pode_ver_dados_completos ? ($perfil['alergias'] ?? '') : '',
+                    'tipo_sanguineo' => $pode_ver_dados_completos ? ($perfil['tipo_sanguineo'] ?? '') : '',
+                    'medicacoes' => $pode_ver_dados_completos ? ($perfil['medicacao_continua'] ?? '') : '',
+                    'doenca_mental' => $pode_ver_dados_completos ? ($perfil['doenca_mental'] ?? 'Não') : '',
+                    'dispositivos' => $pode_ver_dados_completos ? ($perfil['dispositivo_implantado'] ?? '') : '',
+                    'informacoes_relevantes' => $pode_ver_dados_completos ? ($perfil['info_relevantes'] ?? '') : '',
+                    'historico_cirurgias' => $pode_ver_dados_completos ? ($perfil['cirurgias'] ?? '') : '',
+                    'foto_perfil' => $perfil['foto_perfil'] ?? null
+                ];
+                
+                // Registrar acesso no histórico (para profissionais e pacientes comuns)
+                if (isset($_SESSION['usuario_id']) && $_SESSION['usuario_id'] != $usuario_id_paciente) {
+                    $visualizador_id = $_SESSION['usuario_id'];
+                    $tipo_acesso = 'Consulta';
+                    $registro_profissional = '';
+                    
+                    if ($eh_profissional) {
+                        if ($_SESSION['usuario_tipo'] === 'medico') {
+                            $registro_profissional = $_SESSION['usuario_crm'] ?? '';
+                            $tipo_acesso = 'Consulta Médica';
+                        } elseif ($_SESSION['usuario_tipo'] === 'enfermeiro') {
+                            $registro_profissional = $_SESSION['usuario_coren'] ?? '';
+                            $tipo_acesso = 'Consulta Enfermagem';
+                        }
+                    } else {
+                        // Paciente comum visualizando outro paciente
+                        $tipo_acesso = 'Consulta por Usuário';
+                    }
+                    
+                    $stmt = $pdo->prepare("
+                        INSERT INTO historico_acessos 
+                        (profissional_id, paciente_id, dependente_id, tipo_acesso, registro_profissional)
+                        VALUES (?, ?, ?, ?, ?)
+                    ");
+                    $stmt->execute([
+                        $visualizador_id,
+                        $usuario_id_paciente,
+                        $eh_dependente ? $dependente_id : null,
+                        $tipo_acesso,
+                        $registro_profissional
+                    ]);
+                }
+            }
+        } elseif (!empty($codigo_pulseira)) {
+            // Buscar por código da pulseira (implementação futura)
+            // Por enquanto, redirecionar para busca por ID
+            header('Location: inicio-med.php');
+            exit;
+        }
+    } catch(PDOException $e) {
+        // Erro ao buscar dados
+        error_log("Erro ao buscar paciente: " . $e->getMessage());
+    }
 }
 
-// Determinar tipo de profissional
+// Determinar tipo de profissional ou usuário
 $tipo_profissional = '';
 $registro = '';
 if ($_SESSION['usuario_tipo'] === 'medico') {
@@ -65,6 +168,8 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
 } elseif ($_SESSION['usuario_tipo'] === 'enfermeiro') {
     $tipo_profissional = 'Enfermeiro(a)';
     $registro = $_SESSION['usuario_coren'] ?? '';
+} elseif ($_SESSION['usuario_tipo'] === 'paciente') {
+    $tipo_profissional = 'Paciente';
 } else {
     $tipo_profissional = 'Profissional de Saúde';
 }
@@ -98,7 +203,7 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
             </span>
         </nav>
 
-        <a href="inicio-med.php" class="botao-sair" style="background: #666;">
+        <a href="<?= $eh_profissional ? 'inicio-med.php' : 'index.php' ?>" class="botao-sair" style="background: #666;">
             <span>←</span>
             VOLTAR
         </a>
@@ -111,7 +216,11 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
                 <div class="header-paciente">
                     <h2>FICHA MÉDICA DO PACIENTE</h2>
                     <div class="codigo-pulseira">
-                        <span class="badge-pulseira">📱 Código: <?= htmlspecialchars($codigo_pulseira) ?></span>
+                        <?php if ($id_ficha): ?>
+                            <span class="badge-pulseira">🆔 ID Ficha: <?= htmlspecialchars($id_ficha) ?></span>
+                        <?php elseif ($codigo_pulseira): ?>
+                            <span class="badge-pulseira">📱 Código: <?= htmlspecialchars($codigo_pulseira) ?></span>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <hr>
@@ -122,10 +231,18 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
                         <div class="carousel-item active">
                             <div class="card-ficha">
                                 <div class="perfil">
-                                    <img src="img/perfil.svg" alt="Foto do paciente">
+                                    <?php 
+                                    $foto_src = 'img/perfil.svg';
+                                    if (!empty($dados_paciente['foto_perfil']) && file_exists('uploads/fotos/' . $dados_paciente['foto_perfil'])) {
+                                        $foto_src = 'uploads/fotos/' . $dados_paciente['foto_perfil'];
+                                    }
+                                    ?>
+                                    <img src="<?= htmlspecialchars($foto_src) ?>" alt="Foto do paciente" style="object-fit: cover;">
                                     <div>
                                         <h3><?= htmlspecialchars($dados_paciente['nome']) ?></h3>
-                                        <p><strong>IDADE:</strong> <?= htmlspecialchars($dados_paciente['idade']) ?> ANOS</p>
+                                        <?php if ($dados_paciente['idade']): ?>
+                                            <p><strong>IDADE:</strong> <?= htmlspecialchars($dados_paciente['idade']) ?> ANOS</p>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                                 <div class="info-basica">
@@ -145,25 +262,42 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
                             </div>
                         </div>
 
+                        <?php if ($eh_profissional || ($eh_paciente && isset($perfil['autorizacao_usuario']) && $perfil['autorizacao_usuario'] === 'sim')): ?>
                         <!-- Slide 2: Informações Médicas -->
                         <div class="carousel-item">
                             <div class="card-ficha">
                                 <div class="perfil">
-                                    <img src="img/perfil.svg" alt="Foto do paciente">
+                                    <img src="<?= htmlspecialchars($foto_src) ?>" alt="Foto do paciente" style="object-fit: cover;">
                                     <div>
                                         <h3><?= htmlspecialchars($dados_paciente['nome']) ?></h3>
-                                        <p><strong>IDADE:</strong> <?= htmlspecialchars($dados_paciente['idade']) ?> ANOS</p>
+                                        <?php if ($dados_paciente['idade']): ?>
+                                            <p><strong>IDADE:</strong> <?= htmlspecialchars($dados_paciente['idade']) ?> ANOS</p>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                                 <div class="info-basica">
                                     <h4>INFORMAÇÕES MÉDICAS</h4>
-                                    <p><strong>DOENÇAS CRÔNICAS:</strong> <?= htmlspecialchars($dados_paciente['doencas_cronicas']) ?></p>
-                                    <p><strong>ALERGIA:</strong> <?= htmlspecialchars($dados_paciente['alergias']) ?></p>
-                                    <p><strong>TIPO SANGUÍNEO:</strong> <?= htmlspecialchars($dados_paciente['tipo_sanguineo']) ?></p>
-                                    <p><strong>MEDICAÇÃO DE USO CONTÍNUO:</strong> <?= htmlspecialchars($dados_paciente['medicacoes']) ?></p>
-                                    <p><strong>DOENÇA MENTAL:</strong> <?= htmlspecialchars($dados_paciente['doenca_mental']) ?></p>
-                                    <p><strong>DISPOSITIVOS IMPLANTADOS:</strong> <?= htmlspecialchars($dados_paciente['dispositivos']) ?></p>
-                                    <p><strong>INFORMAÇÕES RELEVANTES:</strong> <?= htmlspecialchars($dados_paciente['informacoes_relevantes']) ?></p>
+                                    <?php if ($dados_paciente['doencas_cronicas']): ?>
+                                        <p><strong>DOENÇAS CRÔNICAS:</strong> <?= htmlspecialchars($dados_paciente['doencas_cronicas']) ?></p>
+                                    <?php endif; ?>
+                                    <?php if ($dados_paciente['alergias']): ?>
+                                        <p><strong>ALERGIA:</strong> <?= htmlspecialchars($dados_paciente['alergias']) ?></p>
+                                    <?php endif; ?>
+                                    <?php if ($dados_paciente['tipo_sanguineo']): ?>
+                                        <p><strong>TIPO SANGUÍNEO:</strong> <?= htmlspecialchars($dados_paciente['tipo_sanguineo']) ?></p>
+                                    <?php endif; ?>
+                                    <?php if ($dados_paciente['medicacoes']): ?>
+                                        <p><strong>MEDICAÇÃO DE USO CONTÍNUO:</strong> <?= htmlspecialchars($dados_paciente['medicacoes']) ?></p>
+                                    <?php endif; ?>
+                                    <?php if ($dados_paciente['doenca_mental']): ?>
+                                        <p><strong>DOENÇA MENTAL:</strong> <?= htmlspecialchars($dados_paciente['doenca_mental']) ?></p>
+                                    <?php endif; ?>
+                                    <?php if ($dados_paciente['dispositivos']): ?>
+                                        <p><strong>DISPOSITIVOS IMPLANTADOS:</strong> <?= htmlspecialchars($dados_paciente['dispositivos']) ?></p>
+                                    <?php endif; ?>
+                                    <?php if ($dados_paciente['informacoes_relevantes']): ?>
+                                        <p><strong>INFORMAÇÕES RELEVANTES:</strong> <?= htmlspecialchars($dados_paciente['informacoes_relevantes']) ?></p>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -172,18 +306,25 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
                         <div class="carousel-item">
                             <div class="card-ficha">
                                 <div class="perfil">
-                                    <img src="img/perfil.svg" alt="Foto do paciente">
+                                    <img src="<?= htmlspecialchars($foto_src) ?>" alt="Foto do paciente" style="object-fit: cover;">
                                     <div>
                                         <h3><?= htmlspecialchars($dados_paciente['nome']) ?></h3>
-                                        <p><strong>IDADE:</strong> <?= htmlspecialchars($dados_paciente['idade']) ?> ANOS</p>
+                                        <?php if ($dados_paciente['idade']): ?>
+                                            <p><strong>IDADE:</strong> <?= htmlspecialchars($dados_paciente['idade']) ?> ANOS</p>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                                 <div class="info-basica">
                                     <h4>HISTÓRICO MÉDICO</h4>
-                                    <p><strong>CIRURGIA:</strong> <?= htmlspecialchars($dados_paciente['historico_cirurgias']) ?></p>
+                                    <?php if ($dados_paciente['historico_cirurgias']): ?>
+                                        <p><strong>CIRURGIA:</strong> <?= htmlspecialchars($dados_paciente['historico_cirurgias']) ?></p>
+                                    <?php else: ?>
+                                        <p><strong>CIRURGIA:</strong> NENHUMA REGISTRADA</p>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
+                        <?php endif; ?>
                     </div>
 
                     <!-- Controles -->
@@ -193,8 +334,10 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
                     <!-- Indicadores -->
                     <div class="carousel-indicators">
                         <span data-slide="0" class="active"></span>
+                        <?php if ($eh_profissional || ($eh_paciente && isset($autorizacao_usuario) && $autorizacao_usuario === 'sim')): ?>
                         <span data-slide="1"></span>
                         <span data-slide="2"></span>
+                        <?php endif; ?>
                     </div>
                 </div>
             </section>

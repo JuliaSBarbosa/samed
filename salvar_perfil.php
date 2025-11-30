@@ -91,6 +91,9 @@ if (is_array($dispositivo_input)) {
 $info_relevantes = trim($_POST['info_relevantes'] ?? '');
 $cirurgias = trim($_POST['cirurgias'] ?? '');
 
+// Configurações de privacidade
+$autorizacao_usuario = $_POST['autorizacao_usuario'] ?? 'nao';
+
 // Validações básicas
 $erros = [];
 
@@ -213,134 +216,99 @@ try {
         // Se der erro, assumir que não existe
         $coluna_foto_existe = false;
     }
+    
+    // Verificar se a coluna autorizacao_usuario existe
+    $coluna_autorizacao_existe = false;
+    try {
+        $stmt = $pdo->query("SHOW COLUMNS FROM perfis_medicos LIKE 'autorizacao_usuario'");
+        $coluna_autorizacao_existe = $stmt->rowCount() > 0;
+    } catch(PDOException $e) {
+        // Se der erro, assumir que não existe
+        $coluna_autorizacao_existe = false;
+    }
 
     if ($perfil_existente) {
         // Atualizar perfil existente
+        $set_parts = [
+            'data_nascimento = ?',
+            'sexo = ?',
+            'cpf = ?',
+            'telefone = ?',
+            'email = ?',
+            'tipo_sanguineo = ?',
+            'doencas_cronicas = ?',
+            'alergias = ?',
+            'medicacao_continua = ?',
+            'doenca_mental = ?',
+            'dispositivo_implantado = ?',
+            'info_relevantes = ?',
+            'cirurgias = ?'
+        ];
+        
+        $valores_update = [
+            $data_nascimento_formatada,
+            $sexo,
+            $cpf_formatado,
+            $telefone,
+            $email,
+            $tipo_sanguineo,
+            $doencas_cronicas ?: null,
+            $alergias ?: null,
+            $medicacao_continua ?: null,
+            $doenca_mental ?: null,
+            $dispositivo_implantado ?: null,
+            $info_relevantes ?: null,
+            $cirurgias ?: null
+        ];
+        
         if ($foto_perfil && $coluna_foto_existe) {
-            $stmt = $pdo->prepare("
-                UPDATE perfis_medicos 
-                SET data_nascimento = ?, 
-                    sexo = ?, 
-                    cpf = ?, 
-                    telefone = ?, 
-                    email = ?, 
-                    tipo_sanguineo = ?, 
-                    doencas_cronicas = ?, 
-                    alergias = ?, 
-                    medicacao_continua = ?, 
-                    doenca_mental = ?, 
-                    dispositivo_implantado = ?, 
-                    info_relevantes = ?, 
-                    cirurgias = ?,
-                    foto_perfil = ?,
-                    data_atualizacao = CURRENT_TIMESTAMP
-                WHERE usuario_id = ?
-            ");
-            $stmt->execute([
-                $data_nascimento_formatada,
-                $sexo,
-                $cpf_formatado,
-                $telefone,
-                $email,
-                $tipo_sanguineo,
-                $doencas_cronicas ?: null,
-                $alergias ?: null,
-                $medicacao_continua ?: null,
-                $doenca_mental ?: null,
-                $dispositivo_implantado ?: null,
-                $info_relevantes ?: null,
-                $cirurgias ?: null,
-                $foto_perfil,
-                $usuario_id
-            ]);
-        } else {
-            $stmt = $pdo->prepare("
-                UPDATE perfis_medicos 
-                SET data_nascimento = ?, 
-                    sexo = ?, 
-                    cpf = ?, 
-                    telefone = ?, 
-                    email = ?, 
-                    tipo_sanguineo = ?, 
-                    doencas_cronicas = ?, 
-                    alergias = ?, 
-                    medicacao_continua = ?, 
-                    doenca_mental = ?, 
-                    dispositivo_implantado = ?, 
-                    info_relevantes = ?, 
-                    cirurgias = ?,
-                    data_atualizacao = CURRENT_TIMESTAMP
-                WHERE usuario_id = ?
-            ");
-            $stmt->execute([
-                $data_nascimento_formatada,
-                $sexo,
-                $cpf_formatado,
-                $telefone,
-                $email,
-                $tipo_sanguineo,
-                $doencas_cronicas ?: null,
-                $alergias ?: null,
-                $medicacao_continua ?: null,
-                $doenca_mental ?: null,
-                $dispositivo_implantado ?: null,
-                $info_relevantes ?: null,
-                $cirurgias ?: null,
-                $usuario_id
-            ]);
+            $set_parts[] = 'foto_perfil = ?';
+            $valores_update[] = $foto_perfil;
         }
+        
+        if ($coluna_autorizacao_existe) {
+            $set_parts[] = 'autorizacao_usuario = ?';
+            $valores_update[] = $autorizacao_usuario;
+        }
+        
+        $set_parts[] = 'data_atualizacao = CURRENT_TIMESTAMP';
+        $valores_update[] = $usuario_id;
+        
+        $set_clause = implode(', ', $set_parts);
+        
+        $stmt = $pdo->prepare("
+            UPDATE perfis_medicos 
+            SET $set_clause
+            WHERE usuario_id = ?
+        ");
+        $stmt->execute($valores_update);
     } else {
         // Inserir novo perfil
+        $campos_insert = ['usuario_id', 'data_nascimento', 'sexo', 'cpf', 'telefone', 'email', 'tipo_sanguineo', 
+                         'doencas_cronicas', 'alergias', 'medicacao_continua', 'doenca_mental', 
+                         'dispositivo_implantado', 'info_relevantes', 'cirurgias'];
+        $valores_insert = [$usuario_id, $data_nascimento_formatada, $sexo, $cpf_formatado, $telefone, $email,
+                          $tipo_sanguineo, $doencas_cronicas ?: null, $alergias ?: null, $medicacao_continua ?: null,
+                          $doenca_mental ?: null, $dispositivo_implantado ?: null, $info_relevantes ?: null, $cirurgias ?: null];
+        
         if ($coluna_foto_existe) {
-            $stmt = $pdo->prepare("
-                INSERT INTO perfis_medicos 
-                (usuario_id, data_nascimento, sexo, cpf, telefone, email, tipo_sanguineo, 
-                 doencas_cronicas, alergias, medicacao_continua, doenca_mental, 
-                 dispositivo_implantado, info_relevantes, cirurgias, foto_perfil) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ");
-            $stmt->execute([
-                $usuario_id,
-                $data_nascimento_formatada,
-                $sexo,
-                $cpf_formatado,
-                $telefone,
-                $email,
-                $tipo_sanguineo,
-                $doencas_cronicas ?: null,
-                $alergias ?: null,
-                $medicacao_continua ?: null,
-                $doenca_mental ?: null,
-                $dispositivo_implantado ?: null,
-                $info_relevantes ?: null,
-                $cirurgias ?: null,
-                $foto_perfil
-            ]);
-        } else {
-            $stmt = $pdo->prepare("
-                INSERT INTO perfis_medicos 
-                (usuario_id, data_nascimento, sexo, cpf, telefone, email, tipo_sanguineo, 
-                 doencas_cronicas, alergias, medicacao_continua, doenca_mental, 
-                 dispositivo_implantado, info_relevantes, cirurgias) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ");
-            $stmt->execute([
-                $usuario_id,
-                $data_nascimento_formatada,
-                $sexo,
-                $cpf_formatado,
-                $telefone,
-                $email,
-                $tipo_sanguineo,
-                $doencas_cronicas ?: null,
-                $alergias ?: null,
-                $medicacao_continua ?: null,
-                $doenca_mental ?: null,
-                $dispositivo_implantado ?: null,
-                $info_relevantes ?: null,
-                $cirurgias ?: null
-            ]);
+            $campos_insert[] = 'foto_perfil';
+            $valores_insert[] = $foto_perfil;
         }
+        
+        if ($coluna_autorizacao_existe) {
+            $campos_insert[] = 'autorizacao_usuario';
+            $valores_insert[] = $autorizacao_usuario;
+        }
+        
+        $placeholders = str_repeat('?, ', count($valores_insert) - 1) . '?';
+        $campos_str = implode(', ', $campos_insert);
+        
+        $stmt = $pdo->prepare("
+            INSERT INTO perfis_medicos ($campos_str) 
+            VALUES ($placeholders)
+        ");
+        $stmt->execute($valores_insert);
     }
 
     // Verificar se já existe contato de emergência

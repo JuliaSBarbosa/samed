@@ -67,6 +67,14 @@
                     <p>Confira lista de hospitais próximos</p>
                 </div>
             </a>
+            <?php if ($_SESSION['usuario_tipo'] === 'paciente'): ?>
+            <a href="buscar_paciente.php" class="link-card">
+                <div class="card">
+                    <img src="img/perfil.svg" alt="Buscar Paciente" class="icone">
+                    <p>Buscar Paciente por ID</p>
+                </div>
+            </a>
+            <?php endif; ?>
 
         </div>
     </main>

@@ -1,4 +1,18 @@
-<?php require_once 'verificar_login.php'; ?>
+<?php 
+require_once 'verificar_login.php';
+require_once 'config.php';
+
+// Verificar se é profissional de saúde (médico ou enfermeiro)
+$eh_profissional = false;
+if (isset($_SESSION['usuario_tipo']) && in_array($_SESSION['usuario_tipo'], ['medico', 'enfermeiro'])) {
+    $eh_profissional = true;
+}
+
+if (!$eh_profissional) {
+    header('Location: index.php');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -73,9 +87,31 @@
                 </div>
             </div>
 
-            <!-- Botão de Scanner Manual (para testes) -->
+            <!-- Busca por ID da Ficha Médica -->
             <div class="scanner-manual">
-                <p class="manual-text">Ou digite o código da pulseira manualmente:</p>
+                <p class="manual-text">Digite o ID da ficha médica para consultar:</p>
+                <form method="GET" action="visualizar_paciente.php" class="scanner-form">
+                    <div class="input-group">
+                        <input 
+                            type="number" 
+                            name="id_ficha" 
+                            id="idFicha" 
+                            placeholder="Digite o ID da ficha médica (ex: 1)"
+                            class="scanner-input"
+                            min="1"
+                            required
+                        >
+                        <button type="submit" class="btn-scanner">
+                            <span>🔍</span>
+                            Buscar
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Busca por Código da Pulseira (alternativa) -->
+            <div class="scanner-manual" style="margin-top: 20px;">
+                <p class="manual-text">Ou digite o código da pulseira:</p>
                 <form method="GET" action="visualizar_paciente.php" class="scanner-form">
                     <div class="input-group">
                         <input 
@@ -85,7 +121,6 @@
                             placeholder="Digite o código da pulseira (ex: SAMED-123456)"
                             class="scanner-input"
                             pattern="[A-Z0-9-]+"
-                            required
                         >
                         <button type="submit" class="btn-scanner">
                             <span>🔍</span>
