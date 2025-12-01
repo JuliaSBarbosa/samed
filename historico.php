@@ -138,11 +138,17 @@ $valor_fim = htmlspecialchars($data_fim ?? '');
             <span class="divisor">|</span>
             <a href="perfil.php">MEU PERFIL</a>
             <span class="divisor">|</span>
+            <?php if ($_SESSION['usuario_tipo'] === 'paciente'): ?>
             <a href="dependentes.php">DEPENDENTES</a>
             <span class="divisor">|</span>
+            <?php endif; ?>
             <a href="historico.php" class="ativo">HISTÓRICO</a>
             <span class="divisor">|</span>
             <a href="hospital.php">UNIDADES DE SAÚDE</a>
+            <?php if (in_array($_SESSION['usuario_tipo'] ?? '', ['medico', 'enfermeiro'])): ?>
+            <span class="divisor">|</span>
+            <a href="inicio-med.php">ESCANEAR PULSEIRA</a>
+            <?php endif; ?>
         </nav>
 
         <a href="sair.php" class="botao-sair">

@@ -308,6 +308,15 @@ try {
     // Iniciar transação
     $pdo->beginTransaction();
 
+    // Verificar se a coluna foto_perfil existe na tabela dependentes
+    $coluna_foto_existe = false;
+    try {
+        $stmt = $pdo->query("SHOW COLUMNS FROM dependentes LIKE 'foto_perfil'");
+        $coluna_foto_existe = $stmt->rowCount() > 0;
+    } catch(PDOException $e) {
+        $coluna_foto_existe = false;
+    }
+
     // Formatar data de nascimento
     $data_nascimento_formatada = $data_nascimento ? date('Y-m-d', strtotime($data_nascimento)) : null;
     
@@ -322,13 +331,20 @@ try {
             throw new Exception("Dependente não encontrado ou não pertence a você.");
         }
         
-        // Buscar foto antiga se houver
-        $stmt = $pdo->prepare("SELECT foto_perfil FROM dependentes WHERE id = ?");
-        $stmt->execute([$dependente_id]);
-        $foto_antiga = $stmt->fetchColumn();
+        // Buscar foto antiga se houver (só se a coluna existir)
+        $foto_antiga = null;
+        if ($coluna_foto_existe) {
+            try {
+                $stmt = $pdo->prepare("SELECT foto_perfil FROM dependentes WHERE id = ?");
+                $stmt->execute([$dependente_id]);
+                $foto_antiga = $stmt->fetchColumn();
+            } catch(PDOException $e) {
+                // Ignorar erro
+            }
+        }
         
         // Atualizar dependente
-        if ($foto_perfil) {
+        if ($foto_perfil && $coluna_foto_existe) {
             $stmt = $pdo->prepare("
                 UPDATE dependentes 
                 SET nome = ?, data_nascimento = ?, sexo = ?, cpf = ?, 
@@ -367,21 +383,38 @@ try {
         }
 
         // Inserir dependente
-        $stmt = $pdo->prepare("
-            INSERT INTO dependentes 
-            (paciente_id, nome, data_nascimento, sexo, cpf, telefone, email, foto_perfil) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ");
-        $stmt->execute([
-            $paciente_id,
-            $nome,
-            $data_nascimento_formatada,
-            $sexo,
-            $cpf_formatado,
-            $telefone,
-            $email,
-            $foto_perfil
-        ]);
+        if ($coluna_foto_existe) {
+            $stmt = $pdo->prepare("
+                INSERT INTO dependentes 
+                (paciente_id, nome, data_nascimento, sexo, cpf, telefone, email, foto_perfil) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ");
+            $stmt->execute([
+                $paciente_id,
+                $nome,
+                $data_nascimento_formatada,
+                $sexo,
+                $cpf_formatado,
+                $telefone,
+                $email,
+                $foto_perfil
+            ]);
+        } else {
+            $stmt = $pdo->prepare("
+                INSERT INTO dependentes 
+                (paciente_id, nome, data_nascimento, sexo, cpf, telefone, email) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ");
+            $stmt->execute([
+                $paciente_id,
+                $nome,
+                $data_nascimento_formatada,
+                $sexo,
+                $cpf_formatado,
+                $telefone,
+                $email
+            ]);
+        }
 
         $dependente_id = $pdo->lastInsertId();
     }

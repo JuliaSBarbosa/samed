@@ -25,11 +25,17 @@
             <span class="divisor">|</span>
             <a href="perfil.php">MEU PERFIL</a>
             <span class="divisor">|</span>
+            <?php if ($_SESSION['usuario_tipo'] === 'paciente'): ?>
              <a href="dependentes.php">DEPENDENTES</a>
             <span class="divisor">|</span>
+            <?php endif; ?>
             <a href="historico.php">HISTÓRICO</a>
             <span class="divisor">|</span>
             <a href="hospital.php">UNIDADES DE SAÚDE</a>
+            <?php if (in_array($_SESSION['usuario_tipo'] ?? '', ['medico', 'enfermeiro'])): ?>
+            <span class="divisor">|</span>
+            <a href="inicio-med.php">ESCANEAR PULSEIRA</a>
+            <?php endif; ?>
         </nav>
 
         <a href="sair.php" class="botao-sair">
@@ -67,11 +73,21 @@
                     <p>Confira lista de hospitais próximos</p>
                 </div>
             </a>
+            
             <?php if ($_SESSION['usuario_tipo'] === 'paciente'): ?>
             <a href="buscar_paciente.php" class="link-card">
                 <div class="card">
                     <img src="img/perfil.svg" alt="Buscar Paciente" class="icone">
                     <p>Buscar Paciente por ID</p>
+                </div>
+            </a>
+            <?php endif; ?>
+            
+            <?php if (in_array($_SESSION['usuario_tipo'] ?? '', ['medico', 'enfermeiro'])): ?>
+            <a href="inicio-med.php" class="link-card">
+                <div class="card">
+                    <img src="img/perfil.svg" alt="Scanner de Pulseira" class="icone">
+                    <p>Escanear Pulseira / Buscar Ficha</p>
                 </div>
             </a>
             <?php endif; ?>
