@@ -52,34 +52,38 @@ if (!isset($_SESSION['usuario_tipo']) || $_SESSION['usuario_tipo'] !== 'paciente
     </header>
 
     <!-- Conteúdo principal -->
-    <main>
-        <section class="secao-busca">
-            <h2>BUSCAR PACIENTE</h2>
-            <hr>
-            <p style="margin: 20px 0; color: #666;">
-                Digite o ID da ficha médica para consultar informações básicas do paciente (nome e contato de emergência).
-                <br><strong>Nota:</strong> Apenas pacientes que autorizaram o compartilhamento de dados básicos poderão ser visualizados.
-            </p>
-            
-            <form method="GET" action="visualizar_paciente.php" class="form-busca">
-                <div class="campo-busca">
-                    <label for="id_ficha">ID da Ficha Médica</label>
-                    <input 
-                        type="number" 
-                        id="id_ficha" 
-                        name="id_ficha" 
-                        placeholder="Digite o ID da ficha médica (ex: 1)"
-                        class="input-busca"
-                        min="1"
-                        required
-                    >
-                </div>
-                <button type="submit" class="btn-buscar">
-                    <span>🔍</span>
-                    Buscar
-                </button>
-            </form>
-        </section>
+    <main class="scanner-container">
+        <div class="scanner-wrapper">
+            <h2 class="scanner-titulo">
+                <span class="scanner-icon">🔍</span>
+                BUSCAR FICHA DE PACIENTE
+            </h2>
+            <p class="scanner-subtitulo">Digite o ID da ficha médica para visualizar informações básicas</p>
+
+            <div class="scanner-manual">
+                <p class="manual-text">
+                    <strong>Nota:</strong> Apenas pacientes que autorizaram o compartilhamento de dados básicos poderão ser visualizados.
+                    <br>Você poderá ver apenas: nome e contato de emergência.
+                </p>
+                <form method="GET" action="visualizar_paciente.php" class="scanner-form">
+                    <div class="input-group">
+                        <input 
+                            type="number" 
+                            name="id_ficha" 
+                            id="idFicha" 
+                            placeholder="Digite o ID da ficha médica (ex: 1)"
+                            class="scanner-input"
+                            min="1"
+                            required
+                        >
+                        <button type="submit" class="btn-scanner">
+                            <span>🔍</span>
+                            Buscar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </main>
 
     <!-- Rodapé -->

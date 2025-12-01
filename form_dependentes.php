@@ -552,9 +552,9 @@ if (isset($_SESSION['dados_form'])) {
 
                 <label for="autorizacao_usuario">Autoriza usuários comuns consultar informações básicas (nome, telefone, contato de emergência)?</label>
                 <select id="autorizacao_usuario" name="autorizacao_usuario" required>
-                 <option value="">Selecione</option>
-                    <option value="sim">Sim, autorizo</option>
-                    <option value="nao">Não autorizo</option>
+                    <option value="">Selecione</option>
+                    <option value="sim" <?= (($dados_form['autorizacao_usuario'] ?? $perfil_dependente['autorizacao_usuario'] ?? '') === 'sim') ? 'selected' : '' ?>>Sim, autorizo</option>
+                    <option value="nao" <?= (($dados_form['autorizacao_usuario'] ?? $perfil_dependente['autorizacao_usuario'] ?? '') === 'nao') ? 'selected' : '' ?>>Não autorizo</option>
                 </select>
 
             </div>

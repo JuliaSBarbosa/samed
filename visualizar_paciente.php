@@ -85,11 +85,9 @@ if ($pdo) {
                 }
                 
                 // Verificar autorização para usuários comuns
-                $pode_ver_dados_completos = $eh_profissional;
                 $autorizacao_usuario = $perfil['autorizacao_usuario'] ?? 'nao';
-                if ($eh_paciente && $autorizacao_usuario === 'nao') {
-                    $pode_ver_dados_completos = false;
-                }
+                $pode_ver_dados_completos = $eh_profissional; // Profissionais sempre podem ver tudo
+                $pode_ver_dados_basicos = $eh_profissional || ($eh_paciente && $autorizacao_usuario === 'sim'); // Usuários comuns só veem se autorizado
                 
                 // Montar dados do paciente
                 $dados_paciente = [
@@ -211,7 +209,7 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
 
     <!-- Conteúdo principal -->
     <main>
-        <?php if ($paciente_encontrado && $dados_paciente): ?>
+        <?php if ($paciente_encontrado && $dados_paciente && ($pode_ver_dados_basicos || $pode_ver_dados_completos)): ?>
             <section class="ficha-medica">
                 <div class="header-paciente">
                     <h2>FICHA MÉDICA DO PACIENTE</h2>
@@ -245,6 +243,7 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
                                         <?php endif; ?>
                                     </div>
                                 </div>
+                                <?php if ($pode_ver_dados_completos): ?>
                                 <div class="info-basica">
                                     <h4>INFORMAÇÕES BÁSICAS</h4>
                                     <p><strong>DATA DE NASCIMENTO:</strong> <?= htmlspecialchars($dados_paciente['data_nascimento']) ?></p>
@@ -253,16 +252,19 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
                                     <p><strong>TELEFONE:</strong> <?= htmlspecialchars($dados_paciente['telefone']) ?></p>
                                     <p><strong>E-MAIL:</strong> <?= htmlspecialchars($dados_paciente['email']) ?></p>
                                 </div>
+                                <?php endif; ?>
+                                <?php if ($pode_ver_dados_basicos): ?>
                                 <div class="contato-emergencia">
                                     <h4>CONTATO DE EMERGÊNCIA</h4>
                                     <p><strong>CONTATO:</strong> <?= htmlspecialchars($dados_paciente['contato_emergencia']) ?></p>
                                     <p><strong>PARENTESCO:</strong> <?= htmlspecialchars($dados_paciente['parentesco']) ?></p>
                                     <p><strong>TELEFONE:</strong> <?= htmlspecialchars($dados_paciente['telefone_emergencia']) ?></p>
                                 </div>
+                                <?php endif; ?>
                             </div>
                         </div>
 
-                        <?php if ($eh_profissional || ($eh_paciente && isset($perfil['autorizacao_usuario']) && $perfil['autorizacao_usuario'] === 'sim')): ?>
+                        <?php if ($pode_ver_dados_completos): ?>
                         <!-- Slide 2: Informações Médicas -->
                         <div class="carousel-item">
                             <div class="card-ficha">
@@ -334,21 +336,37 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
                     <!-- Indicadores -->
                     <div class="carousel-indicators">
                         <span data-slide="0" class="active"></span>
-                        <?php if ($eh_profissional || ($eh_paciente && isset($autorizacao_usuario) && $autorizacao_usuario === 'sim')): ?>
+                        <?php if ($pode_ver_dados_completos): ?>
                         <span data-slide="1"></span>
                         <span data-slide="2"></span>
                         <?php endif; ?>
                     </div>
                 </div>
             </section>
+        <?php elseif ($paciente_encontrado && $eh_paciente && isset($autorizacao_usuario) && $autorizacao_usuario === 'nao'): ?>
+            <!-- Usuário comum tentando acessar paciente não autorizado -->
+            <section class="ficha-medica">
+                <div class="mensagem-erro-scanner">
+                    <div class="erro-icon">🔒</div>
+                    <h2>Acesso Negado</h2>
+                    <p>Este paciente não autorizou o compartilhamento de dados básicos.</p>
+                    <p>Você não pode visualizar as informações desta ficha médica.</p>
+                    <a href="buscar_paciente.php" class="btn-voltar-scanner">← Voltar</a>
+                </div>
+            </section>
         <?php else: ?>
+            <!-- Paciente não encontrado -->
             <section class="ficha-medica">
                 <div class="mensagem-erro-scanner">
                     <div class="erro-icon">❌</div>
                     <h2>Paciente não encontrado</h2>
-                    <p>O código da pulseira "<strong><?= htmlspecialchars($codigo_pulseira) ?></strong>" não foi encontrado no sistema.</p>
-                    <p>Verifique se o código está correto e tente novamente.</p>
-                    <a href="inicio-med.php" class="btn-voltar-scanner">← Voltar ao Scanner</a>
+                    <?php if (!empty($codigo_pulseira)): ?>
+                        <p>O código da pulseira "<strong><?= htmlspecialchars($codigo_pulseira) ?></strong>" não foi encontrado no sistema.</p>
+                    <?php else: ?>
+                        <p>A ficha médica informada não foi encontrada no sistema.</p>
+                    <?php endif; ?>
+                    <p>Verifique se o ID está correto e tente novamente.</p>
+                    <a href="<?= $eh_profissional ? 'inicio-med.php' : 'buscar_paciente.php' ?>" class="btn-voltar-scanner">← Voltar</a>
                 </div>
             </section>
         <?php endif; ?>

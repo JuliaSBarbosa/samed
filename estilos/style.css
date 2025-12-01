@@ -165,12 +165,14 @@ main {
     gap: 40px;
     align-items: stretch; /* garante que os cards fiquem com mesma altura */
     margin-top: 40px;
+    flex-wrap: wrap;
 }
 
 .card {
-    width: 250px;
-    height: 250px;
-    min-height: 250px; /* reforça altura mínima para consistência */
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    max-height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center; /* centraliza conteúdo verticalmente */
@@ -182,6 +184,8 @@ main {
     text-align: center;
     padding: 20px;
     transition: transform 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+    overflow: hidden; /* garante que o conteúdo não ultrapasse */
 }
 
 .card:hover {
@@ -192,13 +196,18 @@ main {
 /* padronizar tamanho das imagens dentro das cards na tela de inicio */
 /* imagens que têm a classe `icone` ficam maiores; outras imagens ficam menores */
 .card img.icone {
-    width: 140px;
-    height: 140px;
+    width: 140px !important;
+    height: 140px !important;
+    min-width: 140px !important;
+    min-height: 140px !important;
+    max-width: 140px !important;
+    max-height: 140px !important;
     margin-bottom: 15px;
     object-fit: contain;
     display: block;
     margin-left: auto;
     margin-right: auto;
+    flex-shrink: 0; /* impede que a imagem encolha */
 }
 
 .card .icone-texto {
@@ -224,6 +233,14 @@ main {
 .card p {
     font-size: 16px;
     color: #444;
+    margin: 0;
+    padding: 0;
+    line-height: 1.4;
+    max-width: 100%;
+    word-wrap: break-word;
+    flex-shrink: 0;
+    height: auto;
+    min-height: auto;
 }
 
 /* para tirar o sublinhado de link das divs*/
@@ -231,6 +248,13 @@ main {
     text-decoration: none;
     color: inherit;
     display: block;
+    width: 250px;
+    min-width: 250px;
+    max-width: 250px;
+    height: 250px;
+    min-height: 250px;
+    max-height: 250px;
+    flex-shrink: 0;
 }
 
 /* ======= Rodapé ======= */

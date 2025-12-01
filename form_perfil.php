@@ -594,8 +594,8 @@ if (isset($_SESSION['dados_form'])) {
                     contato de emergência)?</label>
                 <select id="autorizacao_usuario" name="autorizacao_usuario" required>
                     <option value="">Selecione</option>
-                    <option value="sim">Sim, autorizo</option>
-                    <option value="nao">Não autorizo</option>
+                    <option value="sim" <?= (($dados_form['autorizacao_usuario'] ?? $perfil['autorizacao_usuario'] ?? '') === 'sim') ? 'selected' : '' ?>>Sim, autorizo</option>
+                    <option value="nao" <?= (($dados_form['autorizacao_usuario'] ?? $perfil['autorizacao_usuario'] ?? '') === 'nao') ? 'selected' : '' ?>>Não autorizo</option>
                 </select>
 
             </div>
