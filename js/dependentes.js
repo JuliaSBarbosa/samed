@@ -56,13 +56,103 @@ document.addEventListener('DOMContentLoaded', function () {
         let activeStep = 0;
         console.log('[multi-step] init: found', formSteps.length, 'steps');
 
+        // Função para validar um campo individual e atualizar visualmente
+        function validateField(field) {
+            if (field.disabled) return true;
+            
+            let isValid = true;
+            
+            // Handle radio groups
+            if (field.type === 'radio') {
+                const group = form.querySelectorAll('input[name="' + field.name + '"]');
+                let someChecked = false;
+                group.forEach(g => { if (g.checked) someChecked = true; });
+                if (!someChecked) {
+                    isValid = false;
+                    group.forEach(g => g.closest('.tipo-opcoes')?.classList.add('campo-invalido'));
+                    group.forEach(g => g.closest('.tipo-opcoes')?.classList.remove('campo-valido'));
+                } else {
+                    group.forEach(g => g.closest('.tipo-opcoes')?.classList.remove('campo-invalido'));
+                    group.forEach(g => g.closest('.tipo-opcoes')?.classList.add('campo-valido'));
+                }
+                return isValid;
+            }
+
+            // Handle checkboxes
+            if (field.type === 'checkbox') {
+                if (!field.checked) {
+                    isValid = false;
+                    field.classList.add('campo-invalido');
+                    field.classList.remove('campo-valido');
+                } else {
+                    field.classList.remove('campo-invalido');
+                    field.classList.add('campo-valido');
+                }
+                return isValid;
+            }
+
+            // Validação de email
+            if (field.type === 'email') {
+                const valor = field.value.trim();
+                if (valor.length === 0) {
+                    isValid = false;
+                } else {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    isValid = emailRegex.test(valor);
+                }
+            }
+            // Validação de data
+            else if (field.type === 'date') {
+                const valor = field.value;
+                if (!valor) {
+                    isValid = false;
+                } else {
+                    const data = new Date(valor);
+                    const hoje = new Date();
+                    isValid = data <= hoje;
+                }
+            }
+            // Validação de select
+            else if (field.tagName === 'SELECT') {
+                isValid = field.value !== '' && field.value !== null;
+            }
+            // Default text/textarea validation
+            else {
+                isValid = String(field.value || '').trim().length > 0;
+            }
+            
+            // Atualizar classes visuais
+            if (isValid) {
+                field.classList.remove('campo-invalido');
+                field.classList.add('campo-valido');
+                field.setCustomValidity('');
+            } else {
+                field.classList.remove('campo-valido');
+                field.classList.add('campo-invalido');
+            }
+            
+            return isValid;
+        }
+
         function validateCurrentStep() {
             const current = formSteps[activeStep];
             if (!current) return true;
+            
+            // Remover mensagens de erro anteriores
+            current.querySelectorAll('.campo-erro').forEach(el => el.remove());
+            current.querySelectorAll('.campo-invalido').forEach(el => el.classList.remove('campo-invalido'));
+            
             const required = Array.from(current.querySelectorAll('[required]'));
+            let isValid = true;
+            const erros = [];
 
             for (const field of required) {
                 if (field.disabled) continue;
+                
+                const label = field.closest('label') || 
+                             (field.previousElementSibling?.tagName === 'LABEL' ? field.previousElementSibling : null) ||
+                             current.querySelector(`label[for="${field.id}"]`);
+                const fieldName = label ? label.textContent.trim().replace('*', '').trim() : field.name;
 
                 // Handle radio groups
                 if (field.type === 'radio') {
@@ -70,9 +160,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     let someChecked = false;
                     group.forEach(g => { if (g.checked) someChecked = true; });
                     if (!someChecked) {
-                        alert('Selecione: ' + (field.previousElementSibling?.textContent || field.name));
-                        group[0].focus();
-                        return false;
+                        isValid = false;
+                        erros.push(fieldName);
+                        field.closest('.tipo-opcoes')?.classList.add('campo-invalido');
+                        if (erros.length === 1) group[0].focus();
                     }
                     continue;
                 }
@@ -80,23 +171,82 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Handle checkboxes (single required checkbox)
                 if (field.type === 'checkbox') {
                     if (!field.checked) {
-                        alert('Marque o campo obrigatório: ' + (field.previousElementSibling?.textContent || field.name));
-                        field.focus();
-                        return false;
+                        isValid = false;
+                        erros.push(fieldName);
+                        field.classList.add('campo-invalido');
+                        if (erros.length === 1) field.focus();
                     }
                     continue;
                 }
 
+                // Validação de email
+                if (field.type === 'email' && field.value) {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(field.value)) {
+                        isValid = false;
+                        erros.push(fieldName + ' (formato inválido)');
+                        field.classList.add('campo-invalido');
+                        if (erros.length === 1) field.focus();
+                        continue;
+                    }
+                }
+
+                // Validação de data
+                if (field.type === 'date' && field.value) {
+                    const data = new Date(field.value);
+                    const hoje = new Date();
+                    if (data > hoje) {
+                        isValid = false;
+                        erros.push(fieldName + ' (data não pode ser futura)');
+                        field.classList.add('campo-invalido');
+                        if (erros.length === 1) field.focus();
+                        continue;
+                    }
+                }
+
                 // Default text/select/textarea validation
                 if (!String(field.value || '').trim()) {
-                    alert('Preencha o campo obrigatório: ' + (field.previousElementSibling?.textContent || field.name));
-                    field.focus();
-                    return false;
+                    isValid = false;
+                    erros.push(fieldName);
+                    field.classList.add('campo-invalido');
+                    if (erros.length === 1) field.focus();
                 }
             }
-            return true;
+            
+            // Mostrar mensagens de erro
+            if (!isValid && erros.length > 0) {
+                const erroDiv = document.createElement('div');
+                erroDiv.className = 'campo-erro';
+                erroDiv.style.cssText = 'background: #fee; color: #c33; padding: 12px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #f44336;';
+                erroDiv.innerHTML = '<strong>⚠️ Erros encontrados:</strong><ul style="margin: 8px 0 0 20px;">' + 
+                    erros.map(e => '<li>' + e + '</li>').join('') + '</ul>';
+                current.insertBefore(erroDiv, current.firstChild);
+                
+                // Scroll para o erro
+                erroDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+            
+            return isValid;
         }
-
+        
+        // Adicionar validação em tempo real para todos os campos obrigatórios
+        function addRealTimeValidation() {
+            const allRequiredFields = form.querySelectorAll('[required]');
+            allRequiredFields.forEach(field => {
+                // Evitar duplicar listeners
+                if (field.dataset.validationAdded === 'true') return;
+                field.dataset.validationAdded = 'true';
+                
+                // Adicionar listener para input/change
+                const eventType = field.tagName === 'SELECT' ? 'change' : 
+                                 field.type === 'checkbox' || field.type === 'radio' ? 'change' : 'input';
+                
+                field.addEventListener(eventType, function() {
+                    validateField(field);
+                });
+            });
+        }
+        
         function updateStepDisplay() {
             console.log('[multi-step] updateStepDisplay activeStep=', activeStep);
             formSteps.forEach((s, i) => s.classList.toggle('active', i === activeStep));
@@ -111,13 +261,159 @@ document.addEventListener('DOMContentLoaded', function () {
             prevButtons.forEach(btn => btn.style.display = activeStep === 0 ? 'none' : '');
             nextButtons.forEach(btn => btn.style.display = activeStep === formSteps.length - 1 ? 'none' : '');
             if (submitButton) submitButton.style.display = activeStep === formSteps.length - 1 ? '' : 'none';
+            
+            // Re-inicializar validação em tempo real quando mudar de step
+            setTimeout(addRealTimeValidation, 100);
         }
+        
+        // Inicializar validação em tempo real
+        addRealTimeValidation();
+
+        // Função para validar todos os steps
+        function validateAllSteps() {
+            let firstInvalidStep = -1;
+            let firstInvalidField = null;
+            
+            // Primeiro, remover required de todos os campos em steps ocultos
+            formSteps.forEach((step, index) => {
+                if (index !== activeStep) {
+                    step.querySelectorAll('[required]').forEach(field => {
+                        field.removeAttribute('required');
+                        field.setAttribute('data-was-required', 'true');
+                    });
+                }
+            });
+            
+            // Validar todos os steps (agora apenas o step ativo tem campos required)
+            for (let i = 0; i < formSteps.length; i++) {
+                const step = formSteps[i];
+                // Buscar campos required apenas no step ativo, ou validar manualmente nos outros
+                const requiredFields = i === activeStep 
+                    ? Array.from(step.querySelectorAll('[required]'))
+                    : Array.from(step.querySelectorAll('[data-was-required="true"]'));
+                
+                for (const field of requiredFields) {
+                    if (field.disabled) continue;
+                    
+                    // Verificar se é válido
+                    let isValid = true;
+                    if (field.type === 'radio') {
+                        const group = form.querySelectorAll('input[name="' + field.name + '"]');
+                        let someChecked = false;
+                        group.forEach(g => { if (g.checked) someChecked = true; });
+                        isValid = someChecked;
+                    } else if (field.type === 'checkbox') {
+                        isValid = field.checked;
+                    } else if (field.type === 'email') {
+                        const valor = field.value.trim();
+                        isValid = valor.length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor);
+                    } else if (field.type === 'date') {
+                        const valor = field.value;
+                        if (valor) {
+                            const data = new Date(valor);
+                            const hoje = new Date();
+                            isValid = data <= hoje;
+                        } else {
+                            isValid = false;
+                        }
+                    } else if (field.tagName === 'SELECT') {
+                        isValid = field.value !== '' && field.value !== null;
+                    } else {
+                        isValid = String(field.value || '').trim().length > 0;
+                    }
+                    
+                    if (!isValid) {
+                        if (firstInvalidStep === -1) {
+                            firstInvalidStep = i;
+                            firstInvalidField = field;
+                        }
+                    }
+                }
+            }
+            
+            // Se encontrou erro, restaurar required e mostrar o step
+            if (firstInvalidStep !== -1) {
+                // Restaurar todos os atributos required
+                formSteps.forEach(step => {
+                    step.querySelectorAll('[data-was-required="true"]').forEach(field => {
+                        field.setAttribute('required', 'required');
+                        field.removeAttribute('data-was-required');
+                    });
+                });
+                
+                // Ir para o step com erro
+                activeStep = firstInvalidStep;
+                updateStepDisplay();
+                
+                // Focar no campo inválido
+                if (firstInvalidField) {
+                    setTimeout(() => {
+                        firstInvalidField.focus();
+                        firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100);
+                }
+                
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Adicionar listener de submit no formulário
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            
+            // Validar todos os steps antes de enviar
+            if (!validateAllSteps()) {
+                return false;
+            }
+            
+            // Se passou na validação, remover required temporariamente de TODOS os campos ocultos e submeter
+            // Usar setTimeout para garantir que o DOM foi atualizado antes de submeter
+            setTimeout(() => {
+                formSteps.forEach((step, index) => {
+                    // Remover required de todos os steps exceto o ativo
+                    if (index !== activeStep) {
+                        step.querySelectorAll('[required]').forEach(field => {
+                            field.removeAttribute('required');
+                            field.setAttribute('data-was-required', 'true');
+                        });
+                        // Também remover de campos que já tinham data-was-required
+                        step.querySelectorAll('[data-was-required="true"]').forEach(field => {
+                            field.removeAttribute('required');
+                        });
+                    }
+                });
+                
+                // Submeter o formulário
+                console.log('[multi-step] Formulário sendo enviado...');
+                form.submit();
+            }, 50);
+            
+            return false;
+        });
+        
+        // Garantir que campos ocultos não tenham required antes de submeter
+        form.addEventListener('submit', function(e) {
+            // Se já foi interceptado pelo listener anterior, não fazer nada
+            if (e.defaultPrevented) return;
+            
+            // Remover required de campos ocultos como fallback
+            formSteps.forEach((step, index) => {
+                if (index !== activeStep) {
+                    step.querySelectorAll('[required]').forEach(field => {
+                        field.removeAttribute('required');
+                    });
+                }
+            });
+        }, true); // Usar capture phase para executar antes
 
         container.addEventListener('click', function (e) {
             // Não interceptar cliques no botão submit
             const submitBtn = e.target.closest('.submit-btn');
             if (submitBtn) {
-                // Deixar o submit funcionar normalmente
+                // O evento submit do form já vai lidar com a validação completa
+                // Não precisamos interceptar aqui
                 return;
             }
             

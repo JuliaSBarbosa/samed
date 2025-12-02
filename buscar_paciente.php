@@ -32,7 +32,7 @@ if (!isset($_SESSION['usuario_tipo']) || $_SESSION['usuario_tipo'] !== 'paciente
             <span class="divisor">|</span>
             <a href="perfil.php">MEU PERFIL</a>
             <span class="divisor">|</span>
-            <?php if ($_SESSION['usuario_tipo'] === 'paciente'): ?>
+            <?php if (in_array($_SESSION['usuario_tipo'] ?? '', ['paciente', 'medico', 'enfermeiro'])): ?>
             <a href="dependentes.php">DEPENDENTES</a>
             <span class="divisor">|</span>
             <?php endif; ?>
@@ -58,7 +58,7 @@ if (!isset($_SESSION['usuario_tipo']) || $_SESSION['usuario_tipo'] !== 'paciente
                 <span class="scanner-icon">🔍</span>
                 BUSCAR FICHA DE PACIENTE
             </h2>
-            <p class="scanner-subtitulo">Digite o ID da ficha médica para visualizar informações básicas</p>
+            <p class="scanner-subtitulo">Digite o CPF do paciente para visualizar informações básicas</p>
 
             <div class="scanner-manual">
                 <p class="manual-text">
@@ -68,13 +68,15 @@ if (!isset($_SESSION['usuario_tipo']) || $_SESSION['usuario_tipo'] !== 'paciente
                 <form method="GET" action="visualizar_paciente.php" class="scanner-form">
                     <div class="input-group">
                         <input 
-                            type="number" 
-                            name="id_ficha" 
-                            id="idFicha" 
-                            placeholder="Digite o ID da ficha médica (ex: 1)"
+                            type="text" 
+                            name="cpf" 
+                            id="cpfBusca" 
+                            placeholder="Digite o CPF (ex: 123.456.789-00)"
                             class="scanner-input"
-                            min="1"
+                            maxlength="14"
+                            pattern="[0-9.-]+"
                             required
+                            oninput="this.value = this.value.replace(/\D/g, '').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2')"
                         >
                         <button type="submit" class="btn-scanner">
                             <span>🔍</span>
@@ -82,6 +84,27 @@ if (!isset($_SESSION['usuario_tipo']) || $_SESSION['usuario_tipo'] !== 'paciente
                         </button>
                     </div>
                 </form>
+                <p style="margin-top: 15px; font-size: 0.9rem; color: #666;">
+                    Ou busque por <a href="?busca=id" style="color: #6ec1e4;">ID da ficha médica</a>
+                </p>
+                <?php if (isset($_GET['busca']) && $_GET['busca'] === 'id'): ?>
+                <form method="GET" action="visualizar_paciente.php" class="scanner-form" style="margin-top: 15px;">
+                    <div class="input-group">
+                        <input 
+                            type="number" 
+                            name="id_ficha" 
+                            id="idFicha" 
+                            placeholder="Digite o ID da ficha médica (ex: 1)"
+                            class="scanner-input"
+                            min="1"
+                        >
+                        <button type="submit" class="btn-scanner">
+                            <span>🔍</span>
+                            Buscar
+                        </button>
+                    </div>
+                </form>
+                <?php endif; ?>
             </div>
         </div>
     </main>

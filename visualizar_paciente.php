@@ -16,11 +16,12 @@ if (!$eh_profissional && !$eh_paciente) {
     exit;
 }
 
-// Receber ID da ficha ou código da pulseira
+// Receber ID da ficha, CPF ou código da pulseira
 $id_ficha = isset($_GET['id_ficha']) ? (int)$_GET['id_ficha'] : null;
+$cpf_busca = isset($_GET['cpf']) ? preg_replace('/[^0-9]/', '', $_GET['cpf']) : '';
 $codigo_pulseira = $_GET['codigo_pulseira'] ?? '';
 
-if (empty($id_ficha) && empty($codigo_pulseira)) {
+if (empty($id_ficha) && empty($cpf_busca) && empty($codigo_pulseira)) {
     if ($eh_profissional) {
         header('Location: inicio-med.php');
     } else {
@@ -39,8 +40,133 @@ $autorizacao_usuario = 'nao';
 
 if ($pdo) {
     try {
+        // Buscar por CPF primeiro (prioridade)
+        if (!empty($cpf_busca)) {
+            // Buscar perfil médico por CPF
+            $stmt = $pdo->prepare("
+                SELECT pm.*, u.nome as nome_usuario, u.id as usuario_id_paciente, pm.dependente_id
+                FROM perfis_medicos pm
+                LEFT JOIN usuarios u ON pm.usuario_id = u.id
+                WHERE REPLACE(REPLACE(REPLACE(pm.cpf, '.', ''), '-', ''), ' ', '') = ?
+                ORDER BY pm.id DESC
+                LIMIT 1
+            ");
+            $stmt->execute([$cpf_busca]);
+            $perfil = $stmt->fetch();
+            
+            if ($perfil) {
+                $paciente_encontrado = true;
+                $perfil_id = $perfil['id'];
+                $usuario_id_paciente = $perfil['usuario_id_paciente'];
+                $dependente_id = $perfil['dependente_id'];
+                $eh_dependente = !empty($dependente_id);
+                
+                // Buscar contato de emergência e dados
+                $contato_emergencia = null;
+                if ($eh_dependente) {
+                    // Se for dependente, buscar o paciente_id (titular) do dependente
+                    $stmt = $pdo->prepare("SELECT paciente_id FROM dependentes WHERE id = ?");
+                    $stmt->execute([$dependente_id]);
+                    $dependente_data = $stmt->fetch();
+                    
+                    // Usar o paciente_id do dependente como usuario_id_paciente para o histórico
+                    if ($dependente_data && $dependente_data['paciente_id']) {
+                        $usuario_id_paciente = $dependente_data['paciente_id'];
+                    }
+                    
+                    $stmt = $pdo->prepare("SELECT * FROM contatos_emergencia WHERE dependente_id = ?");
+                    $stmt->execute([$dependente_id]);
+                    $contato_emergencia = $stmt->fetch();
+                    
+                    $stmt = $pdo->prepare("SELECT * FROM dependentes WHERE id = ?");
+                    $stmt->execute([$dependente_id]);
+                    $dependente = $stmt->fetch();
+                    $nome_paciente = $dependente['nome'] ?? $perfil['nome_usuario'];
+                } else {
+                    $stmt = $pdo->prepare("SELECT * FROM contatos_emergencia WHERE usuario_id = ?");
+                    $stmt->execute([$usuario_id_paciente]);
+                    $contato_emergencia = $stmt->fetch();
+                    $nome_paciente = $perfil['nome_usuario'];
+                }
+                
+                // Calcular idade
+                $idade = null;
+                if ($perfil['data_nascimento']) {
+                    $data_nasc = new DateTime($perfil['data_nascimento']);
+                    $hoje = new DateTime();
+                    $idade = $hoje->diff($data_nasc)->y;
+                }
+                
+                $autorizacao_usuario = $perfil['autorizacao_usuario'] ?? 'nao';
+                $pode_ver_dados_completos = $eh_profissional;
+                $pode_ver_dados_basicos = $eh_profissional || ($eh_paciente && $autorizacao_usuario === 'sim');
+                
+                // Verificar se pode acessar antes de registrar
+                $pode_acessar = $pode_ver_dados_basicos || $pode_ver_dados_completos;
+                
+                // Montar dados do paciente
+                $dados_paciente = [
+                    'nome' => $nome_paciente,
+                    'idade' => $idade,
+                    'data_nascimento' => $perfil['data_nascimento'] ? date('d/m/Y', strtotime($perfil['data_nascimento'])) : '',
+                    'sexo' => ucfirst($perfil['sexo'] ?? ''),
+                    'cpf' => $perfil['cpf'] ?? '',
+                    'telefone' => $perfil['telefone'] ?? '',
+                    'email' => $perfil['email'] ?? '',
+                    'contato_emergencia' => $contato_emergencia['nome'] ?? '',
+                    'parentesco' => $contato_emergencia['parentesco'] ?? '',
+                    'telefone_emergencia' => $contato_emergencia['telefone'] ?? '',
+                    'doencas_cronicas' => $pode_ver_dados_completos ? ($perfil['doencas_cronicas'] ?? '') : '',
+                    'alergias' => $pode_ver_dados_completos ? ($perfil['alergias'] ?? '') : '',
+                    'tipo_sanguineo' => $pode_ver_dados_completos ? ($perfil['tipo_sanguineo'] ?? '') : '',
+                    'medicacoes' => $pode_ver_dados_completos ? ($perfil['medicacao_continua'] ?? '') : '',
+                    'doenca_mental' => $pode_ver_dados_completos ? ($perfil['doenca_mental'] ?? 'Não') : '',
+                    'dispositivos' => $pode_ver_dados_completos ? ($perfil['dispositivo_implantado'] ?? '') : '',
+                    'informacoes_relevantes' => $pode_ver_dados_completos ? ($perfil['info_relevantes'] ?? '') : '',
+                    'historico_cirurgias' => $pode_ver_dados_completos ? ($perfil['cirurgias'] ?? '') : '',
+                    'foto_perfil' => $perfil['foto_perfil'] ?? null
+                ];
+                
+                // Registrar acesso no histórico (sempre registra, tanto quando permitido quanto quando bloqueado)
+                if (isset($_SESSION['usuario_id']) && $_SESSION['usuario_id'] != $usuario_id_paciente) {
+                    $visualizador_id = $_SESSION['usuario_id'];
+                    $tipo_acesso = 'Consulta';
+                    $registro_profissional = '';
+                    
+                    if ($eh_profissional) {
+                        if ($_SESSION['usuario_tipo'] === 'medico') {
+                            $registro_profissional = $_SESSION['usuario_crm'] ?? '';
+                            $tipo_acesso = 'Consulta Médica';
+                        } elseif ($_SESSION['usuario_tipo'] === 'enfermeiro') {
+                            $registro_profissional = $_SESSION['usuario_coren'] ?? '';
+                            $tipo_acesso = 'Consulta Enfermagem';
+                        }
+                    } else {
+                        $tipo_acesso = 'Consulta por Usuário';
+                    }
+                    
+                    // Se acesso foi bloqueado, registrar como tentativa bloqueada
+                    if (!$pode_acessar && $eh_paciente && $autorizacao_usuario === 'nao') {
+                        $tipo_acesso = 'Tentativa de Acesso Bloqueada - Usuário não autorizou compartilhamento';
+                    }
+                    
+                    $stmt = $pdo->prepare("
+                        INSERT INTO historico_acessos 
+                        (profissional_id, paciente_id, dependente_id, tipo_acesso, registro_profissional)
+                        VALUES (?, ?, ?, ?, ?)
+                    ");
+                    $stmt->execute([
+                        $visualizador_id,
+                        $usuario_id_paciente,
+                        $eh_dependente ? $dependente_id : null,
+                        $tipo_acesso,
+                        $registro_profissional
+                    ]);
+                }
+            }
+        }
         // Buscar por ID da ficha
-        if ($id_ficha) {
+        elseif ($id_ficha) {
             $stmt = $pdo->prepare("
                 SELECT pm.*, u.nome as nome_usuario, u.id as usuario_id_paciente, pm.dependente_id
                 FROM perfis_medicos pm
@@ -60,6 +186,16 @@ if ($pdo) {
                 // Buscar contato de emergência
                 $contato_emergencia = null;
                 if ($eh_dependente) {
+                    // Se for dependente, buscar o paciente_id (titular) do dependente
+                    $stmt = $pdo->prepare("SELECT paciente_id FROM dependentes WHERE id = ?");
+                    $stmt->execute([$dependente_id]);
+                    $dependente_data = $stmt->fetch();
+                    
+                    // Usar o paciente_id do dependente como usuario_id_paciente para o histórico
+                    if ($dependente_data && $dependente_data['paciente_id']) {
+                        $usuario_id_paciente = $dependente_data['paciente_id'];
+                    }
+                    
                     $stmt = $pdo->prepare("SELECT * FROM contatos_emergencia WHERE dependente_id = ?");
                     $stmt->execute([$dependente_id]);
                     $contato_emergencia = $stmt->fetch();
@@ -112,7 +248,10 @@ if ($pdo) {
                     'foto_perfil' => $perfil['foto_perfil'] ?? null
                 ];
                 
-                // Registrar acesso no histórico (para profissionais e pacientes comuns)
+                // Verificar se pode acessar antes de registrar
+                $pode_acessar = $pode_ver_dados_basicos || $pode_ver_dados_completos;
+                
+                // Registrar acesso no histórico (incluindo tentativas bloqueadas)
                 if (isset($_SESSION['usuario_id']) && $_SESSION['usuario_id'] != $usuario_id_paciente) {
                     $visualizador_id = $_SESSION['usuario_id'];
                     $tipo_acesso = 'Consulta';
@@ -127,8 +266,12 @@ if ($pdo) {
                             $tipo_acesso = 'Consulta Enfermagem';
                         }
                     } else {
-                        // Paciente comum visualizando outro paciente
                         $tipo_acesso = 'Consulta por Usuário';
+                    }
+                    
+                    // Se acesso foi bloqueado, registrar como tentativa bloqueada
+                    if (!$pode_acessar && $eh_paciente && $autorizacao_usuario === 'nao') {
+                        $tipo_acesso = 'Tentativa de Acesso Bloqueada - Usuário não autorizou compartilhamento';
                     }
                     
                     $stmt = $pdo->prepare("
@@ -147,7 +290,7 @@ if ($pdo) {
             }
         } elseif (!empty($codigo_pulseira)) {
             // Buscar por código da pulseira (implementação futura)
-            // Por enquanto, redirecionar para busca por ID
+            // Por enquanto, redirecionar para busca por CPF
             header('Location: inicio-med.php');
             exit;
         }
@@ -192,13 +335,22 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
             <h1>SAMED</h1>
         </div>
 
-        <nav class="menu-profissional">
-            <span class="profissional-info">
-                <strong><?= htmlspecialchars($tipo_profissional) ?></strong>
-                <?php if ($registro): ?>
-                    <span class="registro-profissional"><?= htmlspecialchars($registro) ?></span>
-                <?php endif; ?>
-            </span>
+        <nav class="menu">
+            <a href="index.php">INÍCIO</a>
+            <span class="divisor">|</span>
+            <a href="perfil.php">MEU PERFIL</a>
+            <span class="divisor">|</span>
+            <?php if (in_array($_SESSION['usuario_tipo'] ?? '', ['paciente', 'medico', 'enfermeiro'])): ?>
+            <a href="dependentes.php">DEPENDENTES</a>
+            <span class="divisor">|</span>
+            <?php endif; ?>
+            <a href="historico.php">HISTÓRICO</a>
+            <span class="divisor">|</span>
+            <a href="hospital.php">UNIDADES DE SAÚDE</a>
+            <?php if (in_array($_SESSION['usuario_tipo'] ?? '', ['medico', 'enfermeiro'])): ?>
+            <span class="divisor">|</span>
+            <a href="inicio-med.php">ESCANEAR PULSEIRA</a>
+            <?php endif; ?>
         </nav>
 
         <a href="<?= $eh_profissional ? 'inicio-med.php' : 'index.php' ?>" class="botao-sair" style="background: #666;">
@@ -211,10 +363,31 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
     <main>
         <?php if ($paciente_encontrado && $dados_paciente && ($pode_ver_dados_basicos || $pode_ver_dados_completos)): ?>
             <section class="ficha-medica">
+                <!-- Alerta de Doenças Críticas -->
+                <?php if ($pode_ver_dados_completos && (!empty($dados_paciente['doencas_cronicas']) || !empty($dados_paciente['alergias']))): ?>
+                <div class="alerta-doencas" style="background: #fff3cd; border-left: 4px solid #ff9800; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+                    <h3 style="color: #856404; margin: 0 0 10px 0; font-size: 1.1rem;">⚠️ ALERTAS MÉDICOS</h3>
+                    <?php if (!empty($dados_paciente['alergias'])): ?>
+                        <div style="margin-bottom: 8px;">
+                            <strong style="color: #d32f2f;">🚨 ALERGIAS:</strong>
+                            <span style="color: #856404;"><?= htmlspecialchars($dados_paciente['alergias']) ?></span>
+                        </div>
+                    <?php endif; ?>
+                    <?php if (!empty($dados_paciente['doencas_cronicas'])): ?>
+                        <div>
+                            <strong style="color: #d32f2f;">💊 DOENÇAS CRÔNICAS:</strong>
+                            <span style="color: #856404;"><?= htmlspecialchars($dados_paciente['doencas_cronicas']) ?></span>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <?php endif; ?>
+                
                 <div class="header-paciente">
                     <h2>FICHA MÉDICA DO PACIENTE</h2>
                     <div class="codigo-pulseira">
-                        <?php if ($id_ficha): ?>
+                        <?php if (!empty($cpf_busca) && $dados_paciente): ?>
+                            <span class="badge-pulseira">🆔 CPF: <?= htmlspecialchars($dados_paciente['cpf'] ?: $cpf_busca) ?></span>
+                        <?php elseif ($id_ficha): ?>
                             <span class="badge-pulseira">🆔 ID Ficha: <?= htmlspecialchars($id_ficha) ?></span>
                         <?php elseif ($codigo_pulseira): ?>
                             <span class="badge-pulseira">📱 Código: <?= htmlspecialchars($codigo_pulseira) ?></span>
@@ -493,6 +666,8 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
             box-shadow: 0 4px 8px rgba(110, 193, 228, 0.3);
         }
     </style>
+    
+    <script src="js/toast.js"></script>
 
 </body>
 

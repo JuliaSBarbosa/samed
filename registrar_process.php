@@ -1,6 +1,7 @@
 <?php
 require_once 'config.php';
 require_once 'validar_registros.php';
+require_once 'funcoes_auxiliares.php';
 
 // Verificar se o formulário foi enviado
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -27,8 +28,14 @@ if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     $erros[] = "E-mail válido é obrigatório.";
 }
 
-if (empty($password) || strlen($password) < 6) {
-    $erros[] = "Senha deve ter no mínimo 6 caracteres.";
+// Validação de senha segura
+if (empty($password)) {
+    $erros[] = "Senha é obrigatória.";
+} else {
+    $validacao_senha = validarSenhaSegura($password);
+    if (!$validacao_senha['valido']) {
+        $erros[] = $validacao_senha['mensagem'];
+    }
 }
 
 if (empty($tipo) || !in_array($tipo, ['paciente', 'medico', 'enfermeiro'])) {

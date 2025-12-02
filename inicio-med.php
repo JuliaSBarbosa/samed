@@ -32,28 +32,20 @@ if (!$eh_profissional) {
             <h1>SAMED</h1>
         </div>
 
-        <nav class="menu-profissional">
-            <span class="profissional-info">
-                <?php 
-                $tipo_profissional = '';
-                $registro = '';
-                if (isset($_SESSION['usuario_tipo'])) {
-                    if ($_SESSION['usuario_tipo'] === 'medico') {
-                        $tipo_profissional = 'Médico';
-                        $registro = $_SESSION['usuario_crm'] ?? '';
-                    } elseif ($_SESSION['usuario_tipo'] === 'enfermeiro') {
-                        $tipo_profissional = 'Enfermeiro(a)';
-                        $registro = $_SESSION['usuario_coren'] ?? '';
-                    } else {
-                        $tipo_profissional = 'Profissional de Saúde';
-                    }
-                }
-                ?>
-                <strong><?= htmlspecialchars($tipo_profissional) ?></strong>
-                <?php if ($registro): ?>
-                    <span class="registro-profissional"><?= htmlspecialchars($registro) ?></span>
-                <?php endif; ?>
-            </span>
+        <nav class="menu">
+            <a href="index.php">INÍCIO</a>
+            <span class="divisor">|</span>
+            <a href="perfil.php">MEU PERFIL</a>
+            <span class="divisor">|</span>
+            <?php if (in_array($_SESSION['usuario_tipo'] ?? '', ['paciente', 'medico', 'enfermeiro'])): ?>
+            <a href="dependentes.php">DEPENDENTES</a>
+            <span class="divisor">|</span>
+            <?php endif; ?>
+            <a href="historico.php">HISTÓRICO</a>
+            <span class="divisor">|</span>
+            <a href="hospital.php">UNIDADES DE SAÚDE</a>
+            <span class="divisor">|</span>
+            <a href="inicio-med.php" class="ativo">ESCANEAR PULSEIRA</a>
         </nav>
 
         <a href="sair.php" class="botao-sair">
@@ -65,10 +57,12 @@ if (!$eh_profissional) {
     <!-- Conteúdo principal -->
     <main class="scanner-container">
         <div class="scanner-wrapper">
-            <h2 class="scanner-titulo">
-                <span class="scanner-icon">📱</span>
-                ESCANEAR PULSEIRA
-            </h2>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h2 class="scanner-titulo" style="text-align: center;">
+                    <span class="scanner-icon">📱</span>
+                    ESCANEAR PULSEIRA
+                </h2>
+            </div>
             <p class="scanner-subtitulo">Aproxime o celular da pulseira do paciente para acessar os dados médicos</p>
 
             <!-- Área do Scanner -->
@@ -87,18 +81,19 @@ if (!$eh_profissional) {
                 </div>
             </div>
 
-            <!-- Busca por ID da Ficha Médica -->
+            <!-- Busca por CPF -->
             <div class="scanner-manual">
-                <p class="manual-text">Digite o ID da ficha médica para consultar:</p>
+                <p class="manual-text">Digite o CPF do paciente para consultar:</p>
                 <form method="GET" action="visualizar_paciente.php" class="scanner-form">
                     <div class="input-group">
                         <input 
-                            type="number" 
-                            name="id_ficha" 
-                            id="idFicha" 
-                            placeholder="Digite o ID da ficha médica (ex: 1)"
+                            type="text" 
+                            name="cpf" 
+                            id="cpfBusca" 
+                            placeholder="Digite o CPF (ex: 123.456.789-00)"
                             class="scanner-input"
-                            min="1"
+                            maxlength="14"
+                            pattern="[0-9.-]+"
                             required
                         >
                         <button type="submit" class="btn-scanner">
@@ -109,18 +104,18 @@ if (!$eh_profissional) {
                 </form>
             </div>
             
-            <!-- Busca por Código da Pulseira (alternativa) -->
+            <!-- Busca por ID da Ficha Médica (alternativa) -->
             <div class="scanner-manual" style="margin-top: 20px;">
-                <p class="manual-text">Ou digite o código da pulseira:</p>
+                <p class="manual-text">Ou digite o ID da ficha médica:</p>
                 <form method="GET" action="visualizar_paciente.php" class="scanner-form">
                     <div class="input-group">
                         <input 
-                            type="text" 
-                            name="codigo_pulseira" 
-                            id="codigoPulseira" 
-                            placeholder="Digite o código da pulseira (ex: SAMED-123456)"
+                            type="number" 
+                            name="id_ficha" 
+                            id="idFicha" 
+                            placeholder="Digite o ID da ficha médica (ex: 1)"
                             class="scanner-input"
-                            pattern="[A-Z0-9-]+"
+                            min="1"
                         >
                         <button type="submit" class="btn-scanner">
                             <span>🔍</span>
@@ -128,6 +123,13 @@ if (!$eh_profissional) {
                         </button>
                     </div>
                 </form>
+            </div>
+            
+            <!-- Botão Voltar -->
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="index.php" class="btn-voltar-scanner" style="display: inline-block;">
+                    ← Voltar
+                </a>
             </div>
 
             <!-- Informações do Profissional -->
@@ -177,15 +179,24 @@ if (!$eh_profissional) {
             }, 2000);
         }
 
-        // Foco automático no campo de código quando a página carrega
+        // Máscara de CPF no campo de busca
         document.addEventListener('DOMContentLoaded', () => {
-            const codigoInput = document.getElementById('codigoPulseira');
-            if (codigoInput) {
-                // Não focar automaticamente para não abrir o teclado no mobile
-                // codigoInput.focus();
+            const cpfInput = document.getElementById('cpfBusca');
+            if (cpfInput) {
+                cpfInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length <= 11) {
+                        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                        value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                        e.target.value = value;
+                    }
+                });
             }
         });
     </script>
+    
+    <script src="js/toast.js"></script>
 
     <style>
         @keyframes scanLine {

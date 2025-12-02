@@ -57,7 +57,10 @@
                 <input type="email" id="email" name="email" required placeholder="Digite seu e-mail" value="<?php echo isset($_SESSION['dados_form']['email']) ? htmlspecialchars($_SESSION['dados_form']['email']) : ''; ?>">
 
                 <label for="password">SENHA</label>
-                <input type="password" id="password" name="password" required placeholder="Mínimo 6 caracteres">
+                <input type="password" id="password" name="password" required placeholder="Mínimo 8 caracteres, incluindo maiúscula, minúscula, número e caractere especial">
+                <p style="font-size: 0.85rem; color: #666; margin-top: -10px; margin-bottom: 10px;">
+                    A senha deve conter: mínimo 8 caracteres, 1 maiúscula, 1 minúscula, 1 número e 1 caractere especial (!@#$%^&*)
+                </p>
 
                 <label>EU SOU:</label>
                 <div class="tipo-usuario-container">
@@ -138,6 +141,7 @@
         </div>
     </main>
 
+<script src="js/toast.js"></script>
 </body>
 
 </html>

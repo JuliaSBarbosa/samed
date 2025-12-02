@@ -8,9 +8,17 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Verificar se o usuário está logado e é paciente
-if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_tipo'] !== 'paciente') {
-    $_SESSION['erro'] = "Apenas pacientes podem atualizar o perfil médico.";
+// Verificar se o usuário está logado
+if (!isset($_SESSION['usuario_id'])) {
+    $_SESSION['erro'] = "Você precisa estar logado para atualizar o perfil médico.";
+    header('Location: perfil.php');
+    exit;
+}
+
+// Permitir que pacientes, médicos e enfermeiros editem seus perfis
+$tipos_permitidos = ['paciente', 'medico', 'enfermeiro'];
+if (!in_array($_SESSION['usuario_tipo'], $tipos_permitidos)) {
+    $_SESSION['erro'] = "Apenas pacientes, médicos e enfermeiros podem atualizar o perfil médico.";
     header('Location: perfil.php');
     exit;
 }
@@ -81,9 +89,8 @@ $sexo = $_POST['sexo'] ?? null;
 $cpf = trim($_POST['cpf'] ?? '');
 $telefone = trim($_POST['telefone'] ?? '');
 
-// Email: usar o do formulário se preenchido, senão usar o email do login
-$email_form = trim($_POST['email'] ?? '');
-$email = !empty($email_form) ? $email_form : ($_SESSION['usuario_email'] ?? '');
+// Email: obrigatório, usar o do formulário
+$email = trim($_POST['email'] ?? '');
 
 // Dados de contato de emergência
 $contato_nome = trim($_POST['contato_nome'] ?? '');
@@ -184,17 +191,68 @@ if (!$aceitar_termo) {
     $erros[] = "Você deve aceitar o termo de consentimento para continuar.";
 }
 
-// Validar CPF se fornecido
-if (!empty($cpf)) {
-    $cpf = preg_replace('/[^0-9]/', '', $cpf);
-    if (strlen($cpf) !== 11) {
-        $erros[] = "CPF inválido.";
+// Validar CPF (obrigatório)
+if (empty($cpf) || trim($cpf) === '') {
+    $erros[] = "CPF é obrigatório.";
+} else {
+    $cpf_limpo = preg_replace('/[^0-9]/', '', $cpf);
+    if (strlen($cpf_limpo) !== 11) {
+        $erros[] = "CPF deve ter 11 dígitos.";
+    } else {
+        $cpf = $cpf_limpo;
     }
 }
 
-// Validar email se fornecido
-if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $erros[] = "E-mail inválido.";
+// Validar telefone (obrigatório)
+if (empty($telefone) || trim($telefone) === '') {
+    $erros[] = "Telefone é obrigatório.";
+} else {
+    $telefone_limpo = preg_replace('/[^0-9]/', '', $telefone);
+    if (strlen($telefone_limpo) < 10 || strlen($telefone_limpo) > 11) {
+        $erros[] = "Telefone inválido. Use apenas números (10 ou 11 dígitos).";
+    } else {
+        $telefone = $telefone_limpo;
+    }
+}
+
+// Validar email (obrigatório)
+if (empty($email) || trim($email) === '') {
+    $erros[] = "E-mail é obrigatório.";
+} elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $erros[] = "E-mail inválido. Use o formato: exemplo@dominio.com";
+}
+
+// Validar telefone do contato de emergência (obrigatório)
+if (empty($contato_telefone)) {
+    $erros[] = "Telefone do contato de emergência é obrigatório.";
+} else {
+    $contato_telefone_limpo = preg_replace('/[^0-9]/', '', $contato_telefone);
+    if (strlen($contato_telefone_limpo) < 10 || strlen($contato_telefone_limpo) > 11) {
+        $erros[] = "Telefone do contato de emergência inválido. Use apenas números (10 ou 11 dígitos).";
+    } else {
+        $contato_telefone = $contato_telefone_limpo;
+    }
+}
+
+// Validar parentesco (obrigatório)
+if (empty($parentesco) || trim($parentesco) === '') {
+    $erros[] = "Parentesco é obrigatório.";
+}
+
+// Validar tipo sanguíneo (obrigatório)
+if (empty($tipo_sanguineo) || trim($tipo_sanguineo) === '') {
+    $erros[] = "Tipo sanguíneo é obrigatório.";
+} else {
+    $tipos_validos = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'RH-NULO'];
+    if (!in_array($tipo_sanguineo, $tipos_validos)) {
+        $erros[] = "Tipo sanguíneo inválido.";
+    }
+}
+
+// Validar autorização de reanimação (obrigatório)
+$ressuscitacao = $_POST['ressuscitacao'] ?? '';
+if (empty($ressuscitacao) || trim($ressuscitacao) === '') {
+    $erros[] = "Autorização de procedimentos de reanimação é obrigatória.";
 }
 
 // Se houver erros, redirecionar de volta
@@ -230,9 +288,9 @@ try {
             throw new Exception("Formato de arquivo não permitido. Use JPG, PNG ou GIF.");
         }
         
-        // Validar tamanho (máx 2MB)
-        if ($file['size'] > 2 * 1024 * 1024) {
-            throw new Exception("Arquivo muito grande. Tamanho máximo: 2MB.");
+        // Validar tamanho (máx 5MB)
+        if ($file['size'] > 5 * 1024 * 1024) {
+            throw new Exception("Arquivo muito grande. Tamanho máximo: 5MB.");
         }
         
         // Gerar nome único
@@ -257,6 +315,31 @@ try {
             }
         } catch(PDOException $e) {
             // Ignorar erro se a coluna não existir
+        }
+    }
+
+    // Verificar se CPF já existe em outro perfil (se fornecido)
+    if (!empty($cpf)) {
+        $cpf_formatado_check = substr($cpf, 0, 3) . '.' . substr($cpf, 3, 3) . '.' . substr($cpf, 6, 3) . '-' . substr($cpf, 9, 2);
+        $stmt = $pdo->prepare("SELECT id FROM perfis_medicos WHERE cpf = ? AND usuario_id != ?");
+        $stmt->execute([$cpf_formatado_check, $usuario_id]);
+        if ($stmt->fetch()) {
+            $_SESSION['erros'] = ["Este CPF já está cadastrado em outro perfil."];
+            $_SESSION['dados_form'] = $_POST;
+            header('Location: form_perfil.php');
+            exit;
+        }
+    }
+    
+    // Verificar se telefone já existe em outro perfil (se fornecido)
+    if (!empty($telefone)) {
+        $stmt = $pdo->prepare("SELECT id FROM perfis_medicos WHERE telefone = ? AND usuario_id != ?");
+        $stmt->execute([$telefone, $usuario_id]);
+        if ($stmt->fetch()) {
+            $_SESSION['erros'] = ["Este telefone já está cadastrado em outro perfil."];
+            $_SESSION['dados_form'] = $_POST;
+            header('Location: form_perfil.php');
+            exit;
         }
     }
 
@@ -339,9 +422,11 @@ try {
         }
         
         $set_parts[] = 'data_atualizacao = CURRENT_TIMESTAMP';
-        $valores_update[] = $usuario_id;
         
         $set_clause = implode(', ', $set_parts);
+        
+        // Adicionar usuario_id no final para o WHERE
+        $valores_update[] = $usuario_id;
         
         $stmt = $pdo->prepare("
             UPDATE perfis_medicos 
@@ -410,8 +495,8 @@ try {
     // Confirmar transação
     $pdo->commit();
 
-    // Sucesso
-    $_SESSION['sucesso'] = "Perfil médico atualizado com sucesso!";
+    // Sucesso - usar chave específica para perfil
+    $_SESSION['sucesso_perfil'] = "Perfil médico atualizado com sucesso!";
     header('Location: perfil.php');
     exit;
 

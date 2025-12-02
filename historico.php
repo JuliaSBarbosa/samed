@@ -10,6 +10,7 @@ if ($pdo && $usuario_id) {
     try {
         // Buscar acessos ao próprio paciente e seus dependentes
         // Inclui tanto profissionais quanto pacientes comuns que visualizaram
+        // IMPORTANTE: Busca tanto acessos diretos ao paciente quanto aos seus dependentes
         $stmt = $pdo->prepare("
             SELECT 
                 ha.*,
@@ -19,16 +20,17 @@ if ($pdo && $usuario_id) {
                 u_prof.coren,
                 u_pac.nome as nome_paciente,
                 d.nome as nome_dependente,
+                d.paciente_id as dependente_paciente_id,
                 ha.registro_profissional,
                 ha.tipo_acesso
             FROM historico_acessos ha
             INNER JOIN usuarios u_prof ON ha.profissional_id = u_prof.id
-            INNER JOIN usuarios u_pac ON ha.paciente_id = u_pac.id
+            LEFT JOIN usuarios u_pac ON ha.paciente_id = u_pac.id
             LEFT JOIN dependentes d ON ha.dependente_id = d.id
-            WHERE ha.paciente_id = ?
+            WHERE (ha.paciente_id = ? OR (ha.dependente_id IS NOT NULL AND d.paciente_id = ?))
             ORDER BY ha.data_hora DESC
         ");
-        $stmt->execute([$usuario_id]);
+        $stmt->execute([$usuario_id, $usuario_id]);
         $acessos = $stmt->fetchAll();
         
         foreach ($acessos as $acesso) {
@@ -138,7 +140,7 @@ $valor_fim = htmlspecialchars($data_fim ?? '');
             <span class="divisor">|</span>
             <a href="perfil.php">MEU PERFIL</a>
             <span class="divisor">|</span>
-            <?php if ($_SESSION['usuario_tipo'] === 'paciente'): ?>
+            <?php if (in_array($_SESSION['usuario_tipo'] ?? '', ['paciente', 'medico', 'enfermeiro'])): ?>
             <a href="dependentes.php">DEPENDENTES</a>
             <span class="divisor">|</span>
             <?php endif; ?>

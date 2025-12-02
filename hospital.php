@@ -24,7 +24,7 @@ require_once 'verificar_login.php';
             <span class="divisor">|</span>
             <a href="perfil.php">MEU PERFIL</a>
             <span class="divisor">|</span>
-            <?php if ($_SESSION['usuario_tipo'] === 'paciente'): ?>
+            <?php if (in_array($_SESSION['usuario_tipo'] ?? '', ['paciente', 'medico', 'enfermeiro'])): ?>
             <a href="dependentes.php">DEPENDENTES</a>
             <span class="divisor">|</span>
             <?php endif; ?>

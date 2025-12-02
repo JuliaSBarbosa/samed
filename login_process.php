@@ -46,6 +46,11 @@ if ($usuario_encontrado) {
     $_SESSION['usuario_coren'] = $usuario_encontrado['coren'];
     $_SESSION['logado'] = true;
 
+    // Limpar mensagens de cadastro após primeiro login
+    if (isset($_SESSION['sucesso'])) {
+        unset($_SESSION['sucesso']);
+    }
+
     // Redirecionar para página inicial
     header('Location: index.php');
     exit;
@@ -71,6 +76,11 @@ if ($pdo !== null) {
             $_SESSION['usuario_crm'] = $usuario['crm'] ?? null;
             $_SESSION['usuario_coren'] = $usuario['coren'] ?? null;
             $_SESSION['logado'] = true;
+
+            // Limpar mensagens de cadastro após primeiro login
+            if (isset($_SESSION['sucesso'])) {
+                unset($_SESSION['sucesso']);
+            }
 
             // Redirecionar para página inicial
             header('Location: index.php');

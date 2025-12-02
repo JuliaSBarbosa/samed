@@ -67,7 +67,7 @@ if (isset($_SESSION['dados_form'])) {
             <span class="divisor">|</span>
             <a href="perfil.php" class="ativo">MEU PERFIL</a>
             <span class="divisor">|</span>
-            <?php if ($_SESSION['usuario_tipo'] === 'paciente'): ?>
+            <?php if (in_array($_SESSION['usuario_tipo'] ?? '', ['paciente', 'medico', 'enfermeiro'])): ?>
             <a href="dependentes.php">DEPENDENTES</a>
             <span class="divisor">|</span>
             <?php endif; ?>
@@ -162,7 +162,7 @@ if (isset($_SESSION['dados_form'])) {
                     <?php endif; ?>
                     <input type="file" id="foto_perfil" name="foto_perfil" accept="image/*" style="padding: 8px;">
                     <p style="font-size: 0.85rem; color: #666; margin-top: 5px;">Formatos aceitos: JPG, PNG, GIF (máx.
-                        2MB)</p>
+                        5MB)</p>
                 </div>
 
                 <label for="nome">Nome completo</label>
@@ -198,7 +198,7 @@ if (isset($_SESSION['dados_form'])) {
                 </select>
 
                 <label for="cpf">CPF</label>
-                <input type="text" id="cpf" name="cpf" placeholder="Digite o número do seu CPF" value="<?= htmlspecialchars($dados_form['cpf'] ?? $perfil['cpf'] ?? '') ?>">
+                <input type="text" id="cpf" name="cpf" placeholder="Digite o número do seu CPF" value="<?= htmlspecialchars($dados_form['cpf'] ?? $perfil['cpf'] ?? '') ?>" required>
 
                 <label for="sus">Cartão do SUS</label>
                 <input type="text" id="sus" name="sus" placeholder="Digite o número do seu cartão do sus">
@@ -231,17 +231,16 @@ if (isset($_SESSION['dados_form'])) {
                 </div>
 
                 <label for="telefone">Telefone</label>
-                <input type="tel" id="telefone" name="telefone" placeholder="Digite o número do seu telefone" value="<?= htmlspecialchars($dados_form['telefone'] ?? $perfil['telefone'] ?? '') ?>">
+                <input type="tel" id="telefone" name="telefone" placeholder="Digite o número do seu telefone" value="<?= htmlspecialchars($dados_form['telefone'] ?? $perfil['telefone'] ?? '') ?>" required>
 
-                <label for="email">E-mail de contato (opcional)</label>
+                <label for="email">E-mail de contato</label>
                 <?php 
                 // Usar email do perfil se existir, senão usar email do login
                 $email_valor = $dados_form['email'] ?? $perfil['email'] ?? $_SESSION['usuario_email'] ?? '';
                 ?>
-                <input type="email" id="email" name="email" placeholder="Deixe em branco para usar o email do login" value="<?= htmlspecialchars($email_valor) ?>">
+                <input type="email" id="email" name="email" placeholder="Digite o seu e-mail" value="<?= htmlspecialchars($email_valor) ?>" required>
                 <p style="font-size: 0.85rem; color: #666; margin-top: 5px;">
                     Email do login: <strong><?= htmlspecialchars($_SESSION['usuario_email'] ?? 'Não informado') ?></strong>
-                    <br>Se deixar em branco, será usado o email do login automaticamente.
                 </p>
             </div>
 
@@ -256,7 +255,7 @@ if (isset($_SESSION['dados_form'])) {
                 <?php 
                 $parentesco_selecionado = $dados_form['parentesco'] ?? $contato_emergencia['parentesco'] ?? '';
                 ?>
-                <select id="parentesco" name="parentesco">
+                <select id="parentesco" name="parentesco" required>
                     <option value="">Selecione</option>
 
                     <!-- Pais -->
@@ -458,7 +457,7 @@ if (isset($_SESSION['dados_form'])) {
                 <?php 
                 $tipo_sanguineo_selecionado = $dados_form['tipo_sanguineo'] ?? $perfil['tipo_sanguineo'] ?? '';
                 ?>
-                <select id="tipo_sanguineo" name="tipo_sanguineo">
+                <select id="tipo_sanguineo" name="tipo_sanguineo" required>
                     <option value="">Selecione</option>
                     <?php 
                     $tipos = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'RH-NULO'];
@@ -543,7 +542,7 @@ if (isset($_SESSION['dados_form'])) {
                 </select>
 
                 <label for="ressuscitacao">Você autoriza procedimentos de reanimação em caso de emergência?</label>
-                <select id="ressuscitacao" name="ressuscitacao">
+                <select id="ressuscitacao" name="ressuscitacao" required>
                     <option value="">Selecione</option>
                     <option value="sim">Sim, autorizo</option>
                     <option value="nao">Não autorizo</option>
@@ -653,6 +652,8 @@ if (isset($_SESSION['dados_form'])) {
     </footer>
 
     <script src="js/dependentes.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/validacoes.js"></script>
     
     <script>
         // Garantir que o formulário seja submetido quando clicar em Salvar

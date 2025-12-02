@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -37,9 +40,22 @@
       
       <input type="submit" value="ENTRAR">
     </form>
+    
+    <?php
+    // Exibir mensagens de erro de login
+    if (isset($_SESSION['erro_login'])) {
+        echo '<div class="mensagem-erro">' . htmlspecialchars($_SESSION['erro_login']) . '</div>';
+        unset($_SESSION['erro_login']);
+    }
+    if (isset($_SESSION['sucesso'])) {
+        echo '<div class="mensagem-sucesso">' . htmlspecialchars($_SESSION['sucesso']) . '</div>';
+        unset($_SESSION['sucesso']);
+    }
+    ?>
   </div>
 </main>
 
+<script src="js/toast.js"></script>
 </body>
 
 </html>

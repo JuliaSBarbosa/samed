@@ -2,22 +2,95 @@
 require_once 'config.php';
 require_once 'verificar_login.php';
 
+// Debug: log do início do processamento
+error_log("=== INÍCIO CADASTRO DEPENDENTE ===");
+error_log("Método: " . $_SERVER['REQUEST_METHOD']);
+error_log("POST recebido: " . print_r($_POST, true));
+
 // Verificar se o formulário foi enviado
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    error_log("Erro: Método não é POST");
     header('Location: form_dependentes.php');
     exit;
 }
 
-// Verificar se o usuário está logado e é paciente
-if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_tipo'] !== 'paciente') {
-    $_SESSION['erro'] = "Apenas pacientes podem cadastrar dependentes.";
+// Verificar se o usuário está logado
+if (!isset($_SESSION['usuario_id'])) {
+    $_SESSION['erro'] = "Você precisa estar logado para cadastrar dependentes.";
+    header('Location: dependentes.php');
+    exit;
+}
+
+// Permitir que pacientes, médicos e enfermeiros cadastrem dependentes
+$tipos_permitidos = ['paciente', 'medico', 'enfermeiro'];
+if (!in_array($_SESSION['usuario_tipo'] ?? '', $tipos_permitidos)) {
+    $_SESSION['erro'] = "Apenas pacientes, médicos e enfermeiros podem cadastrar dependentes.";
     header('Location: dependentes.php');
     exit;
 }
 
 $paciente_id = $_SESSION['usuario_id'];
-$dependente_id = isset($_POST['dependente_id']) ? (int)$_POST['dependente_id'] : null;
-$editar = $dependente_id !== null;
+
+// Verificar se o usuário existe na tabela usuarios (necessário para a foreign key)
+// Aplicar a mesma lógica que funciona para pacientes
+if ($pdo) {
+    try {
+        $stmt = $pdo->prepare("SELECT id FROM usuarios WHERE id = ?");
+        $stmt->execute([$paciente_id]);
+        $usuario_existe = $stmt->fetch();
+        
+        if (!$usuario_existe) {
+            // Se o usuário não existe no banco, pode ser um usuário padrão
+            // Tentar criar o usuário no banco ou usar o email para encontrar
+            $email_usuario = $_SESSION['usuario_email'] ?? '';
+            if (!empty($email_usuario)) {
+                $stmt = $pdo->prepare("SELECT id FROM usuarios WHERE email = ?");
+                $stmt->execute([$email_usuario]);
+                $usuario_email = $stmt->fetch();
+                
+                if ($usuario_email) {
+                    $paciente_id = $usuario_email['id'];
+                    $_SESSION['usuario_id'] = $paciente_id;
+                } else {
+                    // Criar usuário no banco se não existir
+                    $nome_usuario = $_SESSION['usuario_nome'] ?? 'Usuário';
+                    $tipo_usuario = $_SESSION['usuario_tipo'] ?? 'paciente';
+                    $senha_hash = password_hash('temp123', PASSWORD_DEFAULT);
+                    
+                    // Incluir CRM/COREN se for médico/enfermeiro
+                    $crm = $_SESSION['usuario_crm'] ?? null;
+                    $coren = $_SESSION['usuario_coren'] ?? null;
+                    
+                    $stmt = $pdo->prepare("
+                        INSERT INTO usuarios (nome, email, senha, tipo, crm, coren) 
+                        VALUES (?, ?, ?, ?, ?, ?)
+                    ");
+                    $stmt->execute([$nome_usuario, $email_usuario, $senha_hash, $tipo_usuario, $crm, $coren]);
+                    $paciente_id = $pdo->lastInsertId();
+                    $_SESSION['usuario_id'] = $paciente_id;
+                    
+                    error_log("Usuário criado no banco: ID $paciente_id, Tipo: $tipo_usuario");
+                }
+            } else {
+                throw new Exception("Não foi possível identificar o usuário. Faça login novamente.");
+            }
+        }
+    } catch(PDOException $e) {
+        error_log("Erro ao verificar/criar usuário: " . $e->getMessage());
+        $_SESSION['erros'] = ["Erro ao verificar usuário no banco de dados: " . $e->getMessage()];
+        $_SESSION['dados_form'] = $_POST;
+        header('Location: form_dependentes.php');
+        exit;
+    } catch(Exception $e) {
+        error_log("Erro ao verificar/criar usuário: " . $e->getMessage());
+        $_SESSION['erros'] = [$e->getMessage()];
+        $_SESSION['dados_form'] = $_POST;
+        header('Location: form_dependentes.php');
+        exit;
+    }
+}
+$dependente_id = isset($_POST['dependente_id']) && !empty($_POST['dependente_id']) ? (int)$_POST['dependente_id'] : null;
+$editar = $dependente_id !== null && $dependente_id > 0;
 
 // Receber e limpar dados do formulário
 $nome = trim($_POST['nome'] ?? '');
@@ -244,23 +317,72 @@ if (empty($contato_telefone)) {
     $erros[] = "Telefone do contato de emergência é obrigatório.";
 }
 
-// Validar CPF se fornecido
-if (!empty($cpf)) {
-    $cpf = preg_replace('/[^0-9]/', '', $cpf);
-    if (strlen($cpf) !== 11) {
-        $erros[] = "CPF inválido.";
+// Validar CPF (obrigatório para dependentes)
+if (empty($cpf) || trim($cpf) === '') {
+    $erros[] = "CPF é obrigatório.";
+} else {
+    require_once 'funcoes_auxiliares.php';
+    $cpf_limpo = preg_replace('/[^0-9]/', '', $cpf);
+    if (strlen($cpf_limpo) !== 11) {
+        $erros[] = "CPF deve ter 11 dígitos.";
+    } else {
+        $cpf = $cpf_limpo;
     }
 }
 
-// Validar email se fornecido
-if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $erros[] = "E-mail inválido.";
+// Validar telefone (obrigatório)
+if (empty($telefone) || trim($telefone) === '') {
+    $erros[] = "Telefone é obrigatório.";
+} else {
+    $telefone_limpo = preg_replace('/[^0-9]/', '', $telefone);
+    if (strlen($telefone_limpo) < 10 || strlen($telefone_limpo) > 11) {
+        $erros[] = "Telefone inválido. Use apenas números (10 ou 11 dígitos).";
+    } else {
+        $telefone = $telefone_limpo;
+    }
+}
+
+// Validar email (obrigatório)
+if (empty($email) || trim($email) === '') {
+    $erros[] = "E-mail é obrigatório.";
+} elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $erros[] = "E-mail inválido. Use o formato: exemplo@dominio.com";
+}
+
+// Validar telefone do contato de emergência (apenas números, 10 ou 11 dígitos)
+if (!empty($contato_telefone)) {
+    $contato_telefone_limpo = preg_replace('/[^0-9]/', '', $contato_telefone);
+    if (strlen($contato_telefone_limpo) < 10 || strlen($contato_telefone_limpo) > 11) {
+        $erros[] = "Telefone do contato de emergência inválido. Use apenas números (10 ou 11 dígitos).";
+    }
+    $contato_telefone = $contato_telefone_limpo;
+}
+
+// Validar parentesco (obrigatório)
+if (empty($parentesco) || trim($parentesco) === '') {
+    $erros[] = "Parentesco é obrigatório.";
+}
+
+// Validar tipo sanguíneo se fornecido
+if (!empty($tipo_sanguineo)) {
+    $tipos_validos = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'RH-NULO'];
+    if (!in_array($tipo_sanguineo, $tipos_validos)) {
+        $erros[] = "Tipo sanguíneo inválido.";
+    }
+}
+
+// Validar autorização de reanimação (obrigatório)
+$ressuscitacao = $_POST['ressuscitacao'] ?? '';
+if (empty($ressuscitacao) || trim($ressuscitacao) === '') {
+    $erros[] = "Autorização de procedimentos de reanimação é obrigatória.";
 }
 
 // Se houver erros, redirecionar de volta
 if (!empty($erros)) {
     $_SESSION['erros'] = $erros;
     $_SESSION['dados_form'] = $_POST;
+    // Log dos erros para debug
+    error_log("Erros de validação no cadastro de dependente: " . implode(", ", $erros));
     header('Location: form_dependentes.php');
     exit;
 }
@@ -290,9 +412,9 @@ try {
             throw new Exception("Formato de arquivo não permitido. Use JPG, PNG ou GIF.");
         }
         
-        // Validar tamanho (máx 2MB)
-        if ($file['size'] > 2 * 1024 * 1024) {
-            throw new Exception("Arquivo muito grande. Tamanho máximo: 2MB.");
+        // Validar tamanho (máx 5MB)
+        if ($file['size'] > 5 * 1024 * 1024) {
+            throw new Exception("Arquivo muito grande. Tamanho máximo: 5MB.");
         }
         
         // Gerar nome único
@@ -306,7 +428,9 @@ try {
     }
 
     // Iniciar transação
-    $pdo->beginTransaction();
+    if (!$pdo->beginTransaction()) {
+        throw new Exception("Erro ao iniciar transação no banco de dados.");
+    }
 
     // Verificar se a coluna foto_perfil existe na tabela dependentes
     $coluna_foto_existe = false;
@@ -373,12 +497,21 @@ try {
             ]);
         }
     } else {
-        // Verificar se já existe dependente com mesmo CPF (se fornecido)
+        // Verificar se já existe dependente com mesmo CPF (verificar em todos os pacientes)
         if (!empty($cpf_formatado)) {
-            $stmt = $pdo->prepare("SELECT id FROM dependentes WHERE cpf = ? AND paciente_id = ?");
-            $stmt->execute([$cpf_formatado, $paciente_id]);
+            $stmt = $pdo->prepare("SELECT id FROM dependentes WHERE cpf = ?");
+            $stmt->execute([$cpf_formatado]);
             if ($stmt->fetch()) {
                 throw new Exception("Já existe um dependente cadastrado com este CPF.");
+            }
+        }
+        
+        // Verificar se já existe dependente com mesmo telefone (verificar em todos os pacientes)
+        if (!empty($telefone)) {
+            $stmt = $pdo->prepare("SELECT id FROM dependentes WHERE telefone = ?");
+            $stmt->execute([$telefone]);
+            if ($stmt->fetch()) {
+                throw new Exception("Já existe um dependente cadastrado com este telefone.");
             }
         }
 
@@ -417,10 +550,17 @@ try {
         }
 
         $dependente_id = $pdo->lastInsertId();
+        
+        // Verificar se o ID foi gerado corretamente
+        if (!$dependente_id || $dependente_id <= 0) {
+            throw new Exception("Erro ao obter ID do dependente inserido.");
+        }
     }
 
-    // Verificar se já existe perfil médico
-    $stmt = $pdo->prepare("SELECT id FROM perfis_medicos WHERE dependente_id = ?");
+    // Verificar se já existe perfil médico do dependente
+    // IMPORTANTE: Usamos dependente_id (não usuario_id) para evitar conflitos
+    // A coluna dependente_id é específica para dependentes, enquanto usuario_id é para usuários
+    $stmt = $pdo->prepare("SELECT id FROM perfis_medicos WHERE dependente_id = ? AND usuario_id IS NULL");
     $stmt->execute([$dependente_id]);
     $perfil_existente = $stmt->fetch();
     
@@ -469,14 +609,17 @@ try {
         }
         
         $set_parts[] = 'data_atualizacao = CURRENT_TIMESTAMP';
-        $valores_update[] = $dependente_id;
         
         $set_clause = implode(', ', $set_parts);
         
+        // Adicionar dependente_id no final para o WHERE
+        $valores_update[] = $dependente_id;
+        
+        // Garantir que estamos atualizando apenas perfis de dependentes (não de usuários)
         $stmt = $pdo->prepare("
             UPDATE perfis_medicos 
             SET $set_clause
-            WHERE dependente_id = ?
+            WHERE dependente_id = ? AND usuario_id IS NULL
         ");
         $stmt->execute($valores_update);
     } else {
@@ -544,23 +687,42 @@ try {
     }
 
     // Confirmar transação
-    $pdo->commit();
+    if (!$pdo->commit()) {
+        throw new Exception("Erro ao confirmar transação no banco de dados.");
+    }
 
-    // Sucesso
+    // Sucesso - limpar dados do formulário da sessão se houver
+    if (isset($_SESSION['dados_form'])) {
+        unset($_SESSION['dados_form']);
+    }
+    if (isset($_SESSION['erros'])) {
+        unset($_SESSION['erros']);
+    }
+    
     $_SESSION['sucesso'] = $editar ? "Dependente atualizado com sucesso!" : "Dependente cadastrado com sucesso!";
     header('Location: dependentes.php');
     exit;
 
 } catch(PDOException $e) {
     // Reverter transação em caso de erro
-    if ($pdo->inTransaction()) {
+    if ($pdo && $pdo->inTransaction()) {
         $pdo->rollBack();
     }
+    // Log do erro completo para debug
+    error_log("Erro ao cadastrar dependente (PDO): " . $e->getMessage());
+    error_log("Trace: " . $e->getTraceAsString());
     $_SESSION['erros'] = ["Erro ao cadastrar dependente: " . $e->getMessage()];
     $_SESSION['dados_form'] = $_POST;
     header('Location: form_dependentes.php');
     exit;
 } catch(Exception $e) {
+    // Reverter transação em caso de erro
+    if ($pdo && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+    // Log do erro completo para debug
+    error_log("Erro ao cadastrar dependente (Exception): " . $e->getMessage());
+    error_log("Trace: " . $e->getTraceAsString());
     $_SESSION['erros'] = ["Erro: " . $e->getMessage()];
     $_SESSION['dados_form'] = $_POST;
     header('Location: form_dependentes.php');

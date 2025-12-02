@@ -3,32 +3,50 @@ require_once 'verificar_login.php';
 require_once 'config.php';
 
 $usuario_id = $_SESSION['usuario_id'] ?? null;
+$dependente_id = isset($_GET['id']) ? (int)$_GET['id'] : null;
+
+if (!$dependente_id) {
+    header('Location: dependentes.php');
+    exit;
+}
+
+$dependente = null;
 $perfil = null;
 $contato_emergencia = null;
 $tem_dados = false;
 
-// Buscar dados do perfil médico
-if ($pdo && $usuario_id) {
+// Buscar dados do dependente e perfil médico
+if ($pdo && $usuario_id && $dependente_id) {
     try {
-        // Buscar perfil médico
-        $stmt = $pdo->prepare("
-            SELECT pm.*, u.nome as nome_usuario 
-            FROM perfis_medicos pm
-            INNER JOIN usuarios u ON pm.usuario_id = u.id
-            WHERE pm.usuario_id = ?
-        ");
-        $stmt->execute([$usuario_id]);
+        // Verificar se o dependente pertence ao usuário
+        $stmt = $pdo->prepare("SELECT * FROM dependentes WHERE id = ? AND paciente_id = ?");
+        $stmt->execute([$dependente_id, $usuario_id]);
+        $dependente = $stmt->fetch();
+        
+        if (!$dependente) {
+            $_SESSION['erro'] = "Dependente não encontrado ou não pertence a você.";
+            header('Location: dependentes.php');
+            exit;
+        }
+        
+        // Buscar perfil médico do dependente
+        // IMPORTANTE: Usamos dependente_id (não usuario_id) para evitar conflitos
+        // A coluna dependente_id é específica para dependentes, enquanto usuario_id é para usuários
+        $stmt = $pdo->prepare("SELECT * FROM perfis_medicos WHERE dependente_id = ? AND usuario_id IS NULL");
+        $stmt->execute([$dependente_id]);
         $perfil = $stmt->fetch();
         
         // Buscar contato de emergência
         if ($perfil) {
-            $stmt = $pdo->prepare("SELECT * FROM contatos_emergencia WHERE usuario_id = ?");
-            $stmt->execute([$usuario_id]);
+            $stmt = $pdo->prepare("SELECT * FROM contatos_emergencia WHERE dependente_id = ?");
+            $stmt->execute([$dependente_id]);
             $contato_emergencia = $stmt->fetch();
             $tem_dados = true;
         }
     } catch(PDOException $e) {
-        // Erro ao buscar dados
+        $_SESSION['erro'] = "Erro ao buscar dados do dependente.";
+        header('Location: dependentes.php');
+        exit;
     }
 }
 
@@ -62,10 +80,9 @@ function formatarSexo($sexo) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAMED - Perfil</title>
+    <title>SAMED - Perfil do Dependente</title>
     <link rel="stylesheet" href="estilos/style.css">
     <link rel="icon" href="img/logo.svg" type="image/png">
-
 </head>
 
 <body>
@@ -79,10 +96,10 @@ function formatarSexo($sexo) {
         <nav class="menu">
             <a href="index.php">INÍCIO</a>
             <span class="divisor">|</span>
-            <a href="perfil.php" class="ativo">MEU PERFIL</a>
+            <a href="perfil.php">MEU PERFIL</a>
             <span class="divisor">|</span>
             <?php if (in_array($_SESSION['usuario_tipo'] ?? '', ['paciente', 'medico', 'enfermeiro'])): ?>
-            <a href="dependentes.php">DEPENDENTES</a>
+            <a href="dependentes.php" class="ativo">DEPENDENTES</a>
             <span class="divisor">|</span>
             <?php endif; ?>
             <a href="historico.php">HISTÓRICO</a>
@@ -104,62 +121,58 @@ function formatarSexo($sexo) {
     <main>
         <section class="ficha-medica">
             <div class="ficha-medica">
-                <h2>FICHA MÉDICA</h2>
+                <h2>FICHA MÉDICA - <?= htmlspecialchars($dependente['nome'] ?? 'Dependente') ?></h2>
             </div>
             <hr>
-
-            <?php 
-            // Exibir mensagens de sucesso/erro (apenas relacionadas ao perfil, não de cadastro/login)
-            if (isset($_SESSION['sucesso_perfil'])) {
-                echo '<div class="mensagem-sucesso">' . htmlspecialchars($_SESSION['sucesso_perfil']) . '</div>';
-                unset($_SESSION['sucesso_perfil']);
-            }
-            if (isset($_SESSION['erro_perfil'])) {
-                echo '<div class="mensagem-erro">' . htmlspecialchars($_SESSION['erro_perfil']) . '</div>';
-                unset($_SESSION['erro_perfil']);
-            }
-            // Limpar mensagens de cadastro/login que não devem aparecer aqui
-            unset($_SESSION['sucesso']);
-            unset($_SESSION['erro_login']);
-            ?>
+            
+            <?php if (isset($_SESSION['sucesso_perfil'])): ?>
+                <div class="mensagem-sucesso"><?= htmlspecialchars($_SESSION['sucesso_perfil']) ?></div>
+                <?php unset($_SESSION['sucesso_perfil']); ?>
+            <?php endif; ?>
+            
+            <?php if (isset($_SESSION['erro_perfil'])): ?>
+                <div class="mensagem-erro"><?= htmlspecialchars($_SESSION['erro_perfil']) ?></div>
+                <?php unset($_SESSION['erro_perfil']); ?>
+            <?php endif; ?>
             
             <?php if ($tem_dados): ?>
-                <div class="perfil-actions-container">
-                    <div class="perfil-buttons">
-                        <a href="form_perfil.php?editar=1" class="btn-editar-perfil">
-                            <span class="btn-icon">✏️</span>
-                            <span>Editar Perfil</span>
-                        </a>
-                    </div>
-                    
-                    <!-- Configurações de Privacidade - para pacientes, médicos e enfermeiros -->
-                    <?php if (in_array($_SESSION['usuario_tipo'] ?? '', ['paciente', 'medico', 'enfermeiro'])): ?>
-                    <div class="privacidade-card">
-                        <div class="privacidade-header">
-                            <span class="privacidade-icon">🔒</span>
-                            <h3>Configurações de Privacidade</h3>
+                    <div class="perfil-actions-container">
+                        <div class="perfil-buttons">
+                            <a href="form_dependentes.php?editar=<?= $dependente_id ?>" class="btn-editar-perfil">
+                                <span class="btn-icon">✏️</span>
+                                <span>Editar Perfil</span>
+                            </a>
+                            <a href="dependentes.php" class="btn-voltar-perfil">
+                                <span class="btn-icon">←</span>
+                                <span>Voltar</span>
+                            </a>
                         </div>
-                        <form method="POST" action="atualizar_privacidade.php" class="privacidade-form">
-                            <?php if ($_SESSION['usuario_tipo'] === 'paciente'): ?>
-                            <label class="privacidade-checkbox">
-                                <input type="checkbox" name="compartilhar_localizacao" value="sim" 
-                                    <?= ($perfil['compartilhar_localizacao'] ?? 'nao') === 'sim' ? 'checked' : '' ?>
-                                    onchange="this.form.submit()">
-                                <span class="checkmark"></span>
-                                <span class="checkbox-label">Compartilhar localização</span>
-                            </label>
-                            <?php endif; ?>
-                            <label class="privacidade-checkbox">
-                                <input type="checkbox" name="autorizacao_usuario" value="sim"
-                                    <?= ($perfil['autorizacao_usuario'] ?? 'nao') === 'sim' ? 'checked' : '' ?>
-                                    onchange="this.form.submit()">
-                                <span class="checkmark"></span>
-                                <span class="checkbox-label">Permitir que usuários comuns consultem informações básicas</span>
-                            </label>
-                        </form>
+                        
+                        <!-- Configurações de Privacidade -->
+                        <div class="privacidade-card">
+                            <div class="privacidade-header">
+                                <span class="privacidade-icon">🔒</span>
+                                <h3>Configurações de Privacidade</h3>
+                            </div>
+                            <form method="POST" action="atualizar_privacidade_dependente.php" class="privacidade-form">
+                                <input type="hidden" name="dependente_id" value="<?= $dependente_id ?>">
+                                <label class="privacidade-checkbox">
+                                    <input type="checkbox" name="compartilhar_localizacao" value="sim" 
+                                        <?= ($perfil['compartilhar_localizacao'] ?? 'nao') === 'sim' ? 'checked' : '' ?>
+                                        onchange="this.form.submit()">
+                                    <span class="checkmark"></span>
+                                    <span class="checkbox-label">Compartilhar localização</span>
+                                </label>
+                                <label class="privacidade-checkbox">
+                                    <input type="checkbox" name="autorizacao_usuario" value="sim"
+                                        <?= ($perfil['autorizacao_usuario'] ?? 'nao') === 'sim' ? 'checked' : '' ?>
+                                        onchange="this.form.submit()">
+                                    <span class="checkmark"></span>
+                                    <span class="checkbox-label">Permitir que usuários comuns consultem informações básicas</span>
+                                </label>
+                            </form>
+                        </div>
                     </div>
-                    <?php endif; ?>
-                </div>
             <?php endif; ?>
             
             <?php if (!$tem_dados): ?>
@@ -167,9 +180,8 @@ function formatarSexo($sexo) {
                 <div class="mensagem-sem-dados">
                     <div class="mensagem-icon">📋</div>
                     <h3>Nenhum dado cadastrado</h3>
-                    <p>Você ainda não possui informações médicas cadastradas no sistema.</p>
-                    <p>Cadastre suas informações para que profissionais de saúde possam acessá-las em caso de emergência.</p>
-                    <a href="form_perfil.php" class="btn-cadastrar-perfil">➕ Cadastrar Meu Perfil</a>
+                    <p>Este dependente ainda não possui informações médicas cadastradas no sistema.</p>
+                    <a href="form_dependentes.php?editar=<?= $dependente_id ?>" class="btn-cadastrar-perfil">➕ Cadastrar Perfil Médico</a>
                 </div>
             <?php else: ?>
 
@@ -180,12 +192,12 @@ function formatarSexo($sexo) {
                         <div class="card-ficha">
                             <div class="perfil">
                                 <?php 
-                                $foto_perfil = $perfil['foto_perfil'] ?? null;
+                                $foto_perfil = $dependente['foto_perfil'] ?? null;
                                 $foto_src = $foto_perfil ? 'uploads/fotos/' . $foto_perfil : 'img/perfil.svg';
                                 ?>
-                                <img src="<?= htmlspecialchars($foto_src) ?>" alt="Foto do usuário" style="object-fit: cover;">
+                                <img src="<?= htmlspecialchars($foto_src) ?>" alt="Foto do dependente" style="object-fit: cover;">
                                 <div>
-                                    <h3><?= htmlspecialchars(strtoupper($perfil['nome_usuario'] ?? $_SESSION['usuario_nome'])) ?></h3>
+                                    <h3><?= htmlspecialchars(strtoupper($dependente['nome'])) ?></h3>
                                     <?php if ($idade): ?>
                                         <p><strong>IDADE:</strong> <?= $idade ?> ANOS</p>
                                     <?php endif; ?>
@@ -226,9 +238,9 @@ function formatarSexo($sexo) {
                     <div class="carousel-item">
                         <div class="card-ficha">
                             <div class="perfil">
-                                <img src="<?= htmlspecialchars($foto_src) ?>" alt="Foto do usuário" style="object-fit: cover;">
+                                <img src="<?= htmlspecialchars($foto_src) ?>" alt="Foto do dependente" style="object-fit: cover;">
                                 <div>
-                                    <h3><?= htmlspecialchars(strtoupper($perfil['nome_usuario'] ?? $_SESSION['usuario_nome'])) ?></h3>
+                                    <h3><?= htmlspecialchars(strtoupper($dependente['nome'])) ?></h3>
                                     <?php if ($idade): ?>
                                         <p><strong>IDADE:</strong> <?= $idade ?> ANOS</p>
                                     <?php endif; ?>
@@ -259,50 +271,28 @@ function formatarSexo($sexo) {
                                 <?php if ($perfil['info_relevantes']): ?>
                                     <p><strong>INFORMAÇÕES RELEVANTES:</strong> <?= htmlspecialchars(strtoupper($perfil['info_relevantes'])) ?></p>
                                 <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Slide 3 -->
-                    <div class="carousel-item">
-                        <div class="card-ficha">
-                            <div class="perfil">
-                                <img src="<?= htmlspecialchars($foto_src) ?>" alt="Foto do usuário" style="object-fit: cover;">
-                                <div>
-                                    <h3><?= htmlspecialchars(strtoupper($perfil['nome_usuario'] ?? $_SESSION['usuario_nome'])) ?></h3>
-                                    <?php if ($idade): ?>
-                                        <p><strong>IDADE:</strong> <?= $idade ?> ANOS</p>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                            <div class="info-basica">
-                                <h4>HISTÓRICO MÉDICO</h4>
                                 <?php if ($perfil['cirurgias']): ?>
-                                    <p><strong>CIRURGIA:</strong> <?= htmlspecialchars(strtoupper($perfil['cirurgias'])) ?></p>
-                                <?php else: ?>
-                                    <p><strong>CIRURGIA:</strong> NENHUMA REGISTRADA</p>
+                                    <p><strong>CIRURGIAS:</strong> <?= htmlspecialchars(strtoupper($perfil['cirurgias'])) ?></p>
                                 <?php endif; ?>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Controles -->
-                <button class="carousel-control prev">❮</button>
-                <button class="carousel-control next">❯</button>
-
-                <!-- Indicadores -->
-                <div class="carousel-indicators">
-                    <span data-slide="0" class="active"></span>
-                    <span data-slide="1"></span>
-                    <span data-slide="2"></span>
+                <!-- Controles do carousel -->
+                <div class="carousel-controls">
+                    <button class="carousel-btn prev" onclick="changeSlide(-1)">❮ Anterior</button>
+                    <span class="carousel-indicator">
+                        <span id="currentSlide">1</span> / <span id="totalSlides">3</span>
+                    </span>
+                    <button class="carousel-btn next" onclick="changeSlide(1)">Próximo ❯</button>
                 </div>
-
             </div>
             <?php endif; ?>
         </section>
     </main>
-  <!-- Rodapé -->
+
+    <!-- Rodapé -->
     <footer>
         <div class="footer-logo">
             <img src="img/logo-branco.png" alt="Logo SAMED">
@@ -311,48 +301,38 @@ function formatarSexo($sexo) {
         <p>&copy; 2025 Grupo SAMED. Todos os direitos reservados.</p>
         <div class="lojas">
             <img src="img/appstore.webp" alt="App Store">
-             <img src="img/googleplay.webp" alt="App Store">
+            <img src="img/googleplay.webp" alt="App Store">
         </div>
     </footer>
-
+    
+    <script src="js/toast.js"></script>
     <script>
-        const slides = document.querySelectorAll("#fichaCarousel .carousel-item");
-        const indicators = document.querySelectorAll("#fichaCarousel .carousel-indicators span");
-        const inner = document.querySelector("#fichaCarousel .carousel-inner");
-
-        let index = 0;
-
-        function updateCarousel() {
-            inner.style.transform = `translateX(-${index * 100}%)`;
-
-            // Atualiza os indicadores
-            indicators.forEach(ind => ind.classList.remove("active"));
-            indicators[index].classList.add("active");
-
-            // Atualiza a classe active nos slides
-            slides.forEach(slide => slide.classList.remove("active"));
-            slides[index].classList.add("active");
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.carousel-item');
+        const totalSlides = slides.length;
+        if (document.getElementById('totalSlides')) {
+            document.getElementById('totalSlides').textContent = totalSlides;
         }
 
-        document.querySelector(".carousel-control.next").addEventListener("click", () => {
-            index = (index + 1) % slides.length;
-            updateCarousel();
-        });
-
-        document.querySelector(".carousel-control.prev").addEventListener("click", () => {
-            index = (index - 1 + slides.length) % slides.length;
-            updateCarousel();
-        });
-
-        indicators.forEach(ind => {
-            ind.addEventListener("click", () => {
-                index = Number(ind.dataset.slide);
-                updateCarousel();
-            });
-        });
+        function changeSlide(direction) {
+            if (slides.length === 0) return;
+            
+            slides[currentSlideIndex].classList.remove('active');
+            currentSlideIndex += direction;
+            
+            if (currentSlideIndex < 0) {
+                currentSlideIndex = totalSlides - 1;
+            } else if (currentSlideIndex >= totalSlides) {
+                currentSlideIndex = 0;
+            }
+            
+            slides[currentSlideIndex].classList.add('active');
+            if (document.getElementById('currentSlide')) {
+                document.getElementById('currentSlide').textContent = currentSlideIndex + 1;
+            }
+        }
     </script>
-
-
 </body>
 
 </html>
+

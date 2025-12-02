@@ -102,7 +102,10 @@ function calcularIdade($data_nascimento) {
                                 <?php endif; ?>
                             </div>
                         </div>
-                        <a href="form_dependentes.php?editar=<?= $dependente['id'] ?>" class="btn-editar-dependente">✏️ Editar</a>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <a href="perfil_dependente.php?id=<?= $dependente['id'] ?>" class="btn-editar-dependente" style="background-color: #6ec1e4;">👁️ Ver Perfil</a>
+                            <a href="form_dependentes.php?editar=<?= $dependente['id'] ?>" class="btn-editar-dependente">✏️ Editar</a>
+                        </div>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -121,7 +124,7 @@ function calcularIdade($data_nascimento) {
              <img src="img/googleplay.webp" alt="App Store">
         </div>
     </footer>
-    
+    <script src="js/toast.js"></script>
 </body>
 
 </html>

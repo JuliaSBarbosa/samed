@@ -151,11 +151,12 @@ if (isset($_SESSION['dados_form'])) {
                         </div>
                     <?php endif; ?>
                     <input type="file" id="foto_perfil" name="foto_perfil" accept="image/*" style="padding: 8px;">
-                    <p style="font-size: 0.85rem; color: #666; margin-top: 5px;">Formatos aceitos: JPG, PNG, GIF (máx. 2MB)</p>
+                    <p style="font-size: 0.85rem; color: #666; margin-top: 5px;">Formatos aceitos: JPG, PNG, GIF (máx. 5MB)</p>
                 </div>
                 
                 <label for="nome">Nome completo</label>
-                <input type="text" id="nome" name="nome" placeholder="Digite o nome completo" value="<?= htmlspecialchars($dados_form['nome'] ?? $dependente['nome'] ?? '') ?>" required>
+                <input type="text" id="nome" name="nome" placeholder="Digite o nome completo" 
+                       value="<?= htmlspecialchars($dados_form['nome'] ?? $dependente['nome'] ?? '') ?>" required>
 
                 <label for="nome_social">Nome social (opcional)</label>
                 <input type="text" id="nome_social" name="nome_social" placeholder="Como você prefere ser chamado(a)?">
@@ -183,7 +184,7 @@ if (isset($_SESSION['dados_form'])) {
                 </select>
 
                 <label for="cpf">CPF</label>
-                <input type="text" id="cpf" name="cpf" placeholder="Digite o número do seu CPF">
+                <input type="text" id="cpf" name="cpf" placeholder="Digite o número do seu CPF" required>
 
                 <label for="sus">Cartão do SUS</label>
                 <input type="text" id="sus" name="sus" placeholder="Digite o número do seu cartão do sus">
@@ -216,10 +217,10 @@ if (isset($_SESSION['dados_form'])) {
                 </div>
 
                 <label for="telefone">Telefone</label>
-                <input type="tel" id="telefone" name="telefone" placeholder="Digite o número do seu telefone">
+                <input type="tel" id="telefone" name="telefone" placeholder="Digite o número do seu telefone" required>
 
                 <label for="email">E-mail</label>
-                <input type="email" id="email" name="email" placeholder="Digite o seu e-mail">
+                <input type="email" id="email" name="email" placeholder="Digite o seu e-mail" required>
             </div>
 
             <!-- Etapa 2: Contato de Emergência -->
@@ -230,7 +231,7 @@ if (isset($_SESSION['dados_form'])) {
                 <input type="text" id="contato_nome" name="contato_nome" required>
 
                 <label for="parentesco">Parentesco</label>
-                <select id="parentesco" name="parentesco">
+                <select id="parentesco" name="parentesco" required>
                     <option value="">Selecione</option>
 
                     <!-- Pais -->
@@ -503,7 +504,7 @@ if (isset($_SESSION['dados_form'])) {
                 </select>
 
                 <label for="ressuscitacao">Você autoriza procedimentos de reanimação em caso de emergência?</label>
-                <select id="ressuscitacao" name="ressuscitacao">
+                <select id="ressuscitacao" name="ressuscitacao" required>
                     <option value="">Selecione</option>
                     <option value="sim">Sim, autorizo</option>
                     <option value="nao">Não autorizo</option>
@@ -612,6 +613,18 @@ if (isset($_SESSION['dados_form'])) {
         </div>
     </footer>
     <script src="js/dependentes.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/validacoes.js"></script>
+    <script>
+        // Debug: verificar se há erros na sessão
+        console.log('Página carregada. Verificando erros...');
+        <?php if (isset($_SESSION['erros']) && !empty($_SESSION['erros'])): ?>
+            console.error('Erros encontrados:', <?= json_encode($_SESSION['erros']) ?>);
+        <?php endif; ?>
+        <?php if (isset($_SESSION['sucesso'])): ?>
+            console.log('Sucesso:', <?= json_encode($_SESSION['sucesso']) ?>);
+        <?php endif; ?>
+    </script>
 </body>
 
 </html>

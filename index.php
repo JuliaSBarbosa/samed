@@ -25,7 +25,7 @@
             <span class="divisor">|</span>
             <a href="perfil.php">MEU PERFIL</a>
             <span class="divisor">|</span>
-            <?php if ($_SESSION['usuario_tipo'] === 'paciente'): ?>
+            <?php if (in_array($_SESSION['usuario_tipo'] ?? '', ['paciente', 'medico', 'enfermeiro'])): ?>
              <a href="dependentes.php">DEPENDENTES</a>
             <span class="divisor">|</span>
             <?php endif; ?>
@@ -46,6 +46,13 @@
 
     <!-- Conteúdo principal -->
     <main>
+        <?php
+        // Limpar mensagens de cadastro/login que não devem aparecer na página inicial após primeiro acesso
+        if (isset($_SESSION['sucesso']) && strpos($_SESSION['sucesso'], 'cadastro realizado') !== false) {
+            // Se já fez login, não mostrar mais a mensagem de cadastro
+            unset($_SESSION['sucesso']);
+        }
+        ?>
         <h2 class="titulo">OLÁ, <?php echo strtoupper(htmlspecialchars($_SESSION['usuario_nome'])); ?>!</h2>
 
         <div class="opcoes">
