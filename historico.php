@@ -75,6 +75,7 @@ if ($pdo && $usuario_id) {
     } catch(PDOException $e) {
         // Erro ao buscar dados
         error_log("Erro ao buscar histórico: " . $e->getMessage());
+        $_SESSION['erro'] = "Não foi possível carregar o histórico de acessos. Por favor, tente novamente.";
     }
 }
 
@@ -165,6 +166,15 @@ $valor_fim = htmlspecialchars($data_fim ?? '');
 
     <!-- Conteúdo principal -->
     <main>
+        <?php if (isset($_SESSION['erro'])): ?>
+            <div class="mensagem-erro"><?= htmlspecialchars($_SESSION['erro']) ?></div>
+            <?php unset($_SESSION['erro']); ?>
+        <?php endif; ?>
+        
+        <?php if (isset($_SESSION['sucesso'])): ?>
+            <div class="mensagem-sucesso"><?= htmlspecialchars($_SESSION['sucesso']) ?></div>
+            <?php unset($_SESSION['sucesso']); ?>
+        <?php endif; ?>
 
         <section class="secao-historico">
 

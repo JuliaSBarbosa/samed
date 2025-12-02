@@ -3,14 +3,9 @@ require_once 'config.php';
 require_once 'verificar_login.php';
 require_once 'funcoes_auxiliares.php';
 
-// Debug: log do início do processamento
-error_log("=== INÍCIO CADASTRO DEPENDENTE ===");
-error_log("Método: " . $_SERVER['REQUEST_METHOD']);
-error_log("POST recebido: " . print_r($_POST, true));
-
 // Verificar se o formulário foi enviado
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    error_log("Erro: Método não é POST");
+    $_SESSION['erro'] = "Método de requisição inválido. Por favor, tente novamente.";
     header('Location: form_dependentes.php');
     exit;
 }
@@ -69,8 +64,6 @@ if ($pdo) {
                     $stmt->execute([$nome_usuario, $email_usuario, $senha_hash, $tipo_usuario, $crm, $coren]);
                     $paciente_id = $pdo->lastInsertId();
                     $_SESSION['usuario_id'] = $paciente_id;
-                    
-                    error_log("Usuário criado no banco: ID $paciente_id, Tipo: $tipo_usuario");
                 }
             } else {
                 throw new Exception("Não foi possível identificar o usuário. Faça login novamente.");
@@ -78,7 +71,7 @@ if ($pdo) {
         }
     } catch(PDOException $e) {
         error_log("Erro ao verificar/criar usuário: " . $e->getMessage());
-        $_SESSION['erros'] = ["Erro ao verificar usuário no banco de dados: " . $e->getMessage()];
+        $_SESSION['erros'] = ["Não foi possível verificar seus dados no sistema. Por favor, tente fazer login novamente."];
         $_SESSION['dados_form'] = $_POST;
         header('Location: form_dependentes.php');
         exit;
@@ -381,7 +374,6 @@ if (empty($ressuscitacao) || trim($ressuscitacao) === '') {
 if (!empty($erros)) {
     $_SESSION['erros'] = $erros;
     $_SESSION['dados_form'] = $_POST;
-    // Log dos erros para debug
     error_log("Erros de validação no cadastro de dependente: " . implode(", ", $erros));
     header('Location: form_dependentes.php');
     exit;
@@ -711,7 +703,16 @@ try {
     // Log do erro completo para debug
     error_log("Erro ao cadastrar dependente (PDO): " . $e->getMessage());
     error_log("Trace: " . $e->getTraceAsString());
-    $_SESSION['erros'] = ["Erro ao cadastrar dependente: " . $e->getMessage()];
+    
+    // Mensagem amigável ao usuário
+    $mensagem_erro = "Não foi possível salvar o dependente. Por favor, verifique os dados e tente novamente.";
+    if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
+        $mensagem_erro = "Este CPF ou telefone já está cadastrado no sistema. Verifique os dados informados.";
+    } elseif (strpos($e->getMessage(), 'Foreign key constraint') !== false) {
+        $mensagem_erro = "Erro ao vincular o dependente. Por favor, tente fazer login novamente.";
+    }
+    
+    $_SESSION['erros'] = [$mensagem_erro];
     $_SESSION['dados_form'] = $_POST;
     header('Location: form_dependentes.php');
     exit;
@@ -723,7 +724,14 @@ try {
     // Log do erro completo para debug
     error_log("Erro ao cadastrar dependente (Exception): " . $e->getMessage());
     error_log("Trace: " . $e->getTraceAsString());
-    $_SESSION['erros'] = ["Erro: " . $e->getMessage()];
+    
+    // Mensagem amigável ao usuário
+    $mensagem_erro = $e->getMessage();
+    if (strpos($mensagem_erro, 'Banco de dados não disponível') !== false) {
+        $mensagem_erro = "O sistema está temporariamente indisponível. Por favor, tente novamente em alguns instantes.";
+    }
+    
+    $_SESSION['erros'] = [$mensagem_erro];
     $_SESSION['dados_form'] = $_POST;
     header('Location: form_dependentes.php');
     exit;

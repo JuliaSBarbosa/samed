@@ -32,6 +32,8 @@ if ($editar && $pdo && $usuario_id) {
         }
     } catch (PDOException $e) {
         // Erro ao buscar dados
+        error_log("Erro ao buscar dados do perfil para edição: " . $e->getMessage());
+        $_SESSION['erro_perfil'] = "Não foi possível carregar seus dados para edição. Por favor, tente novamente.";
     }
 }
 

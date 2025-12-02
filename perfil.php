@@ -29,6 +29,8 @@ if ($pdo && $usuario_id) {
         }
     } catch(PDOException $e) {
         // Erro ao buscar dados
+        error_log("Erro ao buscar perfil: " . $e->getMessage());
+        $_SESSION['erro_perfil'] = "Não foi possível carregar seus dados. Por favor, tente novamente.";
     }
 }
 

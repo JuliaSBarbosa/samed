@@ -507,12 +507,17 @@ try {
         $pdo->rollBack();
     }
     
+    // Log do erro para debug
+    error_log("Erro ao salvar perfil (PDO): " . $e->getMessage());
+    
     // Mensagem de erro mais amigável
-    $mensagem_erro = "Erro ao salvar perfil.";
+    $mensagem_erro = "Não foi possível salvar seu perfil. Por favor, verifique os dados e tente novamente.";
     if (strpos($e->getMessage(), 'foto_perfil') !== false) {
-        $mensagem_erro = "Erro: A coluna 'foto_perfil' não existe na tabela. Execute o script SQL 'adicionar_campo_foto.sql' no banco de dados.";
-    } else {
-        $mensagem_erro = "Erro ao salvar perfil: " . $e->getMessage();
+        $mensagem_erro = "Erro ao salvar foto de perfil. Por favor, tente novamente ou entre em contato com o suporte.";
+    } elseif (strpos($e->getMessage(), 'Duplicate entry') !== false) {
+        $mensagem_erro = "Este CPF ou telefone já está cadastrado no sistema. Verifique os dados informados.";
+    } elseif (strpos($e->getMessage(), 'Foreign key constraint') !== false) {
+        $mensagem_erro = "Erro ao salvar perfil. Por favor, tente fazer login novamente.";
     }
     
     $_SESSION['erros'] = [$mensagem_erro];
@@ -520,7 +525,16 @@ try {
     header('Location: form_perfil.php');
     exit;
 } catch(Exception $e) {
-    $_SESSION['erros'] = ["Erro: " . $e->getMessage()];
+    // Log do erro para debug
+    error_log("Erro ao salvar perfil (Exception): " . $e->getMessage());
+    
+    // Mensagem amigável ao usuário
+    $mensagem_erro = $e->getMessage();
+    if (strpos($mensagem_erro, 'Banco de dados não disponível') !== false) {
+        $mensagem_erro = "O sistema está temporariamente indisponível. Por favor, tente novamente em alguns instantes.";
+    }
+    
+    $_SESSION['erros'] = [$mensagem_erro];
     $_SESSION['dados_form'] = $_POST;
     header('Location: form_perfil.php');
     exit;

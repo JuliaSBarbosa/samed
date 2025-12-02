@@ -30,6 +30,10 @@ if ($editar && $dependente_id && $pdo && $usuario_id) {
         }
     } catch(PDOException $e) {
         // Erro ao buscar dados
+        error_log("Erro ao buscar dados do dependente para edição: " . $e->getMessage());
+        $_SESSION['erro'] = "Não foi possível carregar os dados do dependente para edição. Por favor, tente novamente.";
+        header('Location: dependentes.php');
+        exit;
     }
 }
 
