@@ -1,6 +1,7 @@
 <?php
 require_once 'config.php';
 require_once 'verificar_login.php';
+require_once 'funcoes_auxiliares.php';
 
 // Debug: log do início do processamento
 error_log("=== INÍCIO CADASTRO DEPENDENTE ===");
@@ -321,9 +322,8 @@ if (empty($contato_telefone)) {
 if (empty($cpf) || trim($cpf) === '') {
     $erros[] = "CPF é obrigatório.";
 } else {
-    require_once 'funcoes_auxiliares.php';
     $cpf_limpo = preg_replace('/[^0-9]/', '', $cpf);
-    if (strlen($cpf_limpo) !== 11) {
+    if (!validarCPF($cpf_limpo)) {
         $erros[] = "CPF deve ter 11 dígitos.";
     } else {
         $cpf = $cpf_limpo;

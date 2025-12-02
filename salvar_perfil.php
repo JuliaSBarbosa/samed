@@ -1,6 +1,7 @@
 <?php
 require_once 'config.php';
 require_once 'verificar_login.php';
+require_once 'funcoes_auxiliares.php';
 
 // Verificar se o formulário foi enviado
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -196,7 +197,7 @@ if (empty($cpf) || trim($cpf) === '') {
     $erros[] = "CPF é obrigatório.";
 } else {
     $cpf_limpo = preg_replace('/[^0-9]/', '', $cpf);
-    if (strlen($cpf_limpo) !== 11) {
+    if (!validarCPF($cpf_limpo)) {
         $erros[] = "CPF deve ter 11 dígitos.";
     } else {
         $cpf = $cpf_limpo;

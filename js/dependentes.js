@@ -101,6 +101,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     isValid = emailRegex.test(valor);
                 }
             }
+            // Validação de CPF (campo com name="cpf")
+            else if (field.name === 'cpf') {
+                const valor = field.value.replace(/\D/g, ''); // Remove caracteres não numéricos
+                isValid = valor.length === 11;
+                if (!isValid && valor.length > 0) {
+                    field.setCustomValidity('CPF deve ter 11 dígitos.');
+                } else {
+                    field.setCustomValidity('');
+                }
+            }
             // Validação de data
             else if (field.type === 'date') {
                 const valor = field.value;
@@ -191,6 +201,24 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
 
+                // Validação de CPF (campo com name="cpf")
+                if (field.name === 'cpf') {
+                    const valor = field.value.replace(/\D/g, ''); // Remove caracteres não numéricos
+                    if (valor.length === 0) {
+                        isValid = false;
+                        erros.push(fieldName + ' (obrigatório)');
+                        field.classList.add('campo-invalido');
+                        if (erros.length === 1) field.focus();
+                        continue;
+                    } else if (valor.length !== 11) {
+                        isValid = false;
+                        erros.push(fieldName + ' (deve ter 11 dígitos)');
+                        field.classList.add('campo-invalido');
+                        if (erros.length === 1) field.focus();
+                        continue;
+                    }
+                }
+
                 // Validação de data
                 if (field.type === 'date' && field.value) {
                     const data = new Date(field.value);
@@ -237,16 +265,55 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (field.dataset.validationAdded === 'true') return;
                 field.dataset.validationAdded = 'true';
                 
-                // Adicionar listener para input/change
-                const eventType = field.tagName === 'SELECT' ? 'change' : 
-                                 field.type === 'checkbox' || field.type === 'radio' ? 'change' : 'input';
-                
-                field.addEventListener(eventType, function() {
-                    validateField(field);
-                });
+                // Máscara especial para CPF
+                if (field.name === 'cpf') {
+                    // Bloquear caracteres não numéricos e limitar a 11 dígitos
+                    field.addEventListener('keypress', function(e) {
+                        const char = String.fromCharCode(e.which);
+                        const valorAtual = e.target.value.replace(/\D/g, '');
+                        
+                        // Permitir apenas números
+                        if (!/[0-9]/.test(char)) {
+                            e.preventDefault();
+                            return false;
+                        }
+                        
+                        // Limitar a 11 dígitos
+                        if (valorAtual.length >= 11) {
+                            e.preventDefault();
+                            return false;
+                        }
+                    });
+                    
+                    // Aplicar máscara enquanto digita
+                    field.addEventListener('input', function(e) {
+                        const valor = e.target.value;
+                        const valorLimpo = valor.replace(/\D/g, '');
+                        const valorLimitado = valorLimpo.substring(0, 11);
+                        
+                        // Aplicar máscara CPF (000.000.000-00)
+                        let valorFormatado = valorLimitado;
+                        if (valorLimitado.length > 0) {
+                            valorFormatado = valorLimitado.replace(/(\d{3})(\d)/, '$1.$2');
+                            valorFormatado = valorFormatado.replace(/(\d{3})(\d)/, '$1.$2');
+                            valorFormatado = valorFormatado.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                        }
+                        
+                        e.target.value = valorFormatado;
+                        validateField(field);
+                    });
+                } else {
+                    // Adicionar listener para input/change para outros campos
+                    const eventType = field.tagName === 'SELECT' ? 'change' : 
+                                     field.type === 'checkbox' || field.type === 'radio' ? 'change' : 'input';
+                    
+                    field.addEventListener(eventType, function() {
+                        validateField(field);
+                    });
+                }
             });
         }
-        
+
         function updateStepDisplay() {
             console.log('[multi-step] updateStepDisplay activeStep=', activeStep);
             formSteps.forEach((s, i) => s.classList.toggle('active', i === activeStep));
@@ -307,6 +374,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else if (field.type === 'email') {
                         const valor = field.value.trim();
                         isValid = valor.length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor);
+                    } else if (field.name === 'cpf') {
+                        const valor = field.value.replace(/\D/g, ''); // Remove caracteres não numéricos
+                        isValid = valor.length === 11;
                     } else if (field.type === 'date') {
                         const valor = field.value;
                         if (valor) {

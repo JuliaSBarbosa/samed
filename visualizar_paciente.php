@@ -367,21 +367,79 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
     <main>
         <?php if ($paciente_encontrado && $dados_paciente && ($pode_ver_dados_basicos || $pode_ver_dados_completos)): ?>
             <section class="ficha-medica">
-                <!-- Alerta de Doenças Críticas -->
-                <?php if ($pode_ver_dados_completos && (!empty($dados_paciente['doencas_cronicas']) || !empty($dados_paciente['alergias']))): ?>
-                <div class="alerta-doencas" style="background: #fff3cd; border-left: 4px solid #ff9800; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
-                    <h3 style="color: #856404; margin: 0 0 10px 0; font-size: 1.1rem;">⚠️ ALERTAS MÉDICOS</h3>
-                    <?php if (!empty($dados_paciente['alergias'])): ?>
-                        <div style="margin-bottom: 8px;">
-                            <strong style="color: #d32f2f;">🚨 ALERGIAS:</strong>
-                            <span style="color: #856404;"><?= htmlspecialchars($dados_paciente['alergias']) ?></span>
+                <!-- Card de Informações Críticas para Socorro -->
+                <?php if ($pode_ver_dados_completos): ?>
+                <div class="card-info-critica" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); border-radius: 16px; padding: 25px; margin-bottom: 30px; box-shadow: 0 8px 24px rgba(255, 107, 107, 0.3); color: white;">
+                    <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                        <span style="font-size: 2rem; margin-right: 15px;">🚨</span>
+                        <h2 style="margin: 0; color: white; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px;">INFORMAÇÕES CRÍTICAS PARA SOCORRO</h2>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                        <!-- Tipo Sanguíneo -->
+                        <div style="background: rgba(255, 255, 255, 0.15); padding: 15px; border-radius: 12px; backdrop-filter: blur(10px);">
+                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px;">TIPO SANGUÍNEO</div>
+                            <div style="font-size: 1.8rem; font-weight: 700; text-align: center; margin-top: 10px;">
+                                <?= !empty($dados_paciente['tipo_sanguineo']) ? htmlspecialchars($dados_paciente['tipo_sanguineo']) : '<span style="opacity: 0.6;">Não informado</span>' ?>
+                            </div>
                         </div>
-                    <?php endif; ?>
-                    <?php if (!empty($dados_paciente['doencas_cronicas'])): ?>
-                        <div>
-                            <strong style="color: #d32f2f;">💊 DOENÇAS CRÔNICAS:</strong>
-                            <span style="color: #856404;"><?= htmlspecialchars($dados_paciente['doencas_cronicas']) ?></span>
+                        
+                        <!-- Alergias -->
+                        <?php if (!empty($dados_paciente['alergias'])): ?>
+                        <div style="background: rgba(255, 255, 255, 0.15); padding: 15px; border-radius: 12px; backdrop-filter: blur(10px); border: 2px solid rgba(255, 255, 255, 0.3);">
+                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px;">🚨 ALERGIAS</div>
+                            <div style="font-size: 1.1rem; font-weight: 600; margin-top: 10px; line-height: 1.4;">
+                                <?= htmlspecialchars($dados_paciente['alergias']) ?>
+                            </div>
                         </div>
+                        <?php endif; ?>
+                        
+                        <!-- Doenças Crônicas -->
+                        <?php if (!empty($dados_paciente['doencas_cronicas'])): ?>
+                        <div style="background: rgba(255, 255, 255, 0.15); padding: 15px; border-radius: 12px; backdrop-filter: blur(10px);">
+                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px;">💊 DOENÇAS CRÔNICAS</div>
+                            <div style="font-size: 1.1rem; font-weight: 600; margin-top: 10px; line-height: 1.4;">
+                                <?= htmlspecialchars($dados_paciente['doencas_cronicas']) ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                        
+                        <!-- Medicamentos -->
+                        <?php if (!empty($dados_paciente['medicacoes'])): ?>
+                        <div style="background: rgba(255, 255, 255, 0.15); padding: 15px; border-radius: 12px; backdrop-filter: blur(10px);">
+                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px;">💉 MEDICAÇÕES EM USO</div>
+                            <div style="font-size: 1.1rem; font-weight: 600; margin-top: 10px; line-height: 1.4;">
+                                <?= htmlspecialchars($dados_paciente['medicacoes']) ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                        
+                        <!-- Dispositivos Implantados -->
+                        <?php if (!empty($dados_paciente['dispositivos'])): ?>
+                        <div style="background: rgba(255, 255, 255, 0.15); padding: 15px; border-radius: 12px; backdrop-filter: blur(10px);">
+                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px;">⚡ DISPOSITIVOS IMPLANTADOS</div>
+                            <div style="font-size: 1.1rem; font-weight: 600; margin-top: 10px; line-height: 1.4;">
+                                <?= htmlspecialchars($dados_paciente['dispositivos']) ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                        
+                        <!-- Informações Relevantes -->
+                        <?php if (!empty($dados_paciente['informacoes_relevantes'])): ?>
+                        <div style="background: rgba(255, 255, 255, 0.15); padding: 15px; border-radius: 12px; backdrop-filter: blur(10px); grid-column: 1 / -1;">
+                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px;">📋 INFORMAÇÕES RELEVANTES</div>
+                            <div style="font-size: 1.1rem; font-weight: 600; margin-top: 10px; line-height: 1.4;">
+                                <?= htmlspecialchars($dados_paciente['informacoes_relevantes']) ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <!-- Mensagem se não houver informações críticas -->
+                    <?php if (empty($dados_paciente['alergias']) && empty($dados_paciente['doencas_cronicas']) && empty($dados_paciente['medicacoes']) && empty($dados_paciente['dispositivos']) && empty($dados_paciente['informacoes_relevantes'])): ?>
+                    <div style="text-align: center; padding: 20px; opacity: 0.8;">
+                        <p style="margin: 0; font-size: 1.1rem;">Nenhuma informação crítica registrada</p>
+                    </div>
                     <?php endif; ?>
                 </div>
                 <?php endif; ?>
