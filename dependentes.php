@@ -53,6 +53,10 @@ function calcularIdade($data_nascimento) {
             <a href="historico.php">HISTÓRICO</a>
             <span class="divisor">|</span>
             <a href="hospital.php">UNIDADES DE SAÚDE</a>
+            <?php if ($_SESSION['usuario_tipo'] === 'paciente'): ?>
+            <span class="divisor">|</span>
+            <a href="buscar_paciente.php">BUSCAR PACIENTE</a>
+            <?php endif; ?>
             <?php if (in_array($_SESSION['usuario_tipo'] ?? '', ['medico', 'enfermeiro'])): ?>
             <span class="divisor">|</span>
             <a href="inicio-med.php">ESCANEAR PULSEIRA</a>

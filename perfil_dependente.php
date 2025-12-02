@@ -105,6 +105,10 @@ function formatarSexo($sexo) {
             <a href="historico.php">HISTÓRICO</a>
             <span class="divisor">|</span>
             <a href="hospital.php">UNIDADES DE SAÚDE</a>
+            <?php if ($_SESSION['usuario_tipo'] === 'paciente'): ?>
+            <span class="divisor">|</span>
+            <a href="buscar_paciente.php">BUSCAR PACIENTE</a>
+            <?php endif; ?>
             <?php if (in_array($_SESSION['usuario_tipo'] ?? '', ['medico', 'enfermeiro'])): ?>
             <span class="divisor">|</span>
             <a href="inicio-med.php">ESCANEAR PULSEIRA</a>
@@ -279,13 +283,14 @@ function formatarSexo($sexo) {
                     </div>
                 </div>
 
-                <!-- Controles do carousel -->
-                <div class="carousel-controls">
-                    <button class="carousel-btn prev" onclick="changeSlide(-1)">❮ Anterior</button>
-                    <span class="carousel-indicator">
-                        <span id="currentSlide">1</span> / <span id="totalSlides">3</span>
-                    </span>
-                    <button class="carousel-btn next" onclick="changeSlide(1)">Próximo ❯</button>
+                <!-- Controles -->
+                <button class="carousel-control prev">❮</button>
+                <button class="carousel-control next">❯</button>
+
+                <!-- Indicadores -->
+                <div class="carousel-indicators">
+                    <span data-slide="0" class="active"></span>
+                    <span data-slide="1"></span>
                 </div>
             </div>
             <?php endif; ?>
@@ -307,29 +312,47 @@ function formatarSexo($sexo) {
     
     <script src="js/toast.js"></script>
     <script>
-        let currentSlideIndex = 0;
-        const slides = document.querySelectorAll('.carousel-item');
-        const totalSlides = slides.length;
-        if (document.getElementById('totalSlides')) {
-            document.getElementById('totalSlides').textContent = totalSlides;
-        }
+        // Script do carrossel (mesmo do perfil.php)
+        const slides = document.querySelectorAll("#fichaCarousel .carousel-item");
+        const indicators = document.querySelectorAll("#fichaCarousel .carousel-indicators span");
+        const inner = document.querySelector("#fichaCarousel .carousel-inner");
 
-        function changeSlide(direction) {
-            if (slides.length === 0) return;
-            
-            slides[currentSlideIndex].classList.remove('active');
-            currentSlideIndex += direction;
-            
-            if (currentSlideIndex < 0) {
-                currentSlideIndex = totalSlides - 1;
-            } else if (currentSlideIndex >= totalSlides) {
-                currentSlideIndex = 0;
+        if (slides.length > 0) {
+            let index = 0;
+
+            function updateCarousel() {
+                inner.style.transform = `translateX(-${index * 100}%)`;
+
+                // Atualiza os indicadores
+                indicators.forEach(ind => ind.classList.remove("active"));
+                if (indicators[index]) {
+                    indicators[index].classList.add("active");
+                }
+
+                // Atualiza a classe active nos slides
+                slides.forEach(slide => slide.classList.remove("active"));
+                slides[index].classList.add("active");
             }
-            
-            slides[currentSlideIndex].classList.add('active');
-            if (document.getElementById('currentSlide')) {
-                document.getElementById('currentSlide').textContent = currentSlideIndex + 1;
-            }
+
+            // Inicializa o carrossel
+            updateCarousel();
+
+            document.querySelector(".carousel-control.next")?.addEventListener("click", () => {
+                index = (index + 1) % slides.length;
+                updateCarousel();
+            });
+
+            document.querySelector(".carousel-control.prev")?.addEventListener("click", () => {
+                index = (index - 1 + slides.length) % slides.length;
+                updateCarousel();
+            });
+
+            indicators.forEach(ind => {
+                ind.addEventListener("click", () => {
+                    index = Number(ind.dataset.slide);
+                    updateCarousel();
+                });
+            });
         }
     </script>
 </body>

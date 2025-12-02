@@ -18,8 +18,8 @@ if ($editar && $dependente_id && $pdo && $usuario_id) {
         $dependente = $stmt->fetch();
         
         if ($dependente) {
-            // Buscar perfil médico
-            $stmt = $pdo->prepare("SELECT * FROM perfis_medicos WHERE dependente_id = ?");
+            // Buscar perfil médico (garantir que não é de usuário)
+            $stmt = $pdo->prepare("SELECT * FROM perfis_medicos WHERE dependente_id = ? AND usuario_id IS NULL");
             $stmt->execute([$dependente_id]);
             $perfil_dependente = $stmt->fetch();
             
@@ -70,6 +70,10 @@ if (isset($_SESSION['dados_form'])) {
             <a href="historico.php">HISTÓRICO</a>
             <span class="divisor">|</span>
             <a href="hospital.php">UNIDADES DE SAÚDE</a>
+            <?php if ($_SESSION['usuario_tipo'] === 'paciente'): ?>
+            <span class="divisor">|</span>
+            <a href="buscar_paciente.php">BUSCAR PACIENTE</a>
+            <?php endif; ?>
             <?php if (in_array($_SESSION['usuario_tipo'] ?? '', ['medico', 'enfermeiro'])): ?>
             <span class="divisor">|</span>
             <a href="inicio-med.php">ESCANEAR PULSEIRA</a>
@@ -162,14 +166,25 @@ if (isset($_SESSION['dados_form'])) {
                 <input type="text" id="nome_social" name="nome_social" placeholder="Como você prefere ser chamado(a)?">
 
                 <label for="data_nascimento">Data de nascimento</label>
-                <input type="date" id="data_nascimento" name="data_nascimento" required>
+                <?php 
+                $data_nascimento_valor = '';
+                if (isset($dados_form['data_nascimento'])) {
+                    $data_nascimento_valor = $dados_form['data_nascimento'];
+                } elseif ($perfil_dependente && $perfil_dependente['data_nascimento']) {
+                    $data_nascimento_valor = date('Y-m-d', strtotime($perfil_dependente['data_nascimento']));
+                }
+                ?>
+                <input type="date" id="data_nascimento" name="data_nascimento" value="<?= htmlspecialchars($data_nascimento_valor) ?>" required>
 
                 <label for="sexo">Sexo</label>
+                <?php 
+                $sexo_selecionado = $dados_form['sexo'] ?? $perfil_dependente['sexo'] ?? '';
+                ?>
                 <select id="sexo" name="sexo" required>
                     <option value="">Selecione</option>
-                    <option value="masculino">Masculino</option>
-                    <option value="feminino">Feminino</option>
-                    <option value="intersexo">Intersexo</option>
+                    <option value="masculino" <?= $sexo_selecionado == 'masculino' ? 'selected' : '' ?>>Masculino</option>
+                    <option value="feminino" <?= $sexo_selecionado == 'feminino' ? 'selected' : '' ?>>Feminino</option>
+                    <option value="intersexo" <?= $sexo_selecionado == 'intersexo' ? 'selected' : '' ?>>Intersexo</option>
                 </select>
 
                 <label for="genero">Identidade de gênero (opcional)</label>
@@ -184,7 +199,7 @@ if (isset($_SESSION['dados_form'])) {
                 </select>
 
                 <label for="cpf">CPF</label>
-                <input type="text" id="cpf" name="cpf" placeholder="Digite o número do seu CPF" required>
+                <input type="text" id="cpf" name="cpf" placeholder="Digite o número do seu CPF" value="<?= htmlspecialchars($dados_form['cpf'] ?? $perfil_dependente['cpf'] ?? '') ?>" required>
 
                 <label for="sus">Cartão do SUS</label>
                 <input type="text" id="sus" name="sus" placeholder="Digite o número do seu cartão do sus">
@@ -217,10 +232,10 @@ if (isset($_SESSION['dados_form'])) {
                 </div>
 
                 <label for="telefone">Telefone</label>
-                <input type="tel" id="telefone" name="telefone" placeholder="Digite o número do seu telefone" required>
+                <input type="tel" id="telefone" name="telefone" placeholder="Digite o número do seu telefone" value="<?= htmlspecialchars($dados_form['telefone'] ?? $perfil_dependente['telefone'] ?? '') ?>" required>
 
                 <label for="email">E-mail</label>
-                <input type="email" id="email" name="email" placeholder="Digite o seu e-mail" required>
+                <input type="email" id="email" name="email" placeholder="Digite o seu e-mail" value="<?= htmlspecialchars($dados_form['email'] ?? $perfil_dependente['email'] ?? '') ?>" required>
             </div>
 
             <!-- Etapa 2: Contato de Emergência -->
@@ -228,67 +243,70 @@ if (isset($_SESSION['dados_form'])) {
                 <h2>CONTATO DE EMERGÊNCIA</h2> <br>
 
                 <label for="contato_nome">Nome do contato</label>
-                <input type="text" id="contato_nome" name="contato_nome" required>
+                <input type="text" id="contato_nome" name="contato_nome" value="<?= htmlspecialchars($dados_form['contato_nome'] ?? $contato_emergencia['nome'] ?? '') ?>" required>
 
                 <label for="parentesco">Parentesco</label>
+                <?php 
+                $parentesco_selecionado = $dados_form['parentesco'] ?? $contato_emergencia['parentesco'] ?? '';
+                ?>
                 <select id="parentesco" name="parentesco" required>
                     <option value="">Selecione</option>
 
                     <!-- Pais -->
-                    <option>Pai</option>
-                    <option>Mãe</option>
-                    <option>Padrasto</option>
-                    <option>Madrasta</option>
+                    <option value="Pai" <?= $parentesco_selecionado == 'Pai' ? 'selected' : '' ?>>Pai</option>
+                    <option value="Mãe" <?= $parentesco_selecionado == 'Mãe' ? 'selected' : '' ?>>Mãe</option>
+                    <option value="Padrasto" <?= $parentesco_selecionado == 'Padrasto' ? 'selected' : '' ?>>Padrasto</option>
+                    <option value="Madrasta" <?= $parentesco_selecionado == 'Madrasta' ? 'selected' : '' ?>>Madrasta</option>
 
                     <!-- Filhos -->
-                    <option>Filho</option>
-                    <option>Filha</option>
-                    <option>Enteado</option>
-                    <option>Enteada</option>
+                    <option value="Filho" <?= $parentesco_selecionado == 'Filho' ? 'selected' : '' ?>>Filho</option>
+                    <option value="Filha" <?= $parentesco_selecionado == 'Filha' ? 'selected' : '' ?>>Filha</option>
+                    <option value="Enteado" <?= $parentesco_selecionado == 'Enteado' ? 'selected' : '' ?>>Enteado</option>
+                    <option value="Enteada" <?= $parentesco_selecionado == 'Enteada' ? 'selected' : '' ?>>Enteada</option>
 
                     <!-- Cônjuges / Parceiros -->
-                    <option>Esposo</option>
-                    <option>Esposa</option>
-                    <option>Companheiro</option>
-                    <option>Companheira</option>
+                    <option value="Esposo" <?= $parentesco_selecionado == 'Esposo' ? 'selected' : '' ?>>Esposo</option>
+                    <option value="Esposa" <?= $parentesco_selecionado == 'Esposa' ? 'selected' : '' ?>>Esposa</option>
+                    <option value="Companheiro" <?= $parentesco_selecionado == 'Companheiro' ? 'selected' : '' ?>>Companheiro</option>
+                    <option value="Companheira" <?= $parentesco_selecionado == 'Companheira' ? 'selected' : '' ?>>Companheira</option>
 
                     <!-- Avós -->
-                    <option>Avô</option>
-                    <option>Avó</option>
+                    <option value="Avô" <?= $parentesco_selecionado == 'Avô' ? 'selected' : '' ?>>Avô</option>
+                    <option value="Avó" <?= $parentesco_selecionado == 'Avó' ? 'selected' : '' ?>>Avó</option>
 
                     <!-- Netos -->
-                    <option>Neto</option>
-                    <option>Neta</option>
+                    <option value="Neto" <?= $parentesco_selecionado == 'Neto' ? 'selected' : '' ?>>Neto</option>
+                    <option value="Neta" <?= $parentesco_selecionado == 'Neta' ? 'selected' : '' ?>>Neta</option>
 
                     <!-- Irmãos -->
-                    <option>Irmão</option>
-                    <option>Irmã</option>
+                    <option value="Irmão" <?= $parentesco_selecionado == 'Irmão' ? 'selected' : '' ?>>Irmão</option>
+                    <option value="Irmã" <?= $parentesco_selecionado == 'Irmã' ? 'selected' : '' ?>>Irmã</option>
 
                     <!-- Tios -->
-                    <option>Tio</option>
-                    <option>Tia</option>
+                    <option value="Tio" <?= $parentesco_selecionado == 'Tio' ? 'selected' : '' ?>>Tio</option>
+                    <option value="Tia" <?= $parentesco_selecionado == 'Tia' ? 'selected' : '' ?>>Tia</option>
 
                     <!-- Sobrinhos -->
-                    <option>Sobrinho</option>
-                    <option>Sobrinha</option>
+                    <option value="Sobrinho" <?= $parentesco_selecionado == 'Sobrinho' ? 'selected' : '' ?>>Sobrinho</option>
+                    <option value="Sobrinha" <?= $parentesco_selecionado == 'Sobrinha' ? 'selected' : '' ?>>Sobrinha</option>
 
                     <!-- Primos -->
-                    <option>Primo</option>
-                    <option>Prima</option>
+                    <option value="Primo" <?= $parentesco_selecionado == 'Primo' ? 'selected' : '' ?>>Primo</option>
+                    <option value="Prima" <?= $parentesco_selecionado == 'Prima' ? 'selected' : '' ?>>Prima</option>
 
                     <!-- Outros parentes -->
-                    <option>Cunhado</option>
-                    <option>Cunhada</option>
-                    <option>Genro</option>
-                    <option>Nora</option>
-                    <option>Sogro</option>
-                    <option>Sogra</option>
+                    <option value="Cunhado" <?= $parentesco_selecionado == 'Cunhado' ? 'selected' : '' ?>>Cunhado</option>
+                    <option value="Cunhada" <?= $parentesco_selecionado == 'Cunhada' ? 'selected' : '' ?>>Cunhada</option>
+                    <option value="Genro" <?= $parentesco_selecionado == 'Genro' ? 'selected' : '' ?>>Genro</option>
+                    <option value="Nora" <?= $parentesco_selecionado == 'Nora' ? 'selected' : '' ?>>Nora</option>
+                    <option value="Sogro" <?= $parentesco_selecionado == 'Sogro' ? 'selected' : '' ?>>Sogro</option>
+                    <option value="Sogra" <?= $parentesco_selecionado == 'Sogra' ? 'selected' : '' ?>>Sogra</option>
 
                     <!-- Geral -->
-                    <option>Tutor</option>
-                    <option>Responsável</option>
-                    <option>Amigo</option>
-                    <option>Outro</option>
+                    <option value="Tutor" <?= $parentesco_selecionado == 'Tutor' ? 'selected' : '' ?>>Tutor</option>
+                    <option value="Responsável" <?= $parentesco_selecionado == 'Responsável' ? 'selected' : '' ?>>Responsável</option>
+                    <option value="Amigo" <?= $parentesco_selecionado == 'Amigo' ? 'selected' : '' ?>>Amigo</option>
+                    <option value="Outro" <?= $parentesco_selecionado == 'Outro' ? 'selected' : '' ?>>Outro</option>
                 </select>
 
                 <div id="campoOutroParentesco" style="display: none; margin-top: 10px;">
@@ -298,7 +316,7 @@ if (isset($_SESSION['dados_form'])) {
 
 
                 <label for="contato_telefone">Telefone</label>
-                <input type="tel" id="contato_telefone" name="contato_telefone" required>
+                <input type="tel" id="contato_telefone" name="contato_telefone" value="<?= htmlspecialchars($dados_form['contato_telefone'] ?? $contato_emergencia['telefone'] ?? '') ?>" required>
 
             </div>
 
@@ -421,17 +439,20 @@ if (isset($_SESSION['dados_form'])) {
                 <button type="button" id="adicionar-alergia" class="btn-small add" style="margin-top:8px; display: none;">Adicionar alergia</button>
            
                 <label for="tipo_sanguineo">Tipo sanguíneo</label>
-                <select id="tipo_sanguineo" name="tipo_sanguineo">
+                <?php 
+                $tipo_sanguineo_selecionado = $dados_form['tipo_sanguineo'] ?? $perfil_dependente['tipo_sanguineo'] ?? '';
+                ?>
+                <select id="tipo_sanguineo" name="tipo_sanguineo" required>
                     <option value="">Selecione</option>
-                    <option value="A+">A+</option>
-                    <option value="A-">A-</option>
-                    <option value="B+">B+</option>
-                    <option value="B-">B-</option>
-                    <option value="AB+">AB+</option>
-                    <option value="AB-">AB-</option>
-                    <option value="O+">O+</option>
-                    <option value="O-">O-</option>
-                    <option value="RH-NULO">RH NULO</option>
+                    <option value="A+" <?= $tipo_sanguineo_selecionado == 'A+' ? 'selected' : '' ?>>A+</option>
+                    <option value="A-" <?= $tipo_sanguineo_selecionado == 'A-' ? 'selected' : '' ?>>A-</option>
+                    <option value="B+" <?= $tipo_sanguineo_selecionado == 'B+' ? 'selected' : '' ?>>B+</option>
+                    <option value="B-" <?= $tipo_sanguineo_selecionado == 'B-' ? 'selected' : '' ?>>B-</option>
+                    <option value="AB+" <?= $tipo_sanguineo_selecionado == 'AB+' ? 'selected' : '' ?>>AB+</option>
+                    <option value="AB-" <?= $tipo_sanguineo_selecionado == 'AB-' ? 'selected' : '' ?>>AB-</option>
+                    <option value="O+" <?= $tipo_sanguineo_selecionado == 'O+' ? 'selected' : '' ?>>O+</option>
+                    <option value="O-" <?= $tipo_sanguineo_selecionado == 'O-' ? 'selected' : '' ?>>O-</option>
+                    <option value="RH-NULO" <?= $tipo_sanguineo_selecionado == 'RH-NULO' ? 'selected' : '' ?>>RH NULO</option>
 
                 </select>
 
@@ -504,11 +525,14 @@ if (isset($_SESSION['dados_form'])) {
                 </select>
 
                 <label for="ressuscitacao">Você autoriza procedimentos de reanimação em caso de emergência?</label>
+                <?php 
+                $ressuscitacao_selecionado = $dados_form['ressuscitacao'] ?? $perfil_dependente['ressuscitacao'] ?? '';
+                ?>
                 <select id="ressuscitacao" name="ressuscitacao" required>
                     <option value="">Selecione</option>
-                    <option value="sim">Sim, autorizo</option>
-                    <option value="nao">Não autorizo</option>
-                    <option value="nao_informar">Prefiro não informar</option>
+                    <option value="sim" <?= $ressuscitacao_selecionado == 'sim' ? 'selected' : '' ?>>Sim, autorizo</option>
+                    <option value="nao" <?= $ressuscitacao_selecionado == 'nao' ? 'selected' : '' ?>>Não autorizo</option>
+                    <option value="nao_informar" <?= $ressuscitacao_selecionado == 'nao_informar' ? 'selected' : '' ?>>Prefiro não informar</option>
                 </select>
 
                 <label for="transfusao">Em caso de necessidade, autoriza receber transfusão de sangue?</label>
@@ -615,6 +639,19 @@ if (isset($_SESSION['dados_form'])) {
     <script src="js/dependentes.js"></script>
     <script src="js/toast.js"></script>
     <script src="js/validacoes.js"></script>
+    <script>
+        // Debug: verificar se há erros na sessão
+        console.log('Página carregada. Verificando erros...');
+        <?php if (isset($_SESSION['erros']) && !empty($_SESSION['erros'])): ?>
+            console.error('Erros encontrados:', <?= json_encode($_SESSION['erros']) ?>);
+        <?php endif; ?>
+        <?php if (isset($_SESSION['sucesso'])): ?>
+            console.log('Sucesso:', <?= json_encode($_SESSION['sucesso']) ?>);
+        <?php endif; ?>
+    </script>
+</body>
+
+</html>
     <script>
         // Debug: verificar se há erros na sessão
         console.log('Página carregada. Verificando erros...');

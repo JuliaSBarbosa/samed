@@ -408,15 +408,21 @@ footer h1 {
 }
 
 .card-ficha {
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    padding: 25px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fbfc 100%);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(110, 193, 228, 0.15);
+    padding: 35px;
     width: 700px;
     margin: 0 auto;
     text-align: left;
     width: 100%;
-    max-width: 700px;    
+    max-width: 700px;
+    border: 1px solid rgba(110, 193, 228, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.card-ficha:hover {
+    box-shadow: 0 12px 32px rgba(110, 193, 228, 0.2);
 }
 
 
@@ -576,31 +582,44 @@ footer h1 {
 .perfil {
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e8f4f9;
 }
 
 .perfil img {
-    width: 70px;
-    height: 70px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
-    margin-right: 15px;
+    margin-right: 20px;
+    border: 3px solid #6ec1e4;
+    box-shadow: 0 4px 12px rgba(110, 193, 228, 0.2);
+    object-fit: cover;
 }
 
 .info-basica,
 .contato-emergencia {
-    margin-top: 15px;
+    margin-top: 20px;
+    padding: 20px;
+    background: #f8fbfc;
+    border-radius: 12px;
+    border-left: 4px solid #6ec1e4;
 }
 
 h4 {
     font-weight: 700;
-    margin-bottom: 5px;
-    color: #333;
+    margin-bottom: 15px;
+    color: #244357;
+    font-size: 1.1em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 p {
-    margin: 4px 0;
+    margin: 8px 0;
     font-size: 0.95em;
-    color: #333;
+    color: #444;
+    line-height: 1.6;
 }
 
 strong {
@@ -644,9 +663,9 @@ strong {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 45px;
-    height: 45px;
-    background: #6ec1e4;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #6ec1e4 0%, #5bb0d1 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -654,41 +673,62 @@ strong {
     cursor: pointer;
     z-index: 20;
     border: none;
-    font-size: 22px;
+    font-size: 24px;
     color: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(110, 193, 228, 0.4);
+    transition: all 0.3s ease;
+}
+
+.carousel-control:hover {
+    background: linear-gradient(135deg, #5bb0d1 0%, #4a9fc0 100%);
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 6px 16px rgba(110, 193, 228, 0.5);
+}
+
+.carousel-control:active {
+    transform: translateY(-50%) scale(0.95);
 }
 
 /* seta esquerda */
 .carousel-control.prev {
-    left: 10px;
+    left: 15px;
 }
 
 /* seta direita */
 .carousel-control.next {
-    right: 10px;
+    right: 15px;
 }
 
 /* Indicadores */
 .carousel-indicators {
     position: absolute;
-    bottom: -25px;
+    bottom: -35px;
     width: 100%;
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 12px;
+    padding: 10px 0;
 }
 
 .carousel-indicators span {
-    width: 30px;
-    height: 6px;
-    background: #9ad2ea;
-    border-radius: 3px;
+    width: 40px;
+    height: 8px;
+    background: #d0e8f5;
+    border-radius: 4px;
     cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-indicators span:hover {
+    background: #9ad2ea;
+    transform: scaleY(1.2);
 }
 
 .carousel-indicators .active {
-    background: #6ec1e4;
+    background: linear-gradient(135deg, #6ec1e4 0%, #5bb0d1 100%);
+    width: 50px;
+    box-shadow: 0 2px 8px rgba(110, 193, 228, 0.4);
 }
 
 /* ======= Estilos da Página de Hospitais ======= */

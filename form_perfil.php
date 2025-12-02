@@ -19,8 +19,8 @@ if ($editar && $pdo && $usuario_id) {
             $nome_usuario = $usuario_data['nome'];
         }
         
-        // Buscar perfil médico
-        $stmt = $pdo->prepare("SELECT * FROM perfis_medicos WHERE usuario_id = ?");
+        // Buscar perfil médico (garantir que não é de dependente)
+        $stmt = $pdo->prepare("SELECT * FROM perfis_medicos WHERE usuario_id = ? AND dependente_id IS NULL");
         $stmt->execute([$usuario_id]);
         $perfil = $stmt->fetch();
         
@@ -74,6 +74,10 @@ if (isset($_SESSION['dados_form'])) {
             <a href="historico.php">HISTÓRICO</a>
             <span class="divisor">|</span>
             <a href="hospital.php">UNIDADES DE SAÚDE</a>
+            <?php if ($_SESSION['usuario_tipo'] === 'paciente'): ?>
+            <span class="divisor">|</span>
+            <a href="buscar_paciente.php">BUSCAR PACIENTE</a>
+            <?php endif; ?>
             <?php if (in_array($_SESSION['usuario_tipo'] ?? '', ['medico', 'enfermeiro'])): ?>
             <span class="divisor">|</span>
             <a href="inicio-med.php">ESCANEAR PULSEIRA</a>
@@ -173,7 +177,15 @@ if (isset($_SESSION['dados_form'])) {
                 <input type="text" id="nome_social" name="nome_social" placeholder="Como você prefere ser chamado(a)?">
 
                 <label for="data_nascimento">Data de nascimento</label>
-                <input type="date" id="data_nascimento" name="data_nascimento" required>
+                <?php 
+                $data_nascimento_valor = '';
+                if (isset($dados_form['data_nascimento'])) {
+                    $data_nascimento_valor = $dados_form['data_nascimento'];
+                } elseif ($perfil && $perfil['data_nascimento']) {
+                    $data_nascimento_valor = date('Y-m-d', strtotime($perfil['data_nascimento']));
+                }
+                ?>
+                <input type="date" id="data_nascimento" name="data_nascimento" value="<?= htmlspecialchars($data_nascimento_valor) ?>" required>
 
                 <label for="sexo">Sexo</label>
                 <?php 
@@ -259,60 +271,60 @@ if (isset($_SESSION['dados_form'])) {
                     <option value="">Selecione</option>
 
                     <!-- Pais -->
-                    <option>Pai</option>
-                    <option>Mãe</option>
-                    <option>Padrasto</option>
-                    <option>Madrasta</option>
+                    <option value="Pai" <?= $parentesco_selecionado == 'Pai' ? 'selected' : '' ?>>Pai</option>
+                    <option value="Mãe" <?= $parentesco_selecionado == 'Mãe' ? 'selected' : '' ?>>Mãe</option>
+                    <option value="Padrasto" <?= $parentesco_selecionado == 'Padrasto' ? 'selected' : '' ?>>Padrasto</option>
+                    <option value="Madrasta" <?= $parentesco_selecionado == 'Madrasta' ? 'selected' : '' ?>>Madrasta</option>
 
                     <!-- Filhos -->
-                    <option>Filho</option>
-                    <option>Filha</option>
-                    <option>Enteado</option>
-                    <option>Enteada</option>
+                    <option value="Filho" <?= $parentesco_selecionado == 'Filho' ? 'selected' : '' ?>>Filho</option>
+                    <option value="Filha" <?= $parentesco_selecionado == 'Filha' ? 'selected' : '' ?>>Filha</option>
+                    <option value="Enteado" <?= $parentesco_selecionado == 'Enteado' ? 'selected' : '' ?>>Enteado</option>
+                    <option value="Enteada" <?= $parentesco_selecionado == 'Enteada' ? 'selected' : '' ?>>Enteada</option>
 
                     <!-- Cônjuges / Parceiros -->
-                    <option>Esposo</option>
-                    <option>Esposa</option>
-                    <option>Companheiro</option>
-                    <option>Companheira</option>
+                    <option value="Esposo" <?= $parentesco_selecionado == 'Esposo' ? 'selected' : '' ?>>Esposo</option>
+                    <option value="Esposa" <?= $parentesco_selecionado == 'Esposa' ? 'selected' : '' ?>>Esposa</option>
+                    <option value="Companheiro" <?= $parentesco_selecionado == 'Companheiro' ? 'selected' : '' ?>>Companheiro</option>
+                    <option value="Companheira" <?= $parentesco_selecionado == 'Companheira' ? 'selected' : '' ?>>Companheira</option>
 
                     <!-- Avós -->
-                    <option>Avô</option>
-                    <option>Avó</option>
+                    <option value="Avô" <?= $parentesco_selecionado == 'Avô' ? 'selected' : '' ?>>Avô</option>
+                    <option value="Avó" <?= $parentesco_selecionado == 'Avó' ? 'selected' : '' ?>>Avó</option>
 
                     <!-- Netos -->
-                    <option>Neto</option>
-                    <option>Neta</option>
+                    <option value="Neto" <?= $parentesco_selecionado == 'Neto' ? 'selected' : '' ?>>Neto</option>
+                    <option value="Neta" <?= $parentesco_selecionado == 'Neta' ? 'selected' : '' ?>>Neta</option>
 
                     <!-- Irmãos -->
-                    <option>Irmão</option>
-                    <option>Irmã</option>
+                    <option value="Irmão" <?= $parentesco_selecionado == 'Irmão' ? 'selected' : '' ?>>Irmão</option>
+                    <option value="Irmã" <?= $parentesco_selecionado == 'Irmã' ? 'selected' : '' ?>>Irmã</option>
 
                     <!-- Tios -->
-                    <option>Tio</option>
-                    <option>Tia</option>
+                    <option value="Tio" <?= $parentesco_selecionado == 'Tio' ? 'selected' : '' ?>>Tio</option>
+                    <option value="Tia" <?= $parentesco_selecionado == 'Tia' ? 'selected' : '' ?>>Tia</option>
 
                     <!-- Sobrinhos -->
-                    <option>Sobrinho</option>
-                    <option>Sobrinha</option>
+                    <option value="Sobrinho" <?= $parentesco_selecionado == 'Sobrinho' ? 'selected' : '' ?>>Sobrinho</option>
+                    <option value="Sobrinha" <?= $parentesco_selecionado == 'Sobrinha' ? 'selected' : '' ?>>Sobrinha</option>
 
                     <!-- Primos -->
-                    <option>Primo</option>
-                    <option>Prima</option>
+                    <option value="Primo" <?= $parentesco_selecionado == 'Primo' ? 'selected' : '' ?>>Primo</option>
+                    <option value="Prima" <?= $parentesco_selecionado == 'Prima' ? 'selected' : '' ?>>Prima</option>
 
                     <!-- Outros parentes -->
-                    <option>Cunhado</option>
-                    <option>Cunhada</option>
-                    <option>Genro</option>
-                    <option>Nora</option>
-                    <option>Sogro</option>
-                    <option>Sogra</option>
+                    <option value="Cunhado" <?= $parentesco_selecionado == 'Cunhado' ? 'selected' : '' ?>>Cunhado</option>
+                    <option value="Cunhada" <?= $parentesco_selecionado == 'Cunhada' ? 'selected' : '' ?>>Cunhada</option>
+                    <option value="Genro" <?= $parentesco_selecionado == 'Genro' ? 'selected' : '' ?>>Genro</option>
+                    <option value="Nora" <?= $parentesco_selecionado == 'Nora' ? 'selected' : '' ?>>Nora</option>
+                    <option value="Sogro" <?= $parentesco_selecionado == 'Sogro' ? 'selected' : '' ?>>Sogro</option>
+                    <option value="Sogra" <?= $parentesco_selecionado == 'Sogra' ? 'selected' : '' ?>>Sogra</option>
 
                     <!-- Geral -->
-                    <option>Tutor</option>
-                    <option>Responsável</option>
-                    <option>Amigo</option>
-                    <option>Outro</option>
+                    <option value="Tutor" <?= $parentesco_selecionado == 'Tutor' ? 'selected' : '' ?>>Tutor</option>
+                    <option value="Responsável" <?= $parentesco_selecionado == 'Responsável' ? 'selected' : '' ?>>Responsável</option>
+                    <option value="Amigo" <?= $parentesco_selecionado == 'Amigo' ? 'selected' : '' ?>>Amigo</option>
+                    <option value="Outro" <?= $parentesco_selecionado == 'Outro' ? 'selected' : '' ?>>Outro</option>
                 </select>
 
                 <div id="campoOutroParentesco" style="display: none; margin-top: 10px;">
