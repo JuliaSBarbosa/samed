@@ -58,49 +58,43 @@ if (!isset($_SESSION['usuario_tipo']) || $_SESSION['usuario_tipo'] !== 'paciente
     <!-- Conteúdo principal -->
     <main class="scanner-container">
         <div class="scanner-wrapper">
-            <h2 class="scanner-titulo">
-                <span class="scanner-icon">🔍</span>
-                BUSCAR FICHA DE PACIENTE
-            </h2>
-            <p class="scanner-subtitulo">Digite o CPF do paciente para visualizar informações básicas</p>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h2 class="scanner-titulo" style="text-align: center;">
+                    <span class="scanner-icon">📱</span>
+                    ESCANEAR PULSEIRA
+                </h2>
+            </div>
+            <p class="scanner-subtitulo">Aproxime o celular da pulseira do paciente para acessar os dados médicos</p>
 
-            <div class="scanner-manual">
-                <p class="manual-text">
-                    <strong>Nota:</strong> Apenas pacientes que autorizaram o compartilhamento de dados básicos poderão ser visualizados.
-                    <br>Você poderá ver apenas: nome e contato de emergência.
-                </p>
-                <form method="GET" action="visualizar_paciente.php" class="scanner-form">
-                    <div class="input-group">
-                        <input 
-                            type="text" 
-                            name="cpf" 
-                            id="cpfBusca" 
-                            placeholder="Digite o CPF (ex: 123.456.789-00)"
-                            class="scanner-input"
-                            maxlength="14"
-                            pattern="[0-9.-]+"
-                            required
-                            oninput="this.value = this.value.replace(/\D/g, '').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2')"
-                        >
-                        <button type="submit" class="btn-scanner">
-                            <span>🔍</span>
-                            Buscar
-                        </button>
+            <!-- Área do Scanner -->
+            <div class="scanner-area" id="scannerArea">
+                <div class="scanner-frame">
+                    <div class="scanner-corners">
+                        <div class="corner corner-tl"></div>
+                        <div class="corner corner-tr"></div>
+                        <div class="corner corner-bl"></div>
+                        <div class="corner corner-br"></div>
                     </div>
-                </form>
-                <p style="margin-top: 15px; font-size: 0.9rem; color: #666;">
-                    Ou busque por <a href="?busca=id" style="color: #6ec1e4;">ID da ficha médica</a>
-                </p>
-                <?php if (isset($_GET['busca']) && $_GET['busca'] === 'id'): ?>
-                <form method="GET" action="visualizar_paciente.php" class="scanner-form" style="margin-top: 15px;">
+                    <div class="scanner-line"></div>
+                    <div class="scanner-instructions">
+                        <p class="instruction-text">Posicione a pulseira dentro do quadro</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Busca por Número de Série da Pulseira -->
+            <div class="scanner-manual">
+                <p class="manual-text">Digite o número de série da pulseira para consultar:</p>
+                <form method="GET" action="visualizar_paciente.php" class="scanner-form">
                     <div class="input-group">
                         <input 
                             type="number" 
                             name="id_ficha" 
                             id="idFicha" 
-                            placeholder="Digite o ID da ficha médica (ex: 1)"
+                            placeholder="Digite o número de série da pulseira (ex: 1)"
                             class="scanner-input"
                             min="1"
+                            required
                         >
                         <button type="submit" class="btn-scanner">
                             <span>🔍</span>
@@ -108,10 +102,46 @@ if (!isset($_SESSION['usuario_tipo']) || $_SESSION['usuario_tipo'] !== 'paciente
                         </button>
                     </div>
                 </form>
-                <?php endif; ?>
+            </div>
+            
+            <!-- Botão Voltar -->
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="index.php" class="btn-voltar-scanner" style="display: inline-block;">
+                    ← Voltar
+                </a>
+            </div>
+
+            <!-- Aviso sobre funcionalidade e limitações para pacientes -->
+            <div class="aviso-futuro">
+                <p><strong>⚠️ Nota:</strong> A funcionalidade de escaneamento por NFC/QR Code será implementada quando a pulseira física estiver disponível. Por enquanto, use a busca manual acima.</p>
+                <p style="margin-top: 10px;"><strong>ℹ️ Informação:</strong> Como paciente, você poderá visualizar apenas informações básicas de outros pacientes que autorizaram o compartilhamento: nome e contato de emergência.</p>
             </div>
         </div>
     </main>
+
+    <script>
+        // Simulação de animação do scanner (será substituído pela funcionalidade real)
+        const scannerArea = document.getElementById('scannerArea');
+        const scannerLine = document.querySelector('.scanner-line');
+        
+        // Animação da linha do scanner
+        if (scannerLine) {
+            setInterval(() => {
+                scannerLine.style.animation = 'none';
+                setTimeout(() => {
+                    scannerLine.style.animation = 'scanLine 2s ease-in-out infinite';
+                }, 10);
+            }, 2000);
+        }
+    </script>
+
+    <style>
+        @keyframes scanLine {
+            0% { top: 0; opacity: 1; }
+            50% { top: 100%; opacity: 0.8; }
+            100% { top: 0; opacity: 1; }
+        }
+    </style>
 
     <!-- Rodapé -->
     <footer>

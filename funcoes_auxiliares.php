@@ -59,15 +59,50 @@ function gerarTokenRecuperacao() {
 }
 
 /**
- * Valida formato de CPF (apenas verifica se tem 11 dígitos)
+ * Valida CPF com algoritmo completo de validação
  * @param string $cpf CPF a ser validado (com ou sem formatação)
- * @return bool True se válido (11 dígitos), False caso contrário
+ * @return bool True se válido, False caso contrário
  */
 function validarCPF($cpf) {
     // Remove caracteres não numéricos
     $cpf = preg_replace('/[^0-9]/', '', $cpf);
     
     // Verifica se tem 11 dígitos
-    return strlen($cpf) === 11;
+    if (strlen($cpf) !== 11) {
+        return false;
+    }
+    
+    // Verifica se todos os dígitos são iguais (ex: 111.111.111-11)
+    if (preg_match('/(\d)\1{10}/', $cpf)) {
+        return false;
+    }
+    
+    // Valida primeiro dígito verificador
+    $soma = 0;
+    for ($i = 0; $i < 9; $i++) {
+        $soma += intval($cpf[$i]) * (10 - $i);
+    }
+    $resto = ($soma * 10) % 11;
+    if ($resto == 10 || $resto == 11) {
+        $resto = 0;
+    }
+    if ($resto != intval($cpf[9])) {
+        return false;
+    }
+    
+    // Valida segundo dígito verificador
+    $soma = 0;
+    for ($i = 0; $i < 10; $i++) {
+        $soma += intval($cpf[$i]) * (11 - $i);
+    }
+    $resto = ($soma * 10) % 11;
+    if ($resto == 10 || $resto == 11) {
+        $resto = 0;
+    }
+    if ($resto != intval($cpf[10])) {
+        return false;
+    }
+    
+    return true;
 }
 

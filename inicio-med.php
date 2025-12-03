@@ -12,6 +12,17 @@ if (!$eh_profissional) {
     header('Location: index.php');
     exit;
 }
+
+// Determinar tipo de profissional e registro
+$tipo_profissional = '';
+$registro = '';
+if ($_SESSION['usuario_tipo'] === 'medico') {
+    $tipo_profissional = 'Médico';
+    $registro = $_SESSION['usuario_crm'] ?? '';
+} elseif ($_SESSION['usuario_tipo'] === 'enfermeiro') {
+    $tipo_profissional = 'Enfermeiro(a)';
+    $registro = $_SESSION['usuario_coren'] ?? '';
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -81,41 +92,19 @@ if (!$eh_profissional) {
                 </div>
             </div>
 
-            <!-- Busca por CPF -->
+            <!-- Busca por Número de Série da Pulseira -->
             <div class="scanner-manual">
-                <p class="manual-text">Digite o CPF do paciente para consultar:</p>
-                <form method="GET" action="visualizar_paciente.php" class="scanner-form">
-                    <div class="input-group">
-                        <input 
-                            type="text" 
-                            name="cpf" 
-                            id="cpfBusca" 
-                            placeholder="Digite o CPF (ex: 123.456.789-00)"
-                            class="scanner-input"
-                            maxlength="14"
-                            pattern="[0-9.-]+"
-                            required
-                        >
-                        <button type="submit" class="btn-scanner">
-                            <span>🔍</span>
-                            Buscar
-                        </button>
-                    </div>
-                </form>
-            </div>
-            
-            <!-- Busca por ID da Ficha Médica (alternativa) -->
-            <div class="scanner-manual" style="margin-top: 20px;">
-                <p class="manual-text">Ou digite o ID da ficha médica:</p>
+                <p class="manual-text">Digite o número de série da pulseira para consultar:</p>
                 <form method="GET" action="visualizar_paciente.php" class="scanner-form">
                     <div class="input-group">
                         <input 
                             type="number" 
                             name="id_ficha" 
                             id="idFicha" 
-                            placeholder="Digite o ID da ficha médica (ex: 1)"
+                            placeholder="Digite o número de série da pulseira (ex: 1)"
                             class="scanner-input"
                             min="1"
+                            required
                         >
                         <button type="submit" class="btn-scanner">
                             <span>🔍</span>
@@ -147,6 +136,7 @@ if (!$eh_profissional) {
             <!-- Aviso sobre funcionalidade futura -->
             <div class="aviso-futuro">
                 <p><strong>⚠️ Nota:</strong> A funcionalidade de escaneamento por NFC/QR Code será implementada quando a pulseira física estiver disponível. Por enquanto, use a busca manual acima.</p>
+                <p style="margin-top: 10px;"><strong>ℹ️ Informação:</strong> Como profissional de saúde, você terá acesso completo aos dados médicos do paciente após a busca.</p>
             </div>
         </div>
     </main>
@@ -179,21 +169,6 @@ if (!$eh_profissional) {
             }, 2000);
         }
 
-        // Máscara de CPF no campo de busca
-        document.addEventListener('DOMContentLoaded', () => {
-            const cpfInput = document.getElementById('cpfBusca');
-            if (cpfInput) {
-                cpfInput.addEventListener('input', function(e) {
-                    let value = e.target.value.replace(/\D/g, '');
-                    if (value.length <= 11) {
-                        value = value.replace(/(\d{3})(\d)/, '$1.$2');
-                        value = value.replace(/(\d{3})(\d)/, '$1.$2');
-                        value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-                        e.target.value = value;
-                    }
-                });
-            }
-        });
     </script>
     
     <script src="js/toast.js"></script>

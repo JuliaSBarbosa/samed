@@ -2,6 +2,139 @@
 require_once 'verificar_login.php';
 require_once 'config.php';
 
+/**
+ * Formata valores de doenças, alergias, dispositivos etc. removendo underscores e convertendo para nomes legíveis
+ */
+function formatarNomeLegivel($valor) {
+    if (empty($valor)) {
+        return $valor;
+    }
+    
+    // Se já estiver formatado (sem underscores), retornar como está
+    if (strpos($valor, '_') === false) {
+        return $valor;
+    }
+    
+    // Mapeamento de códigos para nomes legíveis
+    $mapeamento = [
+        // Doenças crônicas
+        'hipertensao' => 'Hipertensão arterial',
+        'insuficiencia_cardiaca' => 'Insuficiência cardíaca',
+        'arritmias_cronicas' => 'Arritmias crônicas',
+        'doenca_arterial_coronariana' => 'Doença arterial coronariana',
+        'aterosclerose' => 'Aterosclerose',
+        'doenca_vascular_periferica' => 'Doença vascular periférica',
+        'diabetes_tipo1' => 'Diabetes tipo 1',
+        'diabetes_tipo2' => 'Diabetes tipo 2',
+        'hipotireoidismo' => 'Hipotireoidismo',
+        'hipertireoidismo' => 'Hipertireoidismo',
+        'obesidade_cronica' => 'Obesidade crônica',
+        'sindrome_metabolica' => 'Síndrome metabólica',
+        'asma' => 'Asma',
+        'dpoc' => 'DPOC (Doença Pulmonar Obstrutiva Crônica)',
+        'bronquite_cronica' => 'Bronquite crônica',
+        'enfisema' => 'Enfisema',
+        'fibrose_pulmonar' => 'Fibrose pulmonar',
+        'artrite_reumatoide' => 'Artrite reumatoide',
+        'lupus' => 'Lúpus (LES)',
+        'psoriase' => 'Psoríase',
+        'doenca_celiaca' => 'Doença celíaca',
+        'tireoidite_hashimoto' => 'Tireoidite de Hashimoto',
+        'doenca_de_crohn' => 'Doença de Crohn',
+        'retocolite_ulcerativa' => 'Retocolite ulcerativa',
+        'epilepsia' => 'Epilepsia',
+        'enxaqueca_cronica' => 'Enxaqueca crônica',
+        'doenca_de_parkinson' => 'Doença de Parkinson',
+        'esclerose_multipla' => 'Esclerose múltipla',
+        'neuropatias_perifericas' => 'Neuropatias periféricas',
+        'artrose_osteoartrite' => 'Artrose / Osteoartrite',
+        'fibromialgia' => 'Fibromialgia',
+        'lombalgia_cronica' => 'Lombalgia crônica',
+        'osteoporose' => 'Osteoporose',
+        'hepatite_cronica' => 'Hepatite crônica',
+        'cirrose' => 'Cirrose',
+        'esteatose_hepatica_cronica' => 'Esteatose hepática (gordura no fígado) crônica',
+        'doenca_renal_cronica' => 'Doença renal crônica',
+        'insuficiencia_renal' => 'Insuficiência renal',
+        'refluxo_gastroesofagico_cronico' => 'Refluxo gastroesofágico crônico (GERD)',
+        'sindrome_do_intestino_irritavel' => 'Síndrome do intestino irritável (SII)',
+        'gastrite_cronica' => 'Gastrite crônica',
+        'cancer' => 'Câncer (em acompanhamento ou histórico)',
+        'hiv' => 'HIV',
+        'doencas_hematologicas' => 'Doenças hematológicas',
+        'outra_nao_listada' => 'Outra doença não listada',
+        
+        // Alergias
+        'alimentar' => 'Alergia alimentar',
+        'medicamentos' => 'Alergia medicamentosa',
+        'respiratoria' => 'Alergia respiratória',
+        'dermatologica' => 'Alergia dermatológica',
+        'inseto' => 'Alergia a picada de inseto',
+        'quimica' => 'Alergia química',
+        'fisica' => 'Alergia física',
+        'outra' => 'Outra',
+        
+        // Doenças mentais
+        'depressao' => 'Depressão',
+        'ansiedade' => 'Transtorno de Ansiedade',
+        'bipolaridade' => 'Transtorno Bipolar',
+        'esquizofrenia' => 'Esquizofrenia',
+        'tdah' => 'TDAH (Transtorno do Déficit de Atenção e Hiperatividade)',
+        'toc' => 'TOC (Transtorno Obsessivo-Compulsivo)',
+        'transtorno_estresse_pos_traumatico' => 'Transtorno de Estresse Pós-Traumático',
+        
+        // Dispositivos
+        'marca_passo' => 'Marca-passo',
+        'stent_cardiaco' => 'Stent cardíaco',
+        'valvula_cardiaca' => 'Prótese de válvula cardíaca',
+        'derivacao_cerebral' => 'Derivação ventricular (shunt)',
+        'implante_cochlear' => 'Implante coclear',
+        'proteses_ortopedicas' => 'Próteses ortopédicas',
+        'dispositivo_contraceptivo' => 'Dispositivo contraceptivo',
+    ];
+    
+    // Se o valor contém vírgulas ou ponto e vírgula, processar cada item
+    if (strpos($valor, ',') !== false || strpos($valor, ';') !== false) {
+        $separador = strpos($valor, ';') !== false ? ';' : ',';
+        $itens = explode($separador, $valor);
+        $itens_formatados = [];
+        
+        foreach ($itens as $item) {
+            $item = trim($item);
+            if (!empty($item)) {
+                // Verificar se há dois pontos (ex: "Alergia alimentar: descrição")
+                if (strpos($item, ':') !== false) {
+                    $partes = explode(':', $item, 2);
+                    $tipo = trim($partes[0]);
+                    $descricao = trim($partes[1]);
+                    
+                    // Formatar o tipo
+                    $tipo_formatado = $mapeamento[$tipo] ?? ucwords(str_replace('_', ' ', $tipo));
+                    $itens_formatados[] = $tipo_formatado . ': ' . $descricao;
+                } else {
+                    // Verificar se está no mapeamento
+                    if (isset($mapeamento[$item])) {
+                        $itens_formatados[] = $mapeamento[$item];
+                    } else {
+                        // Se não estiver no mapeamento, formatar removendo underscores e capitalizando
+                        $itens_formatados[] = ucwords(str_replace('_', ' ', $item));
+                    }
+                }
+            }
+        }
+        
+        return implode($separador === ';' ? '; ' : ', ', $itens_formatados);
+    }
+    
+    // Valor único
+    if (isset($mapeamento[$valor])) {
+        return $mapeamento[$valor];
+    }
+    
+    // Se não estiver no mapeamento, formatar removendo underscores e capitalizando
+    return ucwords(str_replace('_', ' ', $valor));
+}
+
 // Verificar se é profissional de saúde
 $eh_profissional = false;
 if (isset($_SESSION['usuario_tipo']) && in_array($_SESSION['usuario_tipo'], ['medico', 'enfermeiro'])) {
@@ -389,7 +522,7 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
                         <div style="background: rgba(255, 255, 255, 0.15); padding: 15px; border-radius: 12px; backdrop-filter: blur(10px); border: 2px solid rgba(255, 255, 255, 0.3);">
                             <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px;">🚨 ALERGIAS</div>
                             <div style="font-size: 1.1rem; font-weight: 600; margin-top: 10px; line-height: 1.4;">
-                                <?= htmlspecialchars($dados_paciente['alergias']) ?>
+                                <?= htmlspecialchars(formatarNomeLegivel($dados_paciente['alergias'])) ?>
                             </div>
                         </div>
                         <?php endif; ?>
@@ -399,7 +532,7 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
                         <div style="background: rgba(255, 255, 255, 0.15); padding: 15px; border-radius: 12px; backdrop-filter: blur(10px);">
                             <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px;">💊 DOENÇAS CRÔNICAS</div>
                             <div style="font-size: 1.1rem; font-weight: 600; margin-top: 10px; line-height: 1.4;">
-                                <?= htmlspecialchars($dados_paciente['doencas_cronicas']) ?>
+                                <?= htmlspecialchars(formatarNomeLegivel($dados_paciente['doencas_cronicas'])) ?>
                             </div>
                         </div>
                         <?php endif; ?>
@@ -419,7 +552,7 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
                         <div style="background: rgba(255, 255, 255, 0.15); padding: 15px; border-radius: 12px; backdrop-filter: blur(10px);">
                             <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px;">⚡ DISPOSITIVOS IMPLANTADOS</div>
                             <div style="font-size: 1.1rem; font-weight: 600; margin-top: 10px; line-height: 1.4;">
-                                <?= htmlspecialchars($dados_paciente['dispositivos']) ?>
+                                <?= htmlspecialchars(formatarNomeLegivel($dados_paciente['dispositivos'])) ?>
                             </div>
                         </div>
                         <?php endif; ?>
@@ -446,6 +579,7 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
                 
                 <div class="header-paciente">
                     <h2>FICHA MÉDICA DO PACIENTE</h2>
+                    <hr>
                     <div class="codigo-pulseira">
                         <?php if (!empty($cpf_busca) && $dados_paciente): ?>
                             <span class="badge-pulseira">🆔 CPF: <?= htmlspecialchars($dados_paciente['cpf'] ?: $cpf_busca) ?></span>
@@ -456,7 +590,7 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
                         <?php endif; ?>
                     </div>
                 </div>
-                <hr>
+                
 
                 <div class="carousel" id="fichaCarousel">
                     <div class="carousel-inner">
@@ -515,10 +649,10 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
                                 <div class="info-basica">
                                     <h4>INFORMAÇÕES MÉDICAS</h4>
                                     <?php if ($dados_paciente['doencas_cronicas']): ?>
-                                        <p><strong>DOENÇAS CRÔNICAS:</strong> <?= htmlspecialchars($dados_paciente['doencas_cronicas']) ?></p>
+                                        <p><strong>DOENÇAS CRÔNICAS:</strong> <?= htmlspecialchars(formatarNomeLegivel($dados_paciente['doencas_cronicas'])) ?></p>
                                     <?php endif; ?>
                                     <?php if ($dados_paciente['alergias']): ?>
-                                        <p><strong>ALERGIA:</strong> <?= htmlspecialchars($dados_paciente['alergias']) ?></p>
+                                        <p><strong>ALERGIA:</strong> <?= htmlspecialchars(formatarNomeLegivel($dados_paciente['alergias'])) ?></p>
                                     <?php endif; ?>
                                     <?php if ($dados_paciente['tipo_sanguineo']): ?>
                                         <p><strong>TIPO SANGUÍNEO:</strong> <?= htmlspecialchars($dados_paciente['tipo_sanguineo']) ?></p>
@@ -527,10 +661,10 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
                                         <p><strong>MEDICAÇÃO DE USO CONTÍNUO:</strong> <?= htmlspecialchars($dados_paciente['medicacoes']) ?></p>
                                     <?php endif; ?>
                                     <?php if ($dados_paciente['doenca_mental']): ?>
-                                        <p><strong>DOENÇA MENTAL:</strong> <?= htmlspecialchars($dados_paciente['doenca_mental']) ?></p>
+                                        <p><strong>DOENÇA MENTAL:</strong> <?= htmlspecialchars(formatarNomeLegivel($dados_paciente['doenca_mental'])) ?></p>
                                     <?php endif; ?>
                                     <?php if ($dados_paciente['dispositivos']): ?>
-                                        <p><strong>DISPOSITIVOS IMPLANTADOS:</strong> <?= htmlspecialchars($dados_paciente['dispositivos']) ?></p>
+                                        <p><strong>DISPOSITIVOS IMPLANTADOS:</strong> <?= htmlspecialchars(formatarNomeLegivel($dados_paciente['dispositivos'])) ?></p>
                                     <?php endif; ?>
                                     <?php if ($dados_paciente['informacoes_relevantes']): ?>
                                         <p><strong>INFORMAÇÕES RELEVANTES:</strong> <?= htmlspecialchars($dados_paciente['informacoes_relevantes']) ?></p>
@@ -661,20 +795,26 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
     <style>
         .header-paciente {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            flex-wrap: wrap;
             gap: 1rem;
             margin-bottom: 1rem;
+        }
+
+        .header-paciente h2 {
+            text-align: center;
+            margin: 0;
         }
 
         .codigo-pulseira {
             display: flex;
             align-items: center;
+            justify-content: center;
         }
 
         .badge-pulseira {
-            background: linear-gradient(135deg, #6ec1e4 0%, #9ad2ea 100%);
+            background: linear-gradient(135deg, #4ca9c7 0%, #4ca9c7 100%);
             color: white;
             padding: 8px 16px;
             border-radius: 20px;
@@ -714,7 +854,7 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
             display: inline-block;
             margin-top: 1.5rem;
             padding: 12px 24px;
-            background: #6ec1e4;
+            background: #4ca9c7;
             color: white;
             border-radius: 8px;
             text-decoration: none;
@@ -723,7 +863,7 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
         }
 
         .btn-voltar-scanner:hover {
-            background: #5bb0d1;
+            background: #4ca9c7;
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(110, 193, 228, 0.3);
         }

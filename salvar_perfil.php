@@ -197,8 +197,10 @@ if (empty($cpf) || trim($cpf) === '') {
     $erros[] = "CPF é obrigatório.";
 } else {
     $cpf_limpo = preg_replace('/[^0-9]/', '', $cpf);
-    if (!validarCPF($cpf_limpo)) {
+    if (strlen($cpf_limpo) !== 11) {
         $erros[] = "CPF deve ter 11 dígitos.";
+    } elseif (!validarCPF($cpf_limpo)) {
+        $erros[] = "CPF inválido. Verifique os dígitos.";
     } else {
         $cpf = $cpf_limpo;
     }

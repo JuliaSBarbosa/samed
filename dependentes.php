@@ -114,7 +114,7 @@ function calcularIdade($data_nascimento) {
                             </div>
                         </div>
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                            <a href="perfil_dependente.php?id=<?= $dependente['id'] ?>" class="btn-editar-dependente" style="background-color: #6ec1e4;">👁️ Ver Perfil</a>
+                            <a href="perfil_dependente.php?id=<?= $dependente['id'] ?>" class="btn-editar-dependente" style="background-color: #4ca9c7;">👁️ Ver Perfil</a>
                             <a href="form_dependentes.php?editar=<?= $dependente['id'] ?>" class="btn-editar-dependente">✏️ Editar</a>
                         </div>
                     </div>

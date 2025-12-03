@@ -43,7 +43,7 @@ header.topo {
 }
 
 .logo h1 {
-    color: #9ad2ea;
+    color: #4ca9c7;
     font-size: 28px;
     font-weight: 700;
 }
@@ -52,7 +52,7 @@ header.topo {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 15px;
+    font-size: 18px;
     flex-wrap: nowrap;
     white-space: nowrap;
     flex: 1 1 auto;
@@ -77,26 +77,26 @@ header.topo {
 
 .menu a {
     text-decoration: none;
-    color: #9ad2ea;
+    color: #4ca9c7;
     font-weight: 600;
     transition: color 0.3s;
     white-space: nowrap;
     padding: 5px 8px;
     display: inline-block;
     flex-shrink: 0;
-    font-size: 15px;
+    font-size: 18px;
 }
 
 .menu a:hover,
 .menu a.ativo {
-    color: #58b4db;
+    color: #4ca9c7;
 }
 
 .divisor {
     color: #ccc;
     flex-shrink: 0;
     margin: 0 2px;
-    font-size: 16px;
+    font-size: 18px;
 }
 
 /* Busca no nav */
@@ -122,7 +122,7 @@ header.topo {
 }
 
 .nav-busca button[type="submit"] {
-    background: #6ec1e4;
+    background: #4ca9c7;
     border: none;
     color: white;
     padding: 5px 10px;
@@ -133,7 +133,7 @@ header.topo {
 }
 
 .nav-busca button[type="submit"]:hover {
-    background: #5bb0d1;
+    background: #3a8ba8;
 }
 
 /* Estilos para validação por etapa */
@@ -165,7 +165,7 @@ header.topo {
 .botao-sair {
     display: flex;
     align-items: center;
-    background-color: #9ad2ea;
+    background-color: #4ca9c7;
     color: #fff;
     padding: 8px 16px;
     border-radius: 6px;
@@ -183,13 +183,13 @@ header.topo {
 }
 
 .botao-sair:hover {
-    background-color: #6bbcd6;
+    background-color: #4ca9c7;
 }
 
 .botao-login {
     display: flex;
     align-items: center;
-    background-color: #9ad2ea;
+    background-color: #4ca9c7;
     color: #fff;
     padding: 8px 15px;
     border-radius: 6px;
@@ -204,14 +204,14 @@ header.topo {
 }
 
 .botao-login:hover {
-    background-color: #6bbcd6;
+    background-color: #4ca9c7;
 }
 
 .botao-registrar {
     display: flex;
     align-items: center;
     background-color: #ffffff;
-    color: #9ad2ea;
+    color: #4ca9c7;
     padding: 8px 15px;
     border-radius: 6px;
     font-weight: bold;
@@ -225,11 +225,11 @@ header.topo {
 }
 
 .botao-registrar:hover {
-    background-color: #6bbcd6;
+    background-color: #4ca9c7;
 }
 
 .botao-registrar {
-    border: 1px solid #6bbcd6;
+    border: 1px solid #4ca9c7;
 }
 
 /* ======= Conteúdo Principal ======= */
@@ -237,15 +237,16 @@ main {
     text-align: center;
     margin-top: 0;
     flex: 1;
+    background-color: #f3f3f3;
     /* Faz o main ocupar o espaço restante, empurrando o footer para baixo */
 }
 
 .titulo {
-    color: #7ec6e6;
+    color: #4ca9c7;
     font-size: 38px;
     margin-bottom: 50px;
     text-transform: uppercase;
-    margin-top: 20px;
+    margin-top: 40px;
 }
 
 .opcoes {
@@ -267,37 +268,81 @@ main {
     flex-direction: column;
     justify-content: center; /* centraliza conteúdo verticalmente */
     align-items: center; /* centraliza conteúdo horizontalmente */
-    background-color: #fff;
-    border: 1px solid #bfe0ef;
-    border-radius: 10px;
-    box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, #ffffff 0%, #f8fbfc 100%);
+    border: 2px solid #bfe0ef;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     text-align: center;
-    padding: 15px;
-    transition: transform 0.2s, box-shadow 0.2s;
+    padding: 25px 20px;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     box-sizing: border-box;
-    overflow: hidden; /* garante que o conteúdo não ultrapasse */
+    overflow: visible; /* permite animações dos ícones */
+    position: relative;
 }
 
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 3px 4px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(-12px) scale(1.05);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+    border-color: #4ca9c7;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f8fc 100%);
 }
 
 /* padronizar tamanho das imagens dentro das cards na tela de inicio */
 /* imagens que têm a classe `icone` ficam maiores; outras imagens ficam menores */
 .card img.icone {
-    width: 120px !important;
-    height: 120px !important;
-    min-width: 120px !important;
-    min-height: 120px !important;
-    max-width: 120px !important;
-    max-height: 120px !important;
-    margin-bottom: 12px;
+    width: 100px !important;
+    height: 100px !important;
+    min-width: 100px !important;
+    min-height: 100px !important;
+    max-width: 100px !important;
+    max-height: 100px !important;
+    margin-bottom: 15px;
     object-fit: contain;
     display: block;
     margin-left: auto;
     margin-right: auto;
     flex-shrink: 0; /* impede que a imagem encolha */
+    transition: opacity 0.3s ease;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+}
+
+.card:hover img.icone {
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+/* Estilos para ícones Font Awesome - Proporcionais ao card (280px altura) */
+.card i.icone {
+    font-size: 100px !important; /* Tamanho reduzido e proporcional */
+    margin-bottom: 15px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    flex-shrink: 0;
+    transition: color 0.3s ease;
+    position: relative;
+    line-height: 1;
+    color: #4ca9c7; /* Cor azul sólida e limpa */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* Todos os ícones com a mesma cor azul padrão - sem animações, sem gradientes, sem filtros */
+.card i.icone-perfil,
+.card i.icone-dependentes,
+.card i.icone-historico,
+.card i.icone-hospital,
+.card i.icone-buscar,
+.card i.icone-qrcode {
+    color: #4ca9c7; /* Azul sólido e limpo */
+}
+
+/* Efeito hover simples - apenas cor mais escura, sem transformações */
+.card:hover i.icone {
+    color: #3a8ba8; /* Azul mais escuro no hover */
+    transition: color 0.3s ease;
 }
 
 .card .icone-texto {
@@ -321,16 +366,22 @@ main {
 }
 
 .card p {
-    font-size: 14px;
-    color: #444;
+    font-size: 15px;
+    color: #333;
     margin: 0;
     padding: 0;
-    line-height: 1.3;
+    line-height: 1.4;
     max-width: 100%;
     word-wrap: break-word;
     flex-shrink: 0;
     height: auto;
     min-height: auto;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+.card:hover p {
+    color: #244357;
 }
 
 /* para tirar o sublinhado de link das divs*/
@@ -338,18 +389,18 @@ main {
     text-decoration: none;
     color: inherit;
     display: block;
-    width: 200px;
-    min-width: 200px;
-    max-width: 200px;
-    height: 250px;
-    min-height: 250px;
-    max-height: 250px;
+    width: 220px;
+    min-width: 220px;
+    max-width: 220px;
+    height: 280px;
+    min-height: 280px;
+    max-height: 280px;
     flex-shrink: 0;
 }
 
 /* ======= Rodapé ======= */
 footer {
-    background-color: #9ad2ea;
+    background-color: #4ca9c7;
     color: #fff;
     margin-top: 0;
     padding: 30px 0px;
@@ -370,9 +421,20 @@ footer {
 }
 
 footer p {
-    font-size: 17px;
-    margin: 0; 
- 
+    font-size: 25px;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 300;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    opacity: 0.9;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.3s ease, color 0.3s ease;
+}
+
+footer p:hover {
+    opacity: 1;
+    color: rgba(255, 255, 255, 1);
 }
 
 footer h1 {
@@ -393,16 +455,17 @@ footer h1 {
     margin-top: 30px;
 }
 
-.ficha-medica h2, .secao-historico h2 {
-    color: #6ec1e4;
+.ficha-medica h2, .secao-historico h2, .hospital-secao h2 {
+    color: #4ca9c7;
     font-weight: 700;
     font-size: 1.5em;
     margin-bottom: 5px;
+    margin-top: 30px;
 }
 
-.ficha-medica hr, .secao-historico hr {
+.ficha-medica hr, .secao-historico hr, .hospital-secao hr {
     width: 120px;
-    border: 2px solid #6ec1e4;
+    border: 2px solid #4ca9c7;
     border-radius: 2px;
     margin: 0 auto 20px;
 }
@@ -410,19 +473,19 @@ footer h1 {
 .card-ficha {
     background: linear-gradient(135deg, #ffffff 0%, #f8fbfc 100%);
     border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(110, 193, 228, 0.15);
+    box-shadow: 0 8px 24px rgba(76, 169, 199, 0.15);
     padding: 35px;
     width: 700px;
     margin: 0 auto;
     text-align: left;
     width: 100%;
     max-width: 700px;
-    border: 1px solid rgba(110, 193, 228, 0.1);
+    border: 1px solid rgba(76, 169, 199, 0.1);
     transition: box-shadow 0.3s ease;
 }
 
 .card-ficha:hover {
-    box-shadow: 0 12px 32px rgba(110, 193, 228, 0.2);
+    box-shadow: 0 12px 32px rgba(76, 169, 199, 0.2);
 }
 
 
@@ -432,21 +495,21 @@ footer h1 {
     align-items: center;
     gap: 8px;
     padding: 10px 20px;
-    background: #6ec1e4;
+    background: #4ca9c7;
     color: white;
     border-radius: 8px;
     text-decoration: none;
     font-weight: 600;
     font-size: 0.95rem;
     transition: all 0.3s;
-    box-shadow: 0 2px 8px rgba(110, 193, 228, 0.3);
+    box-shadow: 0 2px 8px rgba(76, 169, 199, 0.3);
     white-space: nowrap;
 }
 
 .btn-editar-perfil:hover {
-    background: #5bb0d1;
+    background: #3a8ba8;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(110, 193, 228, 0.4);
+    box-shadow: 0 4px 12px rgba(58, 139, 168, 0.4);
 }
 
 @media (max-width: 768px) {
@@ -498,19 +561,19 @@ footer h1 {
     display: inline-block;
     margin-top: 1.5rem;
     padding: 12px 28px;
-    background: #6ec1e4;
+    background: #4ca9c7;
     color: white;
     border-radius: 8px;
     text-decoration: none;
     font-weight: 600;
     transition: all 0.3s;
-    box-shadow: 0 2px 8px rgba(110, 193, 228, 0.3);
+    box-shadow: 0 2px 8px rgba(76, 169, 199, 0.3);
 }
 
 .btn-cadastrar-perfil:hover {
-    background: #5bb0d1;
+    background: #3a8ba8;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(110, 193, 228, 0.4);
+    box-shadow: 0 4px 12px rgba(58, 139, 168, 0.4);
 }
 
 /* Cards de Dependentes */
@@ -541,7 +604,7 @@ footer h1 {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    border: 3px solid #6ec1e4;
+    border: 3px solid #4ca9c7;
 }
 
 .info-dependente h3 {
@@ -562,7 +625,7 @@ footer h1 {
     justify-content: center;
     gap: 6px;
     padding: 8px 16px;
-    background: #6ec1e4;
+    background: #4ca9c7;
     color: white;
     border-radius: 6px;
     text-decoration: none;
@@ -574,9 +637,9 @@ footer h1 {
 }
 
 .btn-editar-dependente:hover {
-    background: #5bb0d1;
+    background: #3a8ba8;
     transform: translateY(-2px);
-    box-shadow: 0 2px 8px rgba(110, 193, 228, 0.3);
+    box-shadow: 0 2px 8px rgba(58, 139, 168, 0.3);
 }
 
 .perfil {
@@ -592,8 +655,8 @@ footer h1 {
     height: 80px;
     border-radius: 50%;
     margin-right: 20px;
-    border: 3px solid #6ec1e4;
-    box-shadow: 0 4px 12px rgba(110, 193, 228, 0.2);
+    border: 3px solid #4ca9c7;
+    box-shadow: 0 4px 12px rgba(76, 169, 199, 0.2);
     object-fit: cover;
 }
 
@@ -603,7 +666,7 @@ footer h1 {
     padding: 20px;
     background: #f8fbfc;
     border-radius: 12px;
-    border-left: 4px solid #6ec1e4;
+    border-left: 4px solid #4ca9c7;
 }
 
 h4 {
@@ -665,7 +728,7 @@ strong {
     transform: translateY(-50%);
     width: 50px;
     height: 50px;
-    background: linear-gradient(135deg, #6ec1e4 0%, #5bb0d1 100%);
+    background: linear-gradient(135deg, #4ca9c7 0%, #4ca9c7 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -675,14 +738,14 @@ strong {
     border: none;
     font-size: 24px;
     color: white;
-    box-shadow: 0 4px 12px rgba(110, 193, 228, 0.4);
+    box-shadow: 0 4px 12px rgba(76, 169, 199, 0.4);
     transition: all 0.3s ease;
 }
 
 .carousel-control:hover {
-    background: linear-gradient(135deg, #5bb0d1 0%, #4a9fc0 100%);
+    background: linear-gradient(135deg, #3a8ba8 0%, #3a8ba8 100%);
     transform: translateY(-50%) scale(1.1);
-    box-shadow: 0 6px 16px rgba(110, 193, 228, 0.5);
+    box-shadow: 0 6px 16px rgba(76, 169, 199, 0.5);
 }
 
 .carousel-control:active {
@@ -721,14 +784,14 @@ strong {
 }
 
 .carousel-indicators span:hover {
-    background: #9ad2ea;
+    background: #4ca9c7;
     transform: scaleY(1.2);
 }
 
 .carousel-indicators .active {
-    background: linear-gradient(135deg, #6ec1e4 0%, #5bb0d1 100%);
+    background: linear-gradient(135deg, #4ca9c7 0%, #4ca9c7 100%);
     width: 50px;
-    box-shadow: 0 2px 8px rgba(110, 193, 228, 0.4);
+    box-shadow: 0 2px 8px rgba(76, 169, 199, 0.4);
 }
 
 /* ======= Estilos da Página de Hospitais ======= */
@@ -795,13 +858,13 @@ strong {
     color: #444;
     /* Mesma cor do texto */
     text-decoration: none;
-    border-bottom: 1px dotted #58b4db;
+    border-bottom: 1px dotted #4ca9c7;
     /* Destaque sutil com a cor do seu menu */
     transition: color 0.3s, border-bottom 0.3s;
 }
 
 .hospital-info a:hover {
-    color: #58b4db;
+    color: #4ca9c7;
     /* Muda a cor ao passar o mouse */
     border-bottom-style: solid;
 }
@@ -877,7 +940,7 @@ strong {
 .city-tag {
     background-color: #eaf6fb;
     /* Fundo azul bem claro */
-    color: #58b4db;
+    color: #4ca9c7;
     /* Cor do seu menu */
     font-size: 0.8rem;
     font-weight: 600;
@@ -898,12 +961,12 @@ strong {
 .hospital-info a {
     color: #444;
     text-decoration: none;
-    border-bottom: 1px dotted #58b4db;
+    border-bottom: 1px dotted #4ca9c7;
     transition: color 0.3s, border-bottom 0.3s;
 }
 
 .hospital-info a:hover {
-    color: #58b4db;
+    color: #4ca9c7;
     border-bottom-style: solid;
 }
 
@@ -937,7 +1000,7 @@ strong {
 
 .filtro-icon {
     flex-shrink: 0;
-    color: #9ad2ea;
+    color: #4ca9c7;
     width: 22px;
     height: 22px;
     align-self: center;
@@ -946,12 +1009,12 @@ strong {
 
 .filtro-input:focus {
     outline: none;
-    border-color: #9ad2ea;
+    border-color: #4ca9c7;
     box-shadow: 0 0 0 3px rgba(154, 210, 234, 0.15);
 }
 
 .filtro-input-wrapper:focus-within .filtro-icon {
-    color: #6bbcd6;
+    color: #4ca9c7;
 }
 
 .filtro-input {
@@ -1031,12 +1094,12 @@ strong {
 
 .filtro-select:focus {
     outline: none;
-    border-color: #9ad2ea;
+    border-color: #4ca9c7;
     box-shadow: 0 0 0 3px rgba(154, 210, 234, 0.15);
 }
 
 .filtro-select:hover {
-    border-color: #9ad2ea;
+    border-color: #4ca9c7;
 }
 
 .resultado-busca {
@@ -1091,7 +1154,7 @@ strong {
 
 .btn-limpar-todos:hover {
     background: #e8e8e8;
-    border-color: #9ad2ea;
+    border-color: #4ca9c7;
     color: #333;
 }
 
@@ -1206,7 +1269,7 @@ main.hero::before {
     background: rgb(255, 255, 255);
     padding: 28px;
     border-radius: 10px;
-    box-shadow: #58b4db;
+    box-shadow: #4ca9c7;
     color: #244357;
     font-weight: 700;
     text-align: left;
@@ -1244,7 +1307,7 @@ main.hero::before {
 
 .login-container input[type="submit"] {
     width: 100%;
-    background: #9ad2ea;
+    background: #4ca9c7;
     color: #fff;
     border: none;
     padding: 10px;
@@ -1306,7 +1369,7 @@ main.hero::before {
 
 .registro-container input[type="submit"] {
     width: 100%;
-    background: #9ad2ea;
+    background: #4ca9c7;
     color: #fff;
     border: none;
     padding: 10px;
@@ -1318,7 +1381,7 @@ main.hero::before {
 }
 
 .registro-container input[type="submit"]:hover {
-    background: #6bbcd6;
+    background: #4ca9c7;
 }
 
 /* Estilos para tipo de usuário */
@@ -1386,13 +1449,13 @@ main.hero::before {
 }
 
 .link-login a {
-    color: #9ad2ea;
+    color: #4ca9c7;
     text-decoration: none;
     font-weight: 600;
 }
 
 .link-login a:hover {
-    color: #6bbcd6;
+    color: #4ca9c7;
     text-decoration: underline;
 }
 
@@ -1403,7 +1466,7 @@ main.hero::before {
 }
 
 .dependentes h2 {
-    color: #6ec1e4;
+    color: #4ca9c7;
     font-weight: 700;
     font-size: 1.5em;
     margin-bottom: 5px;
@@ -1411,7 +1474,7 @@ main.hero::before {
 
 .dependentes hr {
     width: 120px;
-    border: 2px solid #6ec1e4;
+    border: 2px solid #4ca9c7;
     border-radius: 2px;
     margin: 0 auto 20px;
 }
@@ -1420,9 +1483,12 @@ main.hero::before {
     max-width: 1200px;
     margin: 20px auto;
     padding: 15px;
+    padding-bottom: 40px;
     background: white;
     border-radius: 8px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    min-height: calc(100vh - 200px);
+    flex: 1;
 }
 
 .form-container form {
@@ -1471,7 +1537,7 @@ input[type="time"]:focus,
 input[type="date"]:focus,
 textarea:focus,
 select:focus {
-    border-color: #6ec1e4;
+    border-color: #4ca9c7;
     outline: none;
     box-shadow: #244357;
 }
@@ -1556,13 +1622,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .step.active {
-    border-color: #6ec1e4;
-    color: #6ec1e4;
+    border-color: #4ca9c7;
+    color: #4ca9c7;
 }
 
 .step.completed {
-    background: #6ec1e4;
-    border-color: #6ec1e4;
+    background: #4ca9c7;
+    border-color: #4ca9c7;
     color: white;
 }
 
@@ -1580,6 +1646,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .form-step {
     display: none;
     animation: fadeIn 0.5s ease;
+    min-height: 400px;
+    padding-bottom: 20px;
 }
 
 .form-step.active {
@@ -1643,6 +1711,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     display: flex;
     justify-content: space-between;
     margin-top: 30px;
+    margin-bottom: 40px;
     gap: 10px;
 }
 
@@ -1664,7 +1733,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .btn-proximo,
 .submit-btn {
-    background-color: #6ec1e4;
+    background-color: #4ca9c7;
     color: white;
 }
 
@@ -1674,7 +1743,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .btn-proximo:hover,
 .submit-btn:hover {
-    background-color: #6ec1e4;
+    background-color: #4ca9c7;
 }
 
 /* Botões compactos usados em listas dinâmicas (ex.: adicionar/remover medicação) */
@@ -1688,7 +1757,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .btn-small.add {
-    background-color: #6ec1e4;
+    background-color: #4ca9c7;
     color: #fff;
 }
 .btn-small.add:hover { background-color: #5bb6dc; }
@@ -1924,7 +1993,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .btn-limpar-filtros:hover {
     background: #e8e8e8;
-    border-color: #9ad2ea;
+    border-color: #4ca9c7;
     color: #333;
 }
 
@@ -1968,7 +2037,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .campo-filtro .filtro-input:focus,
 .campo-filtro .filtro-select:focus {
     outline: none;
-    border-color: #9ad2ea;
+    border-color: #4ca9c7;
     box-shadow: 0 0 0 3px rgba(154, 210, 234, 0.15);
 }
 
@@ -1979,7 +2048,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .btn-filtrar {
-    background: #6ec1e4;
+    background: #4ca9c7;
     color: white;
     padding: 12px 28px;
     border: none;
@@ -1991,13 +2060,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    box-shadow: 0 2px 8px rgba(110, 193, 228, 0.3);
+    box-shadow: 0 2px 8px rgba(76, 169, 199, 0.3);
 }
 
 .btn-filtrar:hover {
-    background: #5bb0d1;
+    background: #4ca9c7;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(110, 193, 228, 0.4);
+    box-shadow: 0 4px 12px rgba(76, 169, 199, 0.4);
 }
 
 .btn-filtrar span {
@@ -2006,14 +2075,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 /* ======= Contador de Resultados ======= */
 .contador-resultados {
-    background: linear-gradient(135deg, #6ec1e4 0%, #9ad2ea 100%);
+    background: linear-gradient(135deg, #4ca9c7 0%, #4ca9c7 100%);
     color: white;
     padding: 12px 20px;
     border-radius: 8px;
     margin-bottom: 1rem;
     text-align: center;
     font-size: 0.95rem;
-    box-shadow: 0 2px 8px rgba(110, 193, 228, 0.3);
+    box-shadow: 0 2px 8px rgba(76, 169, 199, 0.3);
 }
 
 .contador-resultados strong {
@@ -2036,7 +2105,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .tabela-historico th {
-    background: linear-gradient(135deg, #6ec1e4 0%, #5bb0d1 100%);
+    background: linear-gradient(135deg, #4ca9c7 0%, #4ca9c7 100%);
     color: white;
     font-weight: 700;
     text-transform: uppercase;
@@ -2227,7 +2296,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .btn-limpar-filtros-inline {
     display: inline-block;
     padding: 10px 20px;
-    background: #6ec1e4;
+    background: #4ca9c7;
     color: white;
     border-radius: 6px;
     text-decoration: none;
@@ -2237,9 +2306,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .btn-limpar-filtros-inline:hover {
-    background: #5bb0d1;
+    background: #4ca9c7;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(110, 193, 228, 0.3);
+    box-shadow: 0 4px 8px rgba(76, 169, 199, 0.3);
 }
 
 /* ======= Responsividade - Histórico ======= */
@@ -2331,7 +2400,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     height: 300px;
     margin: 0 auto;
     background: #f8f9fa;
-    border: 3px dashed #9ad2ea;
+    border: 3px dashed #4ca9c7;
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -2351,7 +2420,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     position: absolute;
     width: 40px;
     height: 40px;
-    border: 4px solid #6ec1e4;
+    border: 4px solid #4ca9c7;
 }
 
 .corner-tl {
@@ -2390,11 +2459,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     position: absolute;
     width: 90%;
     height: 3px;
-    background: linear-gradient(90deg, transparent, #6ec1e4, transparent);
+    background: linear-gradient(90deg, transparent, #4ca9c7, transparent);
     top: 0;
     left: 5%;
     animation: scanLine 2s ease-in-out infinite;
-    box-shadow: 0 0 10px rgba(110, 193, 228, 0.5);
+    box-shadow: 0 0 10px rgba(76, 169, 199, 0.5);
 }
 
 .scanner-instructions {
@@ -2447,13 +2516,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .scanner-input:focus {
     outline: none;
-    border-color: #9ad2ea;
+    border-color: #4ca9c7;
     box-shadow: 0 0 0 3px rgba(154, 210, 234, 0.15);
 }
 
 .btn-scanner {
     padding: 14px 28px;
-    background: #6ec1e4;
+    background: #4ca9c7;
     color: white;
     border: none;
     border-radius: 8px;
@@ -2464,18 +2533,40 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    box-shadow: 0 2px 8px rgba(110, 193, 228, 0.3);
+    box-shadow: 0 2px 8px rgba(76, 169, 199, 0.3);
     white-space: nowrap;
 }
 
 .btn-scanner:hover {
-    background: #5bb0d1;
+    background: #4ca9c7;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(110, 193, 228, 0.4);
+    box-shadow: 0 4px 12px rgba(76, 169, 199, 0.4);
 }
 
 .btn-scanner span {
     font-size: 1.2rem;
+}
+
+.btn-voltar-scanner {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #f5f5f5;
+    color: #4ca9c7;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    border: 1px solid #4ca9c7;
+}
+
+.btn-voltar-scanner:hover {
+    background: #4ca9c7;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 169, 199, 0.3);
 }
 
 /* Menu Profissional */
@@ -2495,7 +2586,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .profissional-info strong {
     font-weight: 700;
-    color: #6ec1e4;
+    color: #4ca9c7;
 }
 
 .registro-profissional {
@@ -2613,7 +2704,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     transform: translateX(400px);
     transition: all 0.3s ease;
     pointer-events: auto;
-    border-left: 4px solid #6ec1e4;
+    border-left: 4px solid #4ca9c7;
 }
 
 .toast-notification.show {
@@ -2731,12 +2822,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     }
     
     .menu {
-        font-size: 16px;
+        font-size: 17px;
         gap: 8px;
     }
     
     .menu a {
         padding: 4px 6px;
+        font-size: 17px;
     }
     
     .logo h1 {
@@ -2756,6 +2848,39 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     .botao-sair img {
         width: 35px;
     }
+    
+    /* Cards e ícones responsivos */
+    .opcoes {
+        flex-wrap: wrap;
+        gap: 15px;
+        padding: 0 15px;
+    }
+    
+    .link-card {
+        width: 160px;
+        min-width: 160px;
+        max-width: 160px;
+        height: 220px;
+        min-height: 220px;
+        max-height: 220px;
+    }
+    
+    .card i.icone {
+        font-size: 75px !important;
+    }
+    
+    .card img.icone {
+        width: 75px !important;
+        height: 75px !important;
+        min-width: 75px !important;
+        min-height: 75px !important;
+        max-width: 75px !important;
+        max-height: 75px !important;
+    }
+    
+    .card {
+        padding: 20px 15px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -2771,7 +2896,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     }
     
     .menu {
-        font-size: 14px;
+        font-size: 15px;
         gap: 6px;
         width: 100%;
         overflow-x: auto;
@@ -2784,7 +2909,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     }
     
     .menu::-webkit-scrollbar-thumb {
-        background: #9ad2ea;
+        background: #4ca9c7;
         border-radius: 2px;
     }
     
@@ -2820,6 +2945,40 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     .botao-sair img {
         width: 30px;
     }
+    
+    /* Cards e ícones em telas muito pequenas */
+    .opcoes {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .link-card {
+        width: 100%;
+        max-width: 280px;
+        min-width: 280px;
+        height: 240px;
+        min-height: 240px;
+        max-height: 240px;
+    }
+    
+    .card i.icone {
+        font-size: 85px !important;
+    }
+    
+    .card img.icone {
+        width: 85px !important;
+        height: 85px !important;
+        min-width: 85px !important;
+        min-height: 85px !important;
+        max-width: 85px !important;
+        max-height: 85px !important;
+    }
+    
+    .titulo {
+        font-size: 28px;
+        margin-bottom: 30px;
+    }
 }
 
 /* ======= ESTILOS PERFIL DEPENDENTE ======= */
@@ -2850,20 +3009,20 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     align-items: center;
     gap: 8px;
     padding: 10px 20px;
-    background: #6ec1e4;
+    background: #4ca9c7;
     color: white;
     border-radius: 8px;
     text-decoration: none;
     font-weight: 600;
     font-size: 1rem;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(110, 193, 228, 0.3);
+    box-shadow: 0 2px 8px rgba(76, 169, 199, 0.3);
 }
 
 .btn-voltar-perfil:hover {
-    background: #5bb0d1;
+    background: #4ca9c7;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(110, 193, 228, 0.4);
+    box-shadow: 0 4px 12px rgba(76, 169, 199, 0.4);
 }
 
 .btn-icon {
@@ -2888,7 +3047,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     gap: 12px;
     margin-bottom: 25px;
     padding-bottom: 15px;
-    border-bottom: 2px solid #6ec1e4;
+    border-bottom: 2px solid #4ca9c7;
     text-align: center;
 }
 
@@ -2928,7 +3087,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .privacidade-checkbox:hover {
     background: #f8f9fa;
-    border-color: #6ec1e4;
+    border-color: #4ca9c7;
     transform: translateX(5px);
 }
 
@@ -2945,20 +3104,20 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     width: 24px;
     height: 24px;
     background: white;
-    border: 2px solid #6ec1e4;
+    border: 2px solid #4ca9c7;
     border-radius: 6px;
     flex-shrink: 0;
     transition: all 0.3s ease;
 }
 
 .privacidade-checkbox:hover .checkmark {
-    border-color: #5bb0d1;
-    box-shadow: 0 0 0 4px rgba(110, 193, 228, 0.1);
+    border-color: #4ca9c7;
+    box-shadow: 0 0 0 4px rgba(76, 169, 199, 0.1);
 }
 
 .privacidade-checkbox input[type="checkbox"]:checked + .checkmark {
-    background: #6ec1e4;
-    border-color: #6ec1e4;
+    background: #4ca9c7;
+    border-color: #4ca9c7;
 }
 
 .privacidade-checkbox input[type="checkbox"]:checked + .checkmark::after {

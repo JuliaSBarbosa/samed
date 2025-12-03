@@ -216,6 +216,46 @@ document.addEventListener('DOMContentLoaded', function () {
                         field.classList.add('campo-invalido');
                         if (erros.length === 1) field.focus();
                         continue;
+                    } else {
+                        // Validar CPF com algoritmo completo
+                        // Verifica se todos os dígitos são iguais
+                        if (/^(\d)\1{10}$/.test(valor)) {
+                            isValid = false;
+                            erros.push(fieldName + ' (inválido)');
+                            field.classList.add('campo-invalido');
+                            if (erros.length === 1) field.focus();
+                            continue;
+                        }
+                        
+                        // Valida primeiro dígito verificador
+                        let soma = 0;
+                        for (let i = 0; i < 9; i++) {
+                            soma += parseInt(valor.charAt(i)) * (10 - i);
+                        }
+                        let resto = (soma * 10) % 11;
+                        if (resto === 10 || resto === 11) resto = 0;
+                        if (resto !== parseInt(valor.charAt(9))) {
+                            isValid = false;
+                            erros.push(fieldName + ' (inválido)');
+                            field.classList.add('campo-invalido');
+                            if (erros.length === 1) field.focus();
+                            continue;
+                        }
+                        
+                        // Valida segundo dígito verificador
+                        soma = 0;
+                        for (let i = 0; i < 10; i++) {
+                            soma += parseInt(valor.charAt(i)) * (11 - i);
+                        }
+                        resto = (soma * 10) % 11;
+                        if (resto === 10 || resto === 11) resto = 0;
+                        if (resto !== parseInt(valor.charAt(10))) {
+                            isValid = false;
+                            erros.push(fieldName + ' (inválido)');
+                            field.classList.add('campo-invalido');
+                            if (erros.length === 1) field.focus();
+                            continue;
+                        }
                     }
                 }
 

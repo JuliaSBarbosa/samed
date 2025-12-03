@@ -3,16 +3,47 @@
  */
 
 /**
- * Valida CPF (apenas verifica se tem 11 dígitos)
+ * Valida CPF com algoritmo completo de validação
  * @param {string} cpf - CPF com ou sem formatação
- * @returns {boolean} - True se válido (11 dígitos), False caso contrário
+ * @returns {boolean} - True se válido, False caso contrário
  */
 function validarCPF(cpf) {
     // Remove caracteres não numéricos
     cpf = cpf.replace(/\D/g, '');
     
     // Verifica se tem 11 dígitos
-    return cpf.length === 11;
+    if (cpf.length !== 11) {
+        return false;
+    }
+    
+    // Verifica se todos os dígitos são iguais (ex: 111.111.111-11)
+    if (/^(\d)\1{10}$/.test(cpf)) {
+        return false;
+    }
+    
+    // Valida primeiro dígito verificador
+    let soma = 0;
+    for (let i = 0; i < 9; i++) {
+        soma += parseInt(cpf.charAt(i)) * (10 - i);
+    }
+    let resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) resto = 0;
+    if (resto !== parseInt(cpf.charAt(9))) {
+        return false;
+    }
+    
+    // Valida segundo dígito verificador
+    soma = 0;
+    for (let i = 0; i < 10; i++) {
+        soma += parseInt(cpf.charAt(i)) * (11 - i);
+    }
+    resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) resto = 0;
+    if (resto !== parseInt(cpf.charAt(10))) {
+        return false;
+    }
+    
+    return true;
 }
 
 /**
@@ -156,17 +187,21 @@ function inicializarValidacoes(formId) {
             // Aplicar máscara
             e.target.value = mascaraCPF(valorLimitado);
             
-            // Validar em tempo real
-            if (valorLimitado.length > 0) {
+            // Validar em tempo real (só valida quando tiver 11 dígitos)
+            if (valorLimitado.length === 11) {
                 if (validarCPF(valorLimitado)) {
                     e.target.setCustomValidity('');
                     e.target.classList.remove('campo-invalido');
                     e.target.classList.add('campo-valido');
                 } else {
-                    e.target.setCustomValidity('CPF deve ter 11 dígitos.');
+                    e.target.setCustomValidity('CPF inválido. Verifique os dígitos.');
                     e.target.classList.remove('campo-valido');
                     e.target.classList.add('campo-invalido');
                 }
+            } else if (valorLimitado.length > 0 && valorLimitado.length < 11) {
+                e.target.setCustomValidity('CPF deve ter 11 dígitos.');
+                e.target.classList.remove('campo-valido');
+                e.target.classList.add('campo-invalido');
             } else {
                 // Se for obrigatório e estiver vazio
                 if (isRequired) {
@@ -189,9 +224,13 @@ function inicializarValidacoes(formId) {
             } else if (valorLimpo.length > 0 && valorLimpo.length < 11) {
                 e.target.setCustomValidity('CPF deve ter 11 dígitos.');
                 e.target.classList.add('campo-invalido');
-            } else if (valorLimpo.length > 0 && !validarCPF(valorLimpo)) {
-                e.target.setCustomValidity('CPF deve ter 11 dígitos.');
+            } else if (valorLimpo.length === 11 && !validarCPF(valorLimpo)) {
+                e.target.setCustomValidity('CPF inválido. Verifique os dígitos.');
                 e.target.classList.add('campo-invalido');
+            } else if (valorLimpo.length === 11 && validarCPF(valorLimpo)) {
+                e.target.setCustomValidity('');
+                e.target.classList.remove('campo-invalido');
+                e.target.classList.add('campo-valido');
             }
         });
         
@@ -212,9 +251,9 @@ function inicializarValidacoes(formId) {
                 cpfInput.focus();
                 cpfInput.reportValidity();
                 return false;
-            } else if (valorLimpo.length > 0 && !validarCPF(valorLimpo)) {
+            } else if (valorLimpo.length === 11 && !validarCPF(valorLimpo)) {
                 e.preventDefault();
-                cpfInput.setCustomValidity('CPF deve ter 11 dígitos.');
+                cpfInput.setCustomValidity('CPF inválido. Verifique os dígitos.');
                 cpfInput.classList.add('campo-invalido');
                 cpfInput.focus();
                 cpfInput.reportValidity();

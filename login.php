@@ -40,7 +40,7 @@ session_start();
       <input type="password" id="password" name="password" required placeholder="Digite sua senha" autocomplete="current-password">
       
       <div style="text-align: right; margin-bottom: 15px;">
-        <a href="#" onclick="alert('Funcionalidade em desenvolvimento'); return false;" style="color: #6ec1e4; text-decoration: none; font-size: 0.9rem;">
+        <a href="#" onclick="alert('Funcionalidade em desenvolvimento'); return false;" style="color: #4ca9c7; text-decoration: none; font-size: 0.9rem;">
           Esqueci minha senha
         </a>
       </div>
@@ -62,7 +62,7 @@ session_start();
     
     <div class="link-login" style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd;">
       <p style="color: #666; font-size: 0.9rem; margin: 0;">
-        Não tem uma conta? <a href="registrar.php" style="color: #6ec1e4; text-decoration: none; font-weight: 600;">Registre-se aqui</a>
+        Não tem uma conta? <a href="registrar.php" style="color: #4ca9c7; text-decoration: none; font-weight: 600;">Registre-se aqui</a>
       </p>
     </div>
   </div>

@@ -112,7 +112,7 @@ if (isset($_SESSION['dados_form'])) {
         ?>
         
         <?php if ($editar && $perfil): ?>
-            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #6ec1e4;">
+            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #4ca9c7;">
                 <h3 style="margin: 0; color: #244357; font-size: 1.1rem;">✏️ Modo de Edição</h3>
                 <p style="margin: 5px 0 0 0; color: #666; font-size: 0.9rem;">Você está editando seus dados cadastrados. Os campos abaixo estão preenchidos com suas informações atuais.</p>
             </div>
@@ -162,7 +162,7 @@ if (isset($_SESSION['dados_form'])) {
                     <?php if ($foto_atual && file_exists($foto_atual)): ?>
                         <div style="margin-bottom: 10px;">
                             <img src="<?= htmlspecialchars($foto_atual) ?>" alt="Foto atual"
-                                style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid #6ec1e4;">
+                                style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid #4ca9c7;">
                             <p style="font-size: 0.85rem; color: #666; margin-top: 5px;">Foto atual</p>
                         </div>
                     <?php endif; ?>
@@ -649,8 +649,6 @@ if (isset($_SESSION['dados_form'])) {
             </div>
         </form>
     </div>
-    </section>
-    </main>
 
     <!-- Rodapé -->
     <footer>

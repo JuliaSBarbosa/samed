@@ -154,7 +154,7 @@ if (isset($_SESSION['dados_form'])) {
                     ?>
                     <?php if ($foto_atual && file_exists($foto_atual)): ?>
                         <div style="margin-bottom: 10px;">
-                            <img src="<?= htmlspecialchars($foto_atual) ?>" alt="Foto atual" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid #6ec1e4;">
+                            <img src="<?= htmlspecialchars($foto_atual) ?>" alt="Foto atual" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid #4ca9c7;">
                             <p style="font-size: 0.85rem; color: #666; margin-top: 5px;">Foto atual</p>
                         </div>
                     <?php endif; ?>
@@ -625,8 +625,6 @@ if (isset($_SESSION['dados_form'])) {
             </div>
         </form>
     </div>
-    </section>
-    </main>
 
     <!-- Rodapé -->
     <footer>
@@ -643,19 +641,6 @@ if (isset($_SESSION['dados_form'])) {
     <script src="js/dependentes.js"></script>
     <script src="js/toast.js"></script>
     <script src="js/validacoes.js"></script>
-    <script>
-        // Debug: verificar se há erros na sessão
-        console.log('Página carregada. Verificando erros...');
-        <?php if (isset($_SESSION['erros']) && !empty($_SESSION['erros'])): ?>
-            console.error('Erros encontrados:', <?= json_encode($_SESSION['erros']) ?>);
-        <?php endif; ?>
-        <?php if (isset($_SESSION['sucesso'])): ?>
-            console.log('Sucesso:', <?= json_encode($_SESSION['sucesso']) ?>);
-        <?php endif; ?>
-    </script>
-</body>
-
-</html>
     <script>
         // Debug: verificar se há erros na sessão
         console.log('Página carregada. Verificando erros...');

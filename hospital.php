@@ -48,7 +48,9 @@ require_once 'verificar_login.php';
     </header>
 
     <main>
-        <h2 class="titulo">HOSPITAIS PRÓXIMOS</h2>
+        <section class="hospital-secao">
+            <h2>UNIDADES DE SAÚDE</h2>
+            <hr>
 
         <!-- Filtro de Busca -->
         <div class="hospital-filter-container">
@@ -177,6 +179,7 @@ require_once 'verificar_login.php';
 
             </ul>
         </div>
+        </section>
     </main>
 
     <script>

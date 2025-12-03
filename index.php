@@ -10,6 +10,7 @@
     <link rel="icon" href="img/logo.svg" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body>
@@ -62,25 +63,25 @@
         <div class="opcoes">
             <a href="perfil.php" class="link-card">
                 <div class="card">
-                    <img src="img/usuario.svg" alt="Usuário" class="icone">
+                    <i class="fas fa-user-md icone icone-perfil"></i>
                     <p>Acesse a sua ficha de informações</p>
                 </div>
             </a>
             <a href="dependentes.php" class="link-card">
                 <div class="card">
-                    <img src="img/dependentes.svg" alt="Dependentes" class="icone">
+                    <i class="fas fa-user-friends icone icone-dependentes"></i>
                     <p>Dados dos Dependentes</p>
                 </div>
             </a>
             <a href="historico.php" class="link-card">
                 <div class="card">
-                    <img src="img/historico.svg" alt="Hospitais" class="icone">
+                    <i class="fas fa-file-medical-alt icone icone-historico"></i>
                     <p>Histórico de Acessos</p>
                 </div>
             </a>
             <a href="hospital.php" class="link-card">
                 <div class="card">
-                    <img src="img/local.svg" alt="Hospitais" class="icone">
+                    <i class="fas fa-hospital icone icone-hospital"></i>
                     <p>Confira lista de hospitais próximos</p>
                 </div>
             </a>
@@ -88,7 +89,7 @@
             <?php if ($_SESSION['usuario_tipo'] === 'paciente'): ?>
             <a href="buscar_paciente.php" class="link-card">
                 <div class="card">
-                    <img src="img/perfil.svg" alt="Buscar Paciente" class="icone">
+                    <i class="fas fa-stethoscope icone icone-buscar"></i>
                     <p>Buscar Paciente por ID</p>
                 </div>
             </a>
@@ -97,7 +98,7 @@
             <?php if (in_array($_SESSION['usuario_tipo'] ?? '', ['medico', 'enfermeiro'])): ?>
             <a href="inicio-med.php" class="link-card">
                 <div class="card">
-                    <img src="img/perfil.svg" alt="Scanner de Pulseira" class="icone">
+                    <i class="fas fa-qrcode icone icone-qrcode"></i>
                     <p>Escanear Pulseira / Buscar Ficha</p>
                 </div>
             </a>
