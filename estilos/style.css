@@ -4,6 +4,12 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Poppins', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
 }
 
 body {
@@ -12,6 +18,9 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* ======= Cabeçalho ======= */
@@ -24,10 +33,12 @@ header.topo {
     border-bottom: 2px solid #e8e8e8;
     flex-wrap: nowrap;
     gap: 15px;
-    overflow: hidden;
+    overflow: visible;
     min-width: 0;
     width: 100%;
     box-sizing: border-box;
+    position: relative;
+    z-index: 100;
 }
 
 .logo {
@@ -59,7 +70,7 @@ header.topo {
     min-width: 0;
     justify-content: center;
     margin: 0 auto;
-    overflow: hidden;
+    overflow: visible;
 }
 
 /* Controlar espaçamento entre o menu e os botões*/
@@ -175,15 +186,23 @@ header.topo {
     font-size: 18px;
     flex-shrink: 0;
     white-space: nowrap;
+    min-width: fit-content;
 }
 
 .botao-sair img {
     width: 35px;
+    height: 35px;
     margin-right: 6px;
+    flex-shrink: 0;
+    object-fit: contain;
+}
+
+.botao-sair span {
+    white-space: nowrap;
 }
 
 .botao-sair:hover {
-    background-color: #4ca9c7;
+    background-color: #3a8ba8;
 }
 
 .botao-login {
@@ -402,49 +421,77 @@ main {
 footer {
     background-color: #4ca9c7;
     color: #fff;
-    margin-top: 0;
-    padding: 30px 0px;
+    margin-top: auto;
+    padding: 30px 20px;
     display: flex;
     align-items: center;
     justify-content: space-around;
     text-align: center;
+    flex-wrap: wrap;
+    gap: 20px;
 }
 
 .footer-logo {
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-shrink: 0;
 }
 
 .footer-logo img {
     width: 60px;
+    height: 60px;
+    object-fit: contain;
 }
 
 footer p {
-    font-size: 25px;
+    font-size: 12px;
     margin: 0;
-    color: rgba(255, 255, 255, 0.85);
-    font-weight: 300;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    opacity: 0.9;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-    transition: opacity 0.3s ease, color 0.3s ease;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    opacity: 0.95;
+    transition: opacity 0.3s ease;
+    flex: 1;
+    min-width: 200px;
+    max-width: 100%;
+    text-transform: none;
+    line-height: 1.4;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 footer p:hover {
     opacity: 1;
-    color: rgba(255, 255, 255, 1);
 }
 
 footer h1 {
-    font-size: 38px;
-    margin: 0; 
+    font-size: 28px;
+    margin: 0;
+    color: #fff;
+    font-weight: 700;
+}
+
+.lojas {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-shrink: 0;
+    flex-wrap: nowrap;
 }
 
 .lojas img {
-    height: 40px;
-    margin-left: 10px;
+    height: 35px;
+    width: auto;
+    max-width: 120px;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+}
+
+.lojas img:hover {
+    transform: scale(1.05);
 }
 
 
@@ -2788,6 +2835,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     color: #244357;
 }
 
+/* Toast notifications responsivo */
 @media (max-width: 768px) {
     #toast-container {
         top: 10px;
@@ -2798,186 +2846,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     .toast-notification {
         min-width: auto;
         max-width: 100%;
-    }
-    
-    /* Busca no nav responsiva */
-    .nav-busca {
-        margin-left: 5px !important;
-    }
-    
-    .nav-busca input[type="text"] {
-        width: 120px !important;
-        font-size: 0.85rem !important;
-        padding: 4px 8px !important;
-    }
-    
-    .nav-busca button[type="submit"] {
-        padding: 4px 8px !important;
-        font-size: 0.85rem !important;
-    }
-    
-    /* Menu responsivo */
-    header.topo {
-        padding: 12px 20px;
-    }
-    
-    .menu {
-        font-size: 17px;
-        gap: 8px;
-    }
-    
-    .menu a {
-        padding: 4px 6px;
-        font-size: 17px;
-    }
-    
-    .logo h1 {
-        font-size: 24px;
-    }
-    
-    .logo img {
-        width: 80px;
-        height: 80px;
-    }
-    
-    .botao-sair {
-        font-size: 18px;
-        padding: 6px 12px;
-    }
-    
-    .botao-sair img {
-        width: 35px;
-    }
-    
-    /* Cards e ícones responsivos */
-    .opcoes {
-        flex-wrap: wrap;
-        gap: 15px;
-        padding: 0 15px;
-    }
-    
-    .link-card {
-        width: 160px;
-        min-width: 160px;
-        max-width: 160px;
-        height: 220px;
-        min-height: 220px;
-        max-height: 220px;
-    }
-    
-    .card i.icone {
-        font-size: 75px !important;
-    }
-    
-    .card img.icone {
-        width: 75px !important;
-        height: 75px !important;
-        min-width: 75px !important;
-        min-height: 75px !important;
-        max-width: 75px !important;
-        max-height: 75px !important;
-    }
-    
-    .card {
-        padding: 20px 15px;
-    }
-}
-
-@media (max-width: 480px) {
-    .nav-busca {
-        display: none !important; /* Ocultar busca em telas muito pequenas */
-    }
-    
-    /* Menu muito pequeno */
-    header.topo {
-        padding: 10px 15px;
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .menu {
-        font-size: 15px;
-        gap: 6px;
-        width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: thin;
-    }
-    
-    .menu::-webkit-scrollbar {
-        height: 4px;
-    }
-    
-    .menu::-webkit-scrollbar-thumb {
-        background: #4ca9c7;
-        border-radius: 2px;
-    }
-    
-    .menu a {
-        padding: 3px 5px;
-        flex-shrink: 0;
-    }
-    
-    .logo {
-        width: 100%;
-        margin-bottom: 10px;
-    }
-    
-    .logo h1 {
-        font-size: 20px;
-    }
-    
-    .logo img {
-        width: 60px;
-        height: 60px;
-    }
-    
-    .menu-actions {
-        width: 100%;
-        justify-content: flex-end;
-    }
-    
-    .botao-sair {
-        font-size: 16px;
-        padding: 5px 10px;
-    }
-    
-    .botao-sair img {
-        width: 30px;
-    }
-    
-    /* Cards e ícones em telas muito pequenas */
-    .opcoes {
-        flex-direction: column;
-        align-items: center;
-        gap: 15px;
-    }
-    
-    .link-card {
-        width: 100%;
-        max-width: 280px;
-        min-width: 280px;
-        height: 240px;
-        min-height: 240px;
-        max-height: 240px;
-    }
-    
-    .card i.icone {
-        font-size: 85px !important;
-    }
-    
-    .card img.icone {
-        width: 85px !important;
-        height: 85px !important;
-        min-width: 85px !important;
-        min-height: 85px !important;
-        max-width: 85px !important;
-        max-height: 85px !important;
-    }
-    
-    .titulo {
-        font-size: 28px;
-        margin-bottom: 30px;
     }
 }
 
@@ -3194,5 +3062,1660 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     
     .checkbox-label {
         font-size: 0.85rem;
+    }
+}
+
+/* ======= Card de Informações Críticas ======= */
+.card-info-critica {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 24px rgba(255, 107, 107, 0.3);
+    color: white;
+}
+
+.card-info-critica-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.card-info-critica-header span {
+    font-size: 2rem;
+    margin-right: 15px;
+}
+
+.card-info-critica-header h2 {
+    margin: 0;
+    color: white;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-info-critica-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.card-info-critica-item {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 15px;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+.card-info-critica-item.border-highlight {
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.card-info-critica-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.card-info-critica-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 5px;
+}
+
+.card-info-critica-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 10px;
+    line-height: 1.4;
+}
+
+.card-info-critica-value-large {
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.card-info-critica-empty {
+    text-align: center;
+    padding: 20px;
+    opacity: 0.8;
+}
+
+.card-info-critica-empty p {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+/* ======= RESPONSIVIDADE COMPLETA - TABLET (768px - 1024px) ======= */
+@media (max-width: 1024px) and (min-width: 769px) {
+    /* Cabeçalho tablet */
+    header.topo {
+        padding: 12px 20px;
+        flex-wrap: nowrap;
+    }
+    
+    .logo img {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .logo h1 {
+        font-size: 24px;
+    }
+    
+    .menu {
+        font-size: 15px;
+        gap: 6px;
+    }
+    
+    .menu a {
+        font-size: 15px;
+        padding: 6px 10px;
+    }
+    
+    .botao-sair {
+        font-size: 15px;
+        padding: 8px 14px;
+    }
+    
+    /* Footer tablet */
+    footer {
+        padding: 25px 20px;
+        flex-wrap: nowrap;
+        gap: 25px;
+    }
+    
+    .footer-logo img {
+        width: 55px;
+        height: 55px;
+    }
+    
+    footer h1 {
+        font-size: 26px;
+    }
+    
+    footer p {
+        font-size: 0.85rem;
+    }
+    
+    .lojas img {
+        height: 38px;
+        width: auto;
+    }
+    
+    /* Outros componentes */
+    .opcoes {
+        flex-wrap: wrap;
+        gap: 20px;
+        padding: 0 20px;
+    }
+    
+    .link-card {
+        flex: 1 1 calc(50% - 20px);
+        min-width: 250px;
+        max-width: 350px;
+    }
+    
+    .hospital-list-container {
+        padding: 20px 30px;
+    }
+    
+    .form-container {
+        padding: 20px;
+    }
+    
+    .scanner-wrapper {
+        padding: 2rem 1.5rem;
+    }
+}
+
+/* ======= RESPONSIVIDADE COMPLETA - MOBILE (até 768px) ======= */
+@media (max-width: 768px) {
+    /* ========== HEADER MOBILE ========== */
+    header.topo {
+        flex-wrap: wrap;
+        padding: 10px 12px;
+        gap: 8px;
+        align-items: center;
+        min-height: auto;
+    }
+    
+    /* Logo - primeira linha */
+    .logo {
+        order: 1;
+        flex: 0 0 auto;
+        gap: 8px;
+        min-width: 0;
+    }
+    
+    .logo img {
+        width: 50px;
+        height: 50px;
+        flex-shrink: 0;
+    }
+    
+    .logo h1 {
+        font-size: 18px;
+        white-space: nowrap;
+        line-height: 1.2;
+    }
+    
+    /* Botão Sair - primeira linha, à direita */
+    .botao-sair {
+        order: 2;
+        font-size: 12px;
+        padding: 8px 12px;
+        min-height: 36px;
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    
+    .botao-sair img {
+        width: 16px;
+        height: 16px;
+        margin-right: 4px;
+        flex-shrink: 0;
+    }
+    
+    /* Menu - segunda linha, full width */
+    .menu {
+        order: 3;
+        width: 100%;
+        margin: 0;
+        margin-top: 6px;
+        display: flex;
+        align-items: center;
+        gap: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        padding: 8px 6px;
+        background: rgba(76, 169, 199, 0.06);
+        border-radius: 8px;
+        scrollbar-width: thin;
+        scrollbar-color: #4ca9c7 transparent;
+    }
+    
+    .menu::-webkit-scrollbar {
+        height: 4px;
+    }
+    
+    .menu::-webkit-scrollbar-track {
+        background: transparent;
+        border-radius: 2px;
+    }
+    
+    .menu::-webkit-scrollbar-thumb {
+        background: #4ca9c7;
+        border-radius: 2px;
+    }
+    
+    .menu::-webkit-scrollbar-thumb:hover {
+        background: #3a8ba8;
+    }
+    
+    .menu a {
+        font-size: 11px;
+        padding: 8px 6px;
+        white-space: nowrap;
+        min-height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 5px;
+        transition: all 0.2s;
+        margin: 0 2px;
+        flex-shrink: 0;
+        text-decoration: none;
+        color: #4ca9c7;
+        font-weight: 600;
+    }
+    
+    .menu a:hover {
+        background: rgba(76, 169, 199, 0.12);
+    }
+    
+    .menu a.ativo {
+        background: rgba(76, 169, 199, 0.18);
+        color: #4ca9c7;
+        border-bottom: 2px solid #4ca9c7;
+        padding-bottom: 6px;
+    }
+    
+    .divisor {
+        font-size: 10px;
+        margin: 0 2px;
+        display: inline-flex;
+        align-items: center;
+        opacity: 0.5;
+        flex-shrink: 0;
+        color: #ccc;
+        height: 20px;
+    }
+    
+    /* Nav busca - terceira linha se existir */
+    .nav-busca {
+        order: 4;
+        width: 100%;
+        margin-top: 6px;
+        margin-left: 0;
+    }
+    
+    .nav-busca form {
+        width: 100%;
+        display: flex;
+        gap: 8px;
+    }
+    
+    .nav-busca input[type="text"] {
+        flex: 1;
+        font-size: 14px;
+        padding: 10px 12px;
+        min-height: 40px;
+        border-radius: 8px;
+    }
+    
+    .nav-busca button[type="submit"] {
+        padding: 10px 16px;
+        font-size: 13px;
+        min-height: 40px;
+        white-space: nowrap;
+        border-radius: 8px;
+    }
+    
+    /* Título */
+    .titulo {
+        font-size: 24px;
+        margin-bottom: 25px;
+        margin-top: 15px;
+        padding: 0 15px;
+        line-height: 1.3;
+    }
+    
+    /* Cards de opções */
+    .opcoes {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+        padding: 0 12px;
+        margin-top: 20px;
+    }
+    
+    .link-card {
+        width: 100%;
+        max-width: 100%;
+        min-width: auto;
+        height: auto;
+        min-height: 180px;
+    }
+    
+    .card {
+        padding: 20px 15px;
+        min-height: 180px;
+    }
+    
+    .card img.icone,
+    .card i.icone {
+        width: 70px !important;
+        height: 70px !important;
+        margin-bottom: 12px;
+    }
+    
+    .card h3,
+    .card-title {
+        font-size: 1rem;
+        margin: 0;
+    }
+    
+    /* Ficha médica */
+    .ficha-medica {
+        padding: 12px 10px;
+        margin: 0;
+    }
+    
+    .ficha-medica h2,
+    .ficha-medica h2.secao-historico h2,
+    .ficha-medica h2.hospital-secao h2 {
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+        padding: 0 5px;
+    }
+    
+    .ficha-medica hr {
+        margin: 15px 0;
+    }
+    
+    .header-paciente {
+        padding: 0 5px;
+        margin-bottom: 15px;
+    }
+    
+    .header-paciente h2 {
+        font-size: 1.2rem;
+    }
+    
+    .badge-pulseira {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+        display: inline-block;
+        margin-top: 8px;
+    }
+    
+    .card-ficha {
+        padding: 15px 12px;
+        margin: 0 5px;
+        border-radius: 12px;
+    }
+    
+    .perfil {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+        margin-bottom: 15px;
+    }
+    
+    .perfil img {
+        width: 100px;
+        height: 100px;
+        margin-right: 0;
+        margin-bottom: 8px;
+    }
+    
+    .perfil h3 {
+        font-size: 1.1rem;
+        margin: 0;
+    }
+    
+    .perfil p {
+        font-size: 0.9rem;
+        margin: 5px 0;
+    }
+    
+    .info-basica,
+    .contato-emergencia {
+        text-align: left;
+        padding: 12px;
+        margin-top: 15px;
+    }
+    
+    .info-basica h4,
+    .contato-emergencia h4 {
+        font-size: 1rem;
+        margin-bottom: 12px;
+        line-height: 1.4;
+    }
+    
+    .info-basica p,
+    .contato-emergencia p {
+        font-size: 0.875rem;
+        margin-bottom: 8px;
+        word-break: break-word;
+        line-height: 1.5;
+    }
+    
+    .info-basica p strong,
+    .contato-emergencia p strong {
+        display: inline-block;
+        min-width: 140px;
+        margin-right: 5px;
+    }
+    
+    /* Carrossel */
+    .carousel {
+        margin: 15px 5px;
+        width: calc(100% - 10px);
+        max-width: 100%;
+    }
+    
+    .carousel-item {
+        padding: 15px 0;
+    }
+    
+    .carousel-control {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+        box-shadow: 0 2px 8px rgba(76, 169, 199, 0.3);
+    }
+    
+    .carousel-control.prev {
+        left: 2px;
+    }
+    
+    .carousel-control.next {
+        right: 2px;
+    }
+    
+    .carousel-indicators {
+        bottom: -25px;
+        gap: 6px;
+        padding: 8px 0;
+    }
+    
+    .carousel-indicators span {
+        width: 28px;
+        height: 5px;
+        cursor: pointer;
+    }
+    
+    .carousel-indicators .active {
+        width: 35px;
+    }
+    
+    /* Card de informações críticas */
+    .card-info-critica {
+        padding: 20px 15px !important;
+        margin-bottom: 20px !important;
+    }
+    
+    .card-info-critica-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    
+    .card-info-critica-header span {
+        font-size: 1.5rem;
+        margin-right: 0;
+        margin-bottom: 5px;
+    }
+    
+    .card-info-critica-header h2 {
+        font-size: 1.2rem !important;
+    }
+    
+    .card-info-critica-grid {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+    }
+    
+    .card-info-critica-value-large {
+        font-size: 1.5rem;
+    }
+    
+    /* Formulários */
+    .form-container {
+        padding: 12px;
+        margin: 10px;
+        border-radius: 12px;
+    }
+    
+    .form-container form {
+        padding: 15px 12px;
+    }
+    
+    .form-group {
+        margin-bottom: 18px;
+    }
+    
+    .form-group label {
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+        display: block;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+        margin-bottom: 18px;
+    }
+    
+    .form-column {
+        width: 100%;
+        margin-bottom: 18px;
+    }
+    
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="date"],
+    input[type="number"],
+    input[type="password"],
+    select,
+    textarea {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 16px; /* Evita zoom no iOS */
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        box-sizing: border-box;
+    }
+    
+    textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+    
+    .progress-bar {
+        padding: 0 8px;
+        margin-bottom: 20px;
+    }
+    
+    .step {
+        width: 28px;
+        height: 28px;
+        font-size: 0.85rem;
+    }
+    
+    .step-title {
+        font-size: 10px;
+        top: 32px;
+        white-space: normal;
+        text-align: center;
+        width: 60px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .btn-submit,
+    .btn-next,
+    .btn-prev {
+        width: 100%;
+        padding: 12px;
+        font-size: 1rem;
+        margin-top: 10px;
+        min-height: 44px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .form-actions button,
+    .form-actions a {
+        width: 100%;
+    }
+    
+    /* Scanner */
+    .scanner-container {
+        padding: 1rem 0.5rem;
+        min-height: auto;
+    }
+    
+    .scanner-wrapper {
+        padding: 1.5rem 1rem;
+        margin: 0 5px;
+    }
+    
+    .scanner-titulo {
+        font-size: 1.4rem;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 0.75rem;
+    }
+    
+    .scanner-icon {
+        font-size: 2rem;
+    }
+    
+    .scanner-subtitulo {
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+        padding: 0 10px;
+    }
+    
+    .scanner-area {
+        margin: 1.5rem 0;
+    }
+    
+    .scanner-frame {
+        width: 100%;
+        max-width: 280px;
+        height: 280px;
+        margin: 0 auto;
+    }
+    
+    .scanner-manual {
+        padding: 15px 10px;
+        margin-top: 1.5rem;
+    }
+    
+    .manual-text {
+        font-size: 0.9rem;
+        margin-bottom: 12px;
+    }
+    
+    .scanner-form {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .input-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .scanner-input {
+        width: 100%;
+        font-size: 16px;
+        padding: 12px;
+        min-height: 44px;
+        box-sizing: border-box;
+    }
+    
+    .btn-scanner {
+        width: 100%;
+        justify-content: center;
+        padding: 12px;
+        min-height: 44px;
+        font-size: 1rem;
+    }
+    
+    .mensagem-erro-scanner {
+        padding: 2rem 1.5rem;
+        margin: 1rem;
+    }
+    
+    .erro-icon {
+        font-size: 3rem;
+    }
+    
+    .mensagem-erro-scanner h2 {
+        font-size: 1.3rem;
+    }
+    
+    .mensagem-erro-scanner p {
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+    
+    .btn-voltar-scanner {
+        width: 100%;
+        padding: 12px;
+        text-align: center;
+        min-height: 44px;
+    }
+    
+    /* Hospitais */
+    .hospital-list-container {
+        padding: 15px 12px;
+        margin: 12px 8px;
+    }
+    
+    .hospital-list {
+        padding: 0;
+    }
+    
+    .hospital-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px 0;
+        gap: 15px;
+    }
+    
+    .hospital-card img {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 15px;
+        object-fit: contain;
+    }
+    
+    .hospital-info {
+        text-align: center;
+        width: 100%;
+    }
+    
+    .hospital-info h3 {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+    }
+    
+    .hospital-info p {
+        font-size: 0.9rem;
+        margin: 5px 0;
+    }
+    
+    /* Dependentes */
+    .dependentes-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 0 12px;
+    }
+    
+    .card-dependente {
+        width: 100%;
+        max-width: 100%;
+        padding: 15px;
+    }
+    
+    .card-dependente-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 10px;
+    }
+    
+    .card-dependente-header img {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .card-dependente-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .card-dependente-actions a,
+    .card-dependente-actions button {
+        width: 100%;
+        padding: 10px;
+        min-height: 44px;
+        justify-content: center;
+    }
+    
+    /* ========== FOOTER MOBILE ========== */
+    footer {
+        padding: 20px 15px;
+        flex-direction: column;
+        gap: 18px;
+        text-align: center;
+        background-color: #4ca9c7;
+        width: 100%;
+        box-sizing: border-box;
+        margin-top: auto;
+    }
+    
+    .footer-logo {
+        flex-direction: row;
+        gap: 10px;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: nowrap;
+    }
+    
+    .footer-logo img {
+        width: 45px;
+        height: 45px;
+        object-fit: contain;
+        flex-shrink: 0;
+    }
+    
+    footer h1 {
+        font-size: 20px;
+        margin: 0;
+        color: #fff;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+    
+    footer p {
+        font-size: 11px;
+        margin: 0;
+        line-height: 1.5;
+        padding: 0 10px;
+        color: rgba(255, 255, 255, 0.95);
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        max-width: 100%;
+        text-align: center;
+        hyphens: auto;
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .lojas {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: nowrap;
+        margin-top: 0;
+        width: 100%;
+        overflow-x: auto;
+        padding: 8px 0;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .lojas img {
+        width: 115px;
+        height: 34px;
+        object-fit: contain;
+        flex-shrink: 0;
+    }
+    
+    /* Tabelas */
+    .tabela-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 0 -15px;
+        padding: 0 15px;
+    }
+    
+    .tabela-historico {
+        min-width: 600px;
+        font-size: 0.85rem;
+    }
+    
+    .tabela-historico th,
+    .tabela-historico td {
+        padding: 10px 8px;
+    }
+    
+    /* Botões */
+    .btn-editar-perfil,
+    .btn-voltar-perfil,
+    .btn-cadastrar-perfil {
+        width: 100%;
+        justify-content: center;
+        padding: 12px;
+        min-height: 44px;
+        font-size: 0.95rem;
+    }
+    
+    .perfil-buttons {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+    
+    .perfil-actions-container {
+        padding: 0 8px;
+        margin-bottom: 15px;
+    }
+    
+    .privacidade-card {
+        padding: 15px 12px;
+        margin-top: 15px;
+    }
+    
+    .privacidade-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+    
+    .privacidade-header h3 {
+        font-size: 1rem;
+    }
+    
+    .privacidade-checkbox {
+        padding: 10px 0;
+    }
+    
+    .checkbox-label {
+        font-size: 0.85rem;
+        line-height: 1.4;
+    }
+    
+    /* Mensagens */
+    .mensagem-sem-dados {
+        padding: 1.5rem 1rem;
+        margin: 1rem 0.5rem;
+    }
+    
+    .mensagem-sem-dados .mensagem-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .mensagem-sem-dados h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .mensagem-sem-dados p {
+        font-size: 0.875rem;
+        margin: 0.5rem 0;
+        line-height: 1.5;
+    }
+    
+    .btn-cadastrar-perfil {
+        width: 100%;
+        padding: 12px;
+        margin-top: 1rem;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Mensagens de sucesso/erro */
+    .mensagem-sucesso,
+    .mensagem-erro {
+        padding: 12px 15px;
+        margin: 12px 8px;
+        font-size: 0.875rem;
+        border-radius: 8px;
+    }
+    
+    /* QR Code */
+    .qr-code-card {
+        padding: 18px 12px;
+        margin: 12px 8px;
+    }
+    
+    .qr-code-header {
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+    
+    .qr-code-icon {
+        font-size: 1.3rem;
+    }
+    
+    .qr-code-header h3 {
+        font-size: 1.1rem;
+        margin: 0;
+    }
+    
+    .qr-code-description {
+        font-size: 0.875rem;
+        margin-bottom: 15px;
+        line-height: 1.5;
+        padding: 0 5px;
+    }
+    
+    .qr-code-warning {
+        padding: 12px;
+        margin-bottom: 15px;
+    }
+    
+    .qr-code-warning p {
+        font-size: 0.85rem;
+        margin-bottom: 8px;
+    }
+    
+    .qr-code-warning ul {
+        font-size: 0.8rem;
+        padding-left: 18px;
+        margin: 8px 0;
+    }
+    
+    .qr-code-warning li {
+        margin: 4px 0;
+    }
+    
+    .qr-code-url-config {
+        margin-top: 12px;
+        padding-top: 12px;
+    }
+    
+    .qr-code-url-config label {
+        font-size: 0.85rem;
+        margin-bottom: 6px;
+    }
+    
+    .url-input-group {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .url-input {
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+        min-height: 44px;
+    }
+    
+    .btn-atualizar-url {
+        width: 100%;
+        padding: 10px;
+        min-height: 44px;
+    }
+    
+    .qr-code-container {
+        padding: 12px;
+        margin: 12px 0;
+    }
+    
+    #qrcode {
+        width: 100%;
+        max-width: 220px;
+    }
+    
+    .qr-code-actions {
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 15px;
+    }
+    
+    .btn-download-qr,
+    .btn-print-qr {
+        width: 100%;
+        padding: 12px;
+        min-height: 44px;
+        justify-content: center;
+    }
+    
+    .qr-code-info {
+        font-size: 0.85rem;
+        margin-top: 12px;
+    }
+    
+    .qr-code-url-display {
+        font-size: 0.75rem;
+        padding: 8px;
+        margin-top: 8px;
+        word-break: break-all;
+    }
+}
+
+/* ======= RESPONSIVIDADE COMPLETA - MOBILE PEQUENO (até 480px) ======= */
+@media (max-width: 480px) {
+    /* ========== HEADER MOBILE PEQUENO (480px) ========== */
+    header.topo {
+        padding: 8px 10px;
+        gap: 6px;
+    }
+    
+    .logo {
+        gap: 6px;
+    }
+    
+    .logo img {
+        width: 42px;
+        height: 42px;
+    }
+    
+    .logo h1 {
+        font-size: 16px;
+    }
+    
+    .botao-sair {
+        font-size: 10px;
+        padding: 6px 9px;
+        min-height: 32px;
+    }
+    
+    .botao-sair img {
+        width: 13px;
+        height: 13px;
+        margin-right: 3px;
+    }
+    
+    .menu {
+        padding: 6px 4px;
+        margin-top: 5px;
+    }
+    
+    .menu a {
+        font-size: 10px;
+        padding: 7px 5px;
+        min-height: 30px;
+        margin: 0 1px;
+    }
+    
+    .divisor {
+        font-size: 9px;
+        margin: 0 1px;
+        opacity: 0.4;
+    }
+    
+    .nav-busca {
+        margin-top: 5px;
+    }
+    
+    .nav-busca input[type="text"] {
+        font-size: 14px;
+        padding: 9px 10px;
+        min-height: 38px;
+    }
+    
+    .nav-busca button[type="submit"] {
+        padding: 9px 14px;
+        font-size: 12px;
+        min-height: 38px;
+    }
+    
+    /* Título */
+    .titulo {
+        font-size: 22px;
+        margin-bottom: 20px;
+        padding: 0 10px;
+    }
+    
+    /* Cards */
+    .card {
+        padding: 15px 10px;
+    }
+    
+    .card img.icone,
+    .card i.icone {
+        width: 60px !important;
+        height: 60px !important;
+    }
+    
+    /* Ficha médica */
+    .ficha-medica {
+        padding: 8px 5px;
+    }
+    
+    .ficha-medica h2 {
+        font-size: 1.1rem;
+        margin-bottom: 12px;
+    }
+    
+    .header-paciente h2 {
+        font-size: 1rem;
+    }
+    
+    .badge-pulseira {
+        font-size: 0.75rem;
+        padding: 5px 10px;
+    }
+    
+    .card-ficha {
+        padding: 12px 8px;
+        margin: 0 3px;
+    }
+    
+    .perfil {
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+    
+    .perfil img {
+        width: 90px;
+        height: 90px;
+    }
+    
+    .perfil h3 {
+        font-size: 1rem;
+    }
+    
+    .perfil p {
+        font-size: 0.85rem;
+    }
+    
+    .info-basica,
+    .contato-emergencia {
+        padding: 10px 8px;
+        margin-top: 12px;
+    }
+    
+    .info-basica h4,
+    .contato-emergencia h4 {
+        font-size: 0.95rem;
+        margin-bottom: 10px;
+    }
+    
+    .info-basica p,
+    .contato-emergencia p {
+        font-size: 0.8rem;
+        margin-bottom: 6px;
+    }
+    
+    .info-basica p strong,
+    .contato-emergencia p strong {
+        min-width: 120px;
+        font-size: 0.8rem;
+    }
+    
+    /* Carrossel */
+    .carousel {
+        margin: 12px 3px;
+        width: calc(100% - 6px);
+    }
+    
+    .carousel-item {
+        padding: 12px 0;
+    }
+    
+    .carousel-control {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+    }
+    
+    .carousel-control.prev {
+        left: 1px;
+    }
+    
+    .carousel-control.next {
+        right: 1px;
+    }
+    
+    .carousel-indicators {
+        bottom: -20px;
+        gap: 5px;
+    }
+    
+    .carousel-indicators span {
+        width: 25px;
+        height: 4px;
+    }
+    
+    .carousel-indicators .active {
+        width: 30px;
+    }
+    
+    /* Formulários */
+    .form-container {
+        padding: 8px;
+        margin: 8px 5px;
+    }
+    
+    .form-container form {
+        padding: 12px 8px;
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .form-group label {
+        font-size: 0.85rem;
+    }
+    
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="date"],
+    input[type="number"],
+    input[type="password"],
+    select,
+    textarea {
+        font-size: 16px; /* Evita zoom no iOS */
+        padding: 10px;
+    }
+    
+    .progress-bar {
+        padding: 0 5px;
+        margin-bottom: 15px;
+    }
+    
+    .step {
+        width: 26px;
+        height: 26px;
+        font-size: 0.8rem;
+    }
+    
+    .step-title {
+        font-size: 9px;
+        top: 30px;
+        width: 50px;
+    }
+    
+    .btn-submit,
+    .btn-next,
+    .btn-prev {
+        padding: 11px;
+        font-size: 0.95rem;
+    }
+    
+    /* Scanner */
+    .scanner-container {
+        padding: 0.75rem 0.25rem;
+    }
+    
+    .scanner-wrapper {
+        padding: 1rem 0.75rem;
+        margin: 0 3px;
+    }
+    
+    .scanner-titulo {
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .scanner-icon {
+        font-size: 1.8rem;
+    }
+    
+    .scanner-subtitulo {
+        font-size: 0.8rem;
+        margin-bottom: 1.25rem;
+        padding: 0 5px;
+    }
+    
+    .scanner-frame {
+        max-width: 240px;
+        height: 240px;
+    }
+    
+    .scanner-manual {
+        padding: 12px 8px;
+    }
+    
+    .manual-text {
+        font-size: 0.85rem;
+    }
+    
+    .scanner-input {
+        padding: 11px;
+    }
+    
+    .btn-scanner {
+        padding: 11px;
+        font-size: 0.95rem;
+    }
+    
+    .mensagem-erro-scanner {
+        padding: 1.5rem 1rem;
+        margin: 0.75rem 0.5rem;
+    }
+    
+    .erro-icon {
+        font-size: 2.5rem;
+    }
+    
+    .mensagem-erro-scanner h2 {
+        font-size: 1.1rem;
+    }
+    
+    .mensagem-erro-scanner p {
+        font-size: 0.85rem;
+    }
+    
+    /* Hospitais */
+    .hospital-list-container {
+        padding: 10px;
+        margin: 10px;
+    }
+    
+    .hospital-card img {
+        width: 100px;
+        height: 100px;
+    }
+    
+    /* ========== FOOTER MOBILE PEQUENO (480px) ========== */
+    footer {
+        padding: 18px 12px;
+        gap: 15px;
+    }
+    
+    .footer-logo {
+        gap: 8px;
+    }
+    
+    .footer-logo img {
+        width: 40px;
+        height: 40px;
+    }
+    
+    footer h1 {
+        font-size: 18px;
+    }
+    
+    footer p {
+        font-size: 10px;
+        padding: 0 8px;
+        line-height: 1.3;
+    }
+    
+    .lojas {
+        gap: 8px;
+        padding: 6px 0;
+    }
+    
+    .lojas img {
+        width: 105px;
+        height: 32px;
+    }
+    
+    /* Tabelas */
+    .tabela-historico {
+        min-width: 500px;
+        font-size: 0.8rem;
+    }
+    
+    .tabela-historico th,
+    .tabela-historico td {
+        padding: 8px 6px;
+    }
+    
+    /* QR Code */
+    .qr-code-card {
+        padding: 15px 10px;
+        margin: 10px 5px;
+    }
+    
+    .qr-code-header h3 {
+        font-size: 1rem;
+    }
+    
+    .qr-code-description {
+        font-size: 0.8rem;
+        padding: 0 3px;
+    }
+    
+    .qr-code-warning {
+        padding: 10px;
+    }
+    
+    .qr-code-warning p {
+        font-size: 0.8rem;
+    }
+    
+    .qr-code-warning ul {
+        font-size: 0.75rem;
+        padding-left: 16px;
+    }
+    
+    .url-input {
+        padding: 9px;
+        font-size: 14px;
+    }
+    
+    .btn-atualizar-url {
+        padding: 9px;
+        font-size: 0.9rem;
+    }
+    
+    .qr-code-container {
+        padding: 10px;
+    }
+    
+    #qrcode {
+        max-width: 180px;
+    }
+    
+    .btn-download-qr,
+    .btn-print-qr {
+        padding: 11px;
+        font-size: 0.9rem;
+    }
+    
+    .qr-code-info {
+        font-size: 0.8rem;
+    }
+    
+    .qr-code-url-display {
+        font-size: 0.7rem;
+        padding: 6px;
+    }
+}
+
+/* ======= RESPONSIVIDADE PARA ORIENTAÇÃO LANDSCAPE EM MOBILE ======= */
+@media (max-width: 768px) and (orientation: landscape) {
+    .opcoes {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .link-card {
+        flex: 1 1 calc(50% - 20px);
+        max-width: calc(50% - 20px);
+    }
+    
+    .scanner-container {
+        min-height: auto;
+        padding: 1rem;
+    }
+    
+    .scanner-frame {
+        max-width: 250px;
+        height: 250px;
+    }
+}
+
+/* ======= MELHORIAS DE ACESSIBILIDADE E TOUCH ======= */
+@media (max-width: 768px) {
+    /* Áreas de toque maiores */
+    a, button, .carousel-control, .carousel-indicators span {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* Melhor espaçamento para toque */
+    .menu a {
+        padding: 8px 10px;
+    }
+    
+    /* Scroll suave */
+    * {
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Prevenir zoom em inputs (exceto iOS que precisa de 16px) */
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="number"],
+    input[type="password"],
+    input[type="date"],
+    select,
+    textarea {
+        font-size: 16px;
+    }
+    
+    /* Melhor contraste e legibilidade */
+    body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* Espaçamento consistente */
+    main {
+        padding-bottom: 20px;
+    }
+    
+    /* Melhor uso do espaço vertical */
+    section {
+        margin: 0;
+        padding: 0;
+    }
+    
+    /* Cards com melhor espaçamento */
+    .card,
+    .card-ficha,
+    .card-dependente {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Links e botões mais visíveis */
+    a, button {
+        -webkit-tap-highlight-color: rgba(76, 169, 199, 0.2);
+    }
+    
+    /* Tabelas com scroll melhorado */
+    .tabela-wrapper {
+        position: relative;
+    }
+    
+    .tabela-wrapper::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 20px;
+        background: linear-gradient(to right, transparent, rgba(243, 243, 243, 0.8));
+        pointer-events: none;
+    }
+}
+
+/* ======= AJUSTES ESPECÍFICOS PARA MOBILE PEQUENO ======= */
+@media (max-width: 480px) {
+    /* Melhor uso do espaço */
+    main {
+        padding-bottom: 15px;
+    }
+    
+    /* Reduzir margens desnecessárias */
+    .ficha-medica,
+    .form-container,
+    .scanner-wrapper,
+    .hospital-list-container {
+        margin-left: 0;
+        margin-right: 0;
+    }
+    
+    /* Texto mais legível */
+    p, span, div {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    
+    /* Inputs full width */
+    input, select, textarea {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    /* Botões sempre full width em mobile pequeno */
+    button, .btn-submit, .btn-next, .btn-prev,
+    .btn-editar-perfil, .btn-voltar-perfil,
+    .btn-cadastrar-perfil, .btn-scanner {
+        width: 100% !important;
     }
 }
