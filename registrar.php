@@ -49,7 +49,7 @@
             }
             ?>
             
-            <form action="registrar_process.php" method="post" id="formRegistro">
+            <form action="registrar_process.php" method="post" id="formRegistro" enctype="multipart/form-data">
                 <label for="nome">NOME COMPLETO</label>
                 <input type="text" id="nome" name="nome" required placeholder="Digite seu nome completo" value="<?php echo isset($_SESSION['dados_form']['nome']) ? htmlspecialchars($_SESSION['dados_form']['nome']) : ''; ?>">
 
@@ -90,18 +90,37 @@
                     <input type="text" id="coren" name="coren" placeholder="Digite seu COREN" value="<?php echo isset($_SESSION['dados_form']['coren']) ? htmlspecialchars($_SESSION['dados_form']['coren']) : ''; ?>">
                 </div>
 
+                <div id="campo_validacao" class="registro-kyc-box" style="display: none;">
+                    <div class="registro-kyc-box-header">
+                        <span class="registro-kyc-box-icon" aria-hidden="true">🪪</span>
+                        <div>
+                            <p class="registro-kyc-box-titulo">Validação de identidade (documento + selfie)</p>
+                            <p class="registro-kyc-box-texto">Obrigatório para médicos e enfermeiros. Fluxo semelhante a bancos e cadastros oficiais: após o cadastro, um administrador aprova antes de liberar o acesso completo.</p>
+                        </div>
+                    </div>
+                    <label for="foto_documento">Foto do documento (CRM/COREN ou RG com registro)</label>
+                    <input type="file" id="foto_documento" name="foto_documento" accept="image/*">
+                    <p class="registro-kyc-hint">Documento aberto, legível e sem reflexo forte.</p>
+                    <label for="foto_selfie">Selfie segurando o mesmo documento</label>
+                    <input type="file" id="foto_selfie" name="foto_selfie" accept="image/*">
+                    <p class="registro-kyc-hint">Rosto e documento visíveis na mesma foto.</p>
+                </div>
+
                 <input type="submit" value="CRIAR CONTA">
             </form>
 
             <script>
-                // Mostrar/ocultar campos CRM e COREN conforme o tipo selecionado
+                // Mostrar/ocultar campos CRM, COREN e validação conforme o tipo selecionado
                 document.querySelectorAll('input[name="tipo"]').forEach(radio => {
                     radio.addEventListener('change', function() {
                         const tipo = this.value;
                         const campoCRM = document.getElementById('campo_crm');
                         const campoCOREN = document.getElementById('campo_coren');
+                        const campoValidacao = document.getElementById('campo_validacao');
                         const inputCRM = document.getElementById('crm');
                         const inputCOREN = document.getElementById('coren');
+                        const inputDoc = document.getElementById('foto_documento');
+                        const inputSelfie = document.getElementById('foto_selfie');
 
                         if (tipo === 'medico') {
                             campoCRM.style.display = 'block';
@@ -109,12 +128,18 @@
                             campoCOREN.style.display = 'none';
                             inputCOREN.required = false;
                             inputCOREN.value = '';
+                            campoValidacao.style.display = 'block';
+                            inputDoc.required = true;
+                            inputSelfie.required = true;
                         } else if (tipo === 'enfermeiro') {
                             campoCOREN.style.display = 'block';
                             inputCOREN.required = true;
                             campoCRM.style.display = 'none';
                             inputCRM.required = false;
                             inputCRM.value = '';
+                            campoValidacao.style.display = 'block';
+                            inputDoc.required = true;
+                            inputSelfie.required = true;
                         } else {
                             campoCRM.style.display = 'none';
                             inputCRM.required = false;
@@ -122,11 +147,16 @@
                             campoCOREN.style.display = 'none';
                             inputCOREN.required = false;
                             inputCOREN.value = '';
+                            campoValidacao.style.display = 'none';
+                            inputDoc.required = false;
+                            inputSelfie.required = false;
+                            inputDoc.value = '';
+                            inputSelfie.value = '';
                         }
                     });
                 });
 
-                // Verificar tipo selecionado ao carregar a página
+                // Verificar tipo selecionado ao carregar a página (mostra CRM/COREN e validação se médico/enfermeiro)
                 document.addEventListener('DOMContentLoaded', function() {
                     const tipoSelecionado = document.querySelector('input[name="tipo"]:checked');
                     if (tipoSelecionado) {

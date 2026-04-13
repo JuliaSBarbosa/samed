@@ -77,10 +77,31 @@ if ($tipo === 'enfermeiro') {
     }
 }
 
+// Validação por foto para médico e enfermeiro (obrigatório no registro)
+$foto_documento_nome = null;
+$foto_selfie_nome = null;
+if (in_array($tipo, ['medico', 'enfermeiro'])) {
+    if (empty($_FILES['foto_documento']['name']) || $_FILES['foto_documento']['error'] !== UPLOAD_ERR_OK) {
+        $erros[] = "Envie a foto do documento profissional (CRM/COREN ou RG com registro).";
+    }
+    if (empty($_FILES['foto_selfie']['name']) || $_FILES['foto_selfie']['error'] !== UPLOAD_ERR_OK) {
+        $erros[] = "Envie a selfie segurando o documento.";
+    }
+}
+
 // Se houver erros, redirecionar de volta
 if (!empty($erros)) {
     $_SESSION['erros'] = $erros;
     $_SESSION['dados_form'] = $_POST; // Para manter os dados preenchidos
+    header('Location: registrar.php');
+    exit;
+}
+
+if ($pdo === null) {
+    $_SESSION['erros'] = [
+        "Não foi possível conectar ao banco de dados. Verifique se o MySQL está ligado no XAMPP e se o banco \"samed\" existe. Confira também o arquivo config.php (host, usuário e senha)."
+    ];
+    $_SESSION['dados_form'] = $_POST;
     header('Location: registrar.php');
     exit;
 }
@@ -120,14 +141,51 @@ try {
     // Hash da senha
     $senha_hash = password_hash($password, PASSWORD_DEFAULT);
 
-    // Inserir novo usuário
-    $stmt = $pdo->prepare("INSERT INTO usuarios (nome, email, senha, tipo, crm, coren) VALUES (?, ?, ?, ?, ?, ?)");
+    // Definir status de validação inicial
+    $status_validacao = in_array($tipo, ['medico', 'enfermeiro']) ? 'pendente' : 'aprovado';
+
+    // Salvar fotos de validação para médico/enfermeiro
+    $pasta_upload = __DIR__ . '/uploads/fotos/';
+    if (!is_dir($pasta_upload)) {
+        mkdir($pasta_upload, 0775, true);
+    }
+    $permitidas = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    if (in_array($tipo, ['medico', 'enfermeiro'])) {
+        foreach (['foto_documento' => 'doc_reg', 'foto_selfie' => 'selfie_reg'] as $key => $prefixo) {
+            $arq = $_FILES[$key] ?? null;
+            if ($arq && $arq['error'] === UPLOAD_ERR_OK) {
+                $ext = strtolower(pathinfo($arq['name'], PATHINFO_EXTENSION));
+                if (!in_array($ext, $permitidas)) {
+                    $_SESSION['erros'] = ["Formato inválido em \"$key\". Use JPG, PNG, GIF ou WEBP."];
+                    $_SESSION['dados_form'] = $_POST;
+                    header('Location: registrar.php');
+                    exit;
+                }
+                $nome_arquivo = $prefixo . '_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+                if (!move_uploaded_file($arq['tmp_name'], $pasta_upload . $nome_arquivo)) {
+                    $_SESSION['erros'] = ["Erro ao salvar o arquivo de $key."];
+                    $_SESSION['dados_form'] = $_POST;
+                    header('Location: registrar.php');
+                    exit;
+                }
+                if ($key === 'foto_documento') $foto_documento_nome = $nome_arquivo;
+                else $foto_selfie_nome = $nome_arquivo;
+            }
+        }
+    }
+
+    // Inserir novo usuário (com fotos de validação quando for médico/enfermeiro)
+    $stmt = $pdo->prepare("INSERT INTO usuarios (nome, email, senha, tipo, crm, coren, status_validacao, foto_documento, foto_selfie) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $crm_value = ($tipo === 'medico') ? $crm : null;
     $coren_value = ($tipo === 'enfermeiro') ? $coren : null;
-    $stmt->execute([$nome, $email, $senha_hash, $tipo, $crm_value, $coren_value]);
+    $stmt->execute([$nome, $email, $senha_hash, $tipo, $crm_value, $coren_value, $status_validacao, $foto_documento_nome, $foto_selfie_nome]);
 
-    // Sucesso - redirecionar para login
-    $_SESSION['sucesso'] = "Cadastro realizado com sucesso! Faça login para continuar.";
+    // Sucesso - redirecionar para login (mensagem diferente para profissionais em validação)
+    if (in_array($tipo, ['medico', 'enfermeiro'])) {
+        $_SESSION['sucesso_profissional_kyc'] = true;
+    } else {
+        $_SESSION['sucesso'] = "Cadastro realizado com sucesso! Faça login para continuar.";
+    }
     header('Location: login.php');
     exit;
 

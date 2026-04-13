@@ -49,10 +49,24 @@ session_start();
     </form>
     
     <?php
-    // Exibir mensagens de erro de login
     if (isset($_SESSION['erro_login'])) {
         echo '<div class="mensagem-erro">' . htmlspecialchars($_SESSION['erro_login']) . '</div>';
         unset($_SESSION['erro_login']);
+    }
+    if (!empty($_SESSION['sucesso_profissional_kyc'])) {
+        unset($_SESSION['sucesso_profissional_kyc']);
+        ?>
+        <div class="login-kyc-sucesso">
+            <div class="login-kyc-sucesso-icon" aria-hidden="true">✓</div>
+            <h3 class="login-kyc-sucesso-titulo">Cadastro recebido</h3>
+            <p class="login-kyc-sucesso-texto">Suas fotos de validação foram enviadas. O próximo passo é igual ao de bancos e portais do governo: um <strong>administrador</strong> confere documento e selfie antes de liberar o acesso.</p>
+            <ul class="login-kyc-passos">
+                <li><span>1</span> Faça login com o e-mail e a senha que você cadastrou.</li>
+                <li><span>2</span> Você verá a área de acompanhamento até a aprovação.</li>
+                <li><span>3</span> Quando for aprovado, o sistema libera o painel completo automaticamente.</li>
+            </ul>
+        </div>
+        <?php
     }
     if (isset($_SESSION['sucesso'])) {
         echo '<div class="mensagem-sucesso">' . htmlspecialchars($_SESSION['sucesso']) . '</div>';

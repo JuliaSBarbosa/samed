@@ -28,3 +28,10 @@ Thumbs.db
 *.tmp
 *.temp
 
+# Fotos de perfil / KYC (documento, selfie) — não versionar
+uploads/fotos/*
+!uploads/fotos/.gitkeep
+
+# Script único para criar admin localmente — não versionar (risco se ficar em produção)
+criar_admin.php
+

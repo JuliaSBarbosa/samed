@@ -1506,6 +1506,520 @@ main.hero::before {
     text-decoration: underline;
 }
 
+/* ======= VALIDAÇÃO PROFISSIONAL (médico/enfermeiro) ======= */
+.pagina-validacao main,
+.pagina-admin main {
+    align-items: flex-start;
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+.validacao-status-box {
+    background: #f0f8fc;
+    border-left: 4px solid #4ca9c7;
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    color: #244357;
+}
+
+.validacao-status-box strong { color: #244357; }
+.validacao-status-box .status-aprovado { color: #2e7d32; font-weight: 700; }
+.validacao-status-box .status-reprovado { color: #c62828; font-weight: 700; }
+.validacao-status-box .status-pendente { color: #e65100; font-weight: 700; }
+.validacao-status-box p:last-child { margin-bottom: 0; font-size: 0.9rem; color: #555; }
+
+.registro-container input[type="file"] {
+    width: 100%;
+    padding: 10px 12px;
+    margin: 8px 0 14px;
+    border: 2px solid #d7eaf1;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 0.95rem;
+    color: #244357;
+}
+
+.registro-container .validacao-obs {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 4px;
+    margin-bottom: 16px;
+}
+
+/* ======= PAINEL ADMIN - VALIDAÇÕES (padrão do site) ======= */
+.admin-intro {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 24px;
+    line-height: 1.5;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.admin-table-wrapper {
+    overflow-x: auto;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    background: #fff;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    color: #244357;
+}
+
+.admin-table thead {
+    background: #e8f4f8;
+}
+
+.admin-table th {
+    padding: 14px 16px;
+    text-align: left;
+    font-weight: 700;
+    border-bottom: 2px solid #4ca9c7;
+    white-space: nowrap;
+    color: #244357;
+}
+
+.admin-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+.admin-table tbody tr:hover {
+    background: #f8fbfc;
+}
+
+.admin-table .admin-email { display: block; font-size: 0.8rem; color: #777; margin-top: 2px; }
+.admin-table .admin-td-center { text-align: center; }
+.admin-table .admin-td-uppercase { text-transform: uppercase; }
+
+.admin-badge { font-weight: 600; padding: 4px 8px; border-radius: 6px; font-size: 0.85rem; }
+.admin-badge-ok { background: #e8f5e9; color: #2e7d32; }
+.admin-badge-erro { background: #ffebee; color: #c62828; }
+.admin-badge-pendente { background: #fff3e0; color: #e65100; }
+.admin-data { display: block; font-size: 0.75rem; color: #777; margin-top: 4px; }
+
+.admin-link {
+    color: #4ca9c7;
+    text-decoration: none;
+    font-weight: 600;
+}
+.admin-link:hover { text-decoration: underline; }
+
+/* Coluna de ações: encolher à largura do conteúdo (evita “espaço vazio” entre botões) */
+.admin-table th:last-child,
+.admin-table td.admin-td-acoes {
+    width: 1%;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.admin-td-acoes {
+    text-align: left;
+}
+
+/* Wrapper dentro da célula: flex em <td> quebra layout de tabela em alguns navegadores */
+.admin-acoes-inline {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+/* Qualquer form dentro da tabela admin: não herdar .form-container form (900px) */
+.form-container .admin-table-wrapper form {
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent;
+    box-shadow: none;
+    display: inline-block;
+}
+
+.admin-form-btn {
+    display: inline-block;
+    margin: 0;
+    margin-bottom: 0;
+}
+
+.admin-btn.aprovar {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+}
+.admin-btn.reprovar {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    background: #666;
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.admin-btn.reprovar:hover { background: #555; }
+
+/* ======= LOGIN — mensagem pós-cadastro profissional (KYC) ======= */
+.login-kyc-sucesso {
+    background: linear-gradient(135deg, #e8f6fa 0%, #f0f9fc 100%);
+    border: 1px solid #b8dce8;
+    border-radius: 12px;
+    padding: 20px 22px;
+    margin-bottom: 20px;
+    text-align: left;
+    color: #244357;
+}
+.login-kyc-sucesso-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #4ca9c7;
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+.login-kyc-sucesso-titulo {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+    color: #244357;
+}
+.login-kyc-sucesso-texto {
+    font-size: 0.9rem;
+    line-height: 1.55;
+    margin: 0 0 14px 0;
+    color: #444;
+}
+.login-kyc-passos {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: #333;
+}
+.login-kyc-passos li {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+.login-kyc-passos li span {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #4ca9c7;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ======= REGISTRO — bloco KYC ======= */
+.registro-kyc-box {
+    margin-top: 16px;
+    padding: 18px;
+    background: linear-gradient(135deg, #f5fbfd 0%, #eef6f9 100%);
+    border-radius: 12px;
+    border: 1px solid #c5e4ed;
+    border-left: 4px solid #4ca9c7;
+}
+.registro-kyc-box-header {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 16px;
+    align-items: flex-start;
+}
+.registro-kyc-box-icon {
+    font-size: 1.75rem;
+    line-height: 1;
+}
+.registro-kyc-box-titulo {
+    font-weight: 700;
+    margin: 0 0 6px 0;
+    color: #244357;
+    font-size: 1rem;
+}
+.registro-kyc-box-texto {
+    font-size: 0.88rem;
+    color: #555;
+    margin: 0;
+    line-height: 1.5;
+}
+.registro-kyc-hint {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 4px;
+    margin-bottom: 12px;
+}
+
+/* ======= TELA VALIDAÇÃO KYC (médico/enfermeiro) ======= */
+.validacao-kyc-body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+.validacao-kyc-nav {
+    color: #4ca9c7;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+.validacao-kyc-main {
+    flex: 1;
+    max-width: 720px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 28px 20px 48px;
+    box-sizing: border-box;
+}
+.validacao-kyc-msg-top {
+    margin-bottom: 16px;
+}
+.validacao-kyc-flash {
+    background: #fff8e6;
+    border: 1px solid #ffe0a3;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 22px;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: #5c4a1a;
+}
+.validacao-kyc-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(36, 67, 87, 0.1);
+    padding: 28px 26px;
+    margin-bottom: 20px;
+    border: 1px solid #e8eef1;
+}
+.validacao-kyc-card--ok {
+    text-align: center;
+    border-color: #b8e0c8;
+    background: linear-gradient(180deg, #f4fcf6 0%, #fff 45%);
+}
+.validacao-kyc-card--alert {
+    border-color: #f5c6c6;
+    background: linear-gradient(180deg, #fff8f8 0%, #fff 50%);
+}
+.validacao-kyc-card--form {
+    padding-top: 22px;
+}
+.validacao-kyc-card-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: #2e7d32;
+    color: #fff;
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.validacao-kyc-h2 {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #244357;
+    margin: 0 0 12px 0;
+    text-align: center;
+}
+.validacao-kyc-card--ok .validacao-kyc-h2 { margin-top: 0; }
+.validacao-kyc-lead {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #444;
+    margin: 0 0 18px 0;
+    text-align: center;
+}
+.validacao-kyc-card--ok .validacao-kyc-lead { max-width: 420px; margin-left: auto; margin-right: auto; }
+.validacao-kyc-cta {
+    display: inline-flex;
+    margin-top: 8px;
+}
+.validacao-kyc-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 14px;
+}
+.validacao-kyc-badge--pendente {
+    background: #fff3e0;
+    color: #e65100;
+}
+.validacao-kyc-badge--erro {
+    background: #ffebee;
+    color: #c62828;
+}
+.validacao-kyc-timeline {
+    list-style: none;
+    padding: 0;
+    margin: 22px 0 0 0;
+    position: relative;
+}
+.validacao-kyc-timeline-item {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 18px;
+    align-items: flex-start;
+    opacity: 0.55;
+}
+.validacao-kyc-timeline-item--done,
+.validacao-kyc-timeline-item--active {
+    opacity: 1;
+}
+.validacao-kyc-step-num {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #e8eef1;
+    color: #244357;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+}
+.validacao-kyc-timeline-item--done .validacao-kyc-step-num {
+    background: #4ca9c7;
+    color: #fff;
+}
+.validacao-kyc-timeline-item--active .validacao-kyc-step-num {
+    background: #244357;
+    color: #fff;
+    box-shadow: 0 0 0 4px rgba(76, 169, 199, 0.35);
+}
+.validacao-kyc-timeline-item strong {
+    display: block;
+    color: #244357;
+    font-size: 0.95rem;
+    margin-bottom: 2px;
+}
+.validacao-kyc-timeline-item span {
+    font-size: 0.85rem;
+    color: #666;
+    line-height: 1.45;
+}
+.validacao-kyc-dica {
+    font-size: 0.85rem;
+    color: #666;
+    line-height: 1.55;
+    margin: 20px 0 0 0;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
+}
+.validacao-kyc-details {
+    margin-top: 18px;
+    border-top: 1px dashed #ccc;
+    padding-top: 14px;
+}
+.validacao-kyc-details summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: #4ca9c7;
+    font-size: 0.9rem;
+}
+.validacao-kyc-details summary:hover {
+    text-decoration: underline;
+}
+.validacao-kyc-details[open] summary {
+    margin-bottom: 14px;
+}
+.validacao-kyc-form label {
+    display: block;
+    font-weight: 700;
+    color: #244357;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+}
+.validacao-kyc-form input[type="file"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #d7eaf1;
+    border-radius: 8px;
+    box-sizing: border-box;
+    margin-bottom: 4px;
+}
+.validacao-kyc-form input[type="submit"] {
+    width: 100%;
+    margin-top: 18px;
+    padding: 12px;
+    background: #4ca9c7;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background 0.2s;
+}
+.validacao-kyc-form input[type="submit"]:hover {
+    background: #3a8ba8;
+}
+.validacao-kyc-hint {
+    font-size: 0.8rem;
+    color: #666;
+    margin: 0 0 8px 0;
+}
+
+@media (max-width: 600px) {
+    .validacao-kyc-main { padding: 18px 14px 36px; }
+    .validacao-kyc-card { padding: 20px 16px; }
+}
+
+/* ======= ADMIN — painel resumo ======= */
+.admin-painel-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    justify-content: center;
+    margin: 0 auto 24px;
+    max-width: 900px;
+}
+.admin-stat-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px 22px;
+    min-width: 140px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    border: 1px solid #e8eef1;
+}
+.admin-stat-num {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #4ca9c7;
+    line-height: 1.2;
+}
+.admin-stat-label {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 4px;
+}
+
 /* ESTILO TELA DEPENDENTES */
 .dependentes {
     text-align: center;

@@ -62,12 +62,13 @@ if ($usuario_encontrado) {
 if ($pdo !== null) {
     try {
         // Buscar usuário pelo email no banco de dados
-        $stmt = $pdo->prepare("SELECT id, nome, email, senha, tipo, crm, coren FROM usuarios WHERE email = ?");
+        $stmt = $pdo->prepare("SELECT id, nome, email, senha, tipo, crm, coren, status_validacao FROM usuarios WHERE email = ?");
         $stmt->execute([$email]);
         $usuario = $stmt->fetch();
 
         // Verificar se usuário existe e senha está correta
         if ($usuario && password_verify($password, $usuario['senha'])) {
+            $tipo = strtolower($usuario['tipo'] ?? '');
             // Login bem-sucedido - criar sessão
             $_SESSION['usuario_id'] = $usuario['id'];
             $_SESSION['usuario_nome'] = $usuario['nome'];
@@ -75,6 +76,7 @@ if ($pdo !== null) {
             $_SESSION['usuario_tipo'] = $usuario['tipo'];
             $_SESSION['usuario_crm'] = $usuario['crm'] ?? null;
             $_SESSION['usuario_coren'] = $usuario['coren'] ?? null;
+            $_SESSION['status_validacao'] = $usuario['status_validacao'] ?? 'aprovado';
             $_SESSION['logado'] = true;
 
             // Limpar mensagens de cadastro após primeiro login
@@ -82,8 +84,20 @@ if ($pdo !== null) {
                 unset($_SESSION['sucesso']);
             }
 
-            // Redirecionar para página inicial
-            header('Location: index.php');
+            // Se for administrador, ir direto para painel de validações
+            if ($tipo === 'admin') {
+                header('Location: admin_validacoes.php');
+                exit;
+            }
+
+            // Médico/enfermeiro sem aprovação: área de acompanhamento (validação facial/documental)
+            if (in_array($tipo, ['medico', 'enfermeiro']) && ($_SESSION['status_validacao'] ?? '') !== 'aprovado') {
+                $_SESSION['flash_validacao_info'] = true;
+                header('Location: validacao_pendente.php');
+            } else {
+                // Redirecionar para página inicial
+                header('Location: index.php');
+            }
             exit;
         }
     } catch(PDOException $e) {

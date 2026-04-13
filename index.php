@@ -1,4 +1,14 @@
-<?php require_once 'verificar_login.php'; ?>
+<?php 
+require_once 'verificar_login.php'; 
+$tipo_usuario = $_SESSION['usuario_tipo'] ?? '';
+$tipo_usuario_lower = strtolower($tipo_usuario);
+
+// Se for administrador, redirecionar direto para o painel de validações
+if ($tipo_usuario_lower === 'admin') {
+    header('Location: admin_validacoes.php');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -54,10 +64,10 @@
         <?php
         // Limpar mensagens de cadastro/login que não devem aparecer na página inicial após primeiro acesso
         if (isset($_SESSION['sucesso']) && strpos($_SESSION['sucesso'], 'cadastro realizado') !== false) {
-            // Se já fez login, não mostrar mais a mensagem de cadastro
             unset($_SESSION['sucesso']);
         }
         ?>
+
         <h2 class="titulo">OLÁ, <?php echo strtoupper(htmlspecialchars($_SESSION['usuario_nome'])); ?>!</h2>
 
         <div class="opcoes">
