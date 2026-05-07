@@ -1,0 +1,33 @@
+SAMED — ordem para o grupo importar no MySQL (phpMyAdmin ou cliente SQL)
+========================================================================
+
+Banco: samed (ajustem o USE nos arquivos se o nome for outro.)
+
+CAMINHO A — Banco que JÁ EXISTE (só atualizar)
+---------------------------------------------------------------------------
+Importar / executar NESTA ORDEM:
+
+  1) docs/sql_adicionar_tipo_admin.sql
+     → Só se a coluna "tipo" for ENUM e NÃO tiver o valor 'admin'.
+     → Se "tipo" for VARCHAR, PULE este arquivo.
+
+  2) docs/sql_validacao_profissionais.sql
+     → Adiciona colunas de validação KYC em "usuarios".
+     → Se já rodaram antes, pode dar erro de coluna duplicada — aí pule.
+
+  3) docs/sql_inserir_admin_padrao.sql
+     → Cria o admin admin@samed.com / Admin@123 (se esse e-mail ainda não existir).
+
+  4) docs/sql_denuncias_acessos.sql
+     → Cria a tabela denuncias_acessos (denúncias do paciente sobre acessos à ficha).
+     → Se já tiver rodado, pode dar erro de tabela existente — ignorar.
+
+CAMINHO B — Banco do ZERO (apaga dados das tabelas principais)
+---------------------------------------------------------------------------
+  1) docs/sql_schema_samed_completo.sql
+     → Recria tabelas; já inclui colunas de validação, tipo VARCHAR e a tabela denuncias_acessos.
+
+  2) docs/sql_inserir_admin_padrao.sql
+     → Admin padrão (não precisa do sql_adicionar_tipo_admin nem do sql_validacao.)
+
+Observação: pasta uploads/fotos/ no servidor precisa existir e permitir escrita.

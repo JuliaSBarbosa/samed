@@ -11,26 +11,67 @@ if ($pdo && $usuario_id) {
         // Buscar acessos ao próprio paciente e seus dependentes
         // Inclui tanto profissionais quanto pacientes comuns que visualizaram
         // IMPORTANTE: Busca tanto acessos diretos ao paciente quanto aos seus dependentes
-        $stmt = $pdo->prepare("
-            SELECT 
-                ha.*,
-                u_prof.nome as nome_profissional,
-                u_prof.tipo as tipo_profissional,
-                u_prof.crm,
-                u_prof.coren,
-                u_pac.nome as nome_paciente,
-                d.nome as nome_dependente,
-                d.paciente_id as dependente_paciente_id,
-                ha.registro_profissional,
-                ha.tipo_acesso
-            FROM historico_acessos ha
-            INNER JOIN usuarios u_prof ON ha.profissional_id = u_prof.id
-            LEFT JOIN usuarios u_pac ON ha.paciente_id = u_pac.id
-            LEFT JOIN dependentes d ON ha.dependente_id = d.id
-            WHERE (ha.paciente_id = ? OR (ha.dependente_id IS NOT NULL AND d.paciente_id = ?))
-            ORDER BY ha.data_hora DESC
-        ");
-        $stmt->execute([$usuario_id, $usuario_id]);
+        $tem_tabela_denuncias = false;
+        try {
+            $check = $pdo->query("SHOW TABLES LIKE 'denuncias_acessos'");
+            $tem_tabela_denuncias = $check && $check->fetch() !== false;
+        } catch (PDOException $e) {
+            $tem_tabela_denuncias = false;
+        }
+
+        if ($tem_tabela_denuncias) {
+            $stmt = $pdo->prepare("
+                SELECT 
+                    ha.id AS historico_id,
+                    ha.profissional_id,
+                    ha.paciente_id,
+                    ha.dependente_id,
+                    ha.data_hora,
+                    ha.registro_profissional,
+                    ha.tipo_acesso,
+                    u_prof.nome as nome_profissional,
+                    u_prof.tipo as tipo_profissional,
+                    u_prof.crm,
+                    u_prof.coren,
+                    u_pac.nome as nome_paciente,
+                    d.nome as nome_dependente,
+                    d.paciente_id as dependente_paciente_id,
+                    da.id AS denuncia_id,
+                    da.status AS denuncia_status,
+                    da.data_denuncia AS denuncia_data
+                FROM historico_acessos ha
+                INNER JOIN usuarios u_prof ON ha.profissional_id = u_prof.id
+                LEFT JOIN usuarios u_pac ON ha.paciente_id = u_pac.id
+                LEFT JOIN dependentes d ON ha.dependente_id = d.id
+                LEFT JOIN denuncias_acessos da
+                    ON da.historico_acesso_id = ha.id AND da.denunciante_id = ?
+                WHERE (ha.paciente_id = ? OR (ha.dependente_id IS NOT NULL AND d.paciente_id = ?))
+                ORDER BY ha.data_hora DESC
+            ");
+            $stmt->execute([$usuario_id, $usuario_id, $usuario_id]);
+        } else {
+            $stmt = $pdo->prepare("
+                SELECT 
+                    ha.id AS historico_id,
+                    ha.*,
+                    u_prof.nome as nome_profissional,
+                    u_prof.tipo as tipo_profissional,
+                    u_prof.crm,
+                    u_prof.coren,
+                    u_pac.nome as nome_paciente,
+                    d.nome as nome_dependente,
+                    d.paciente_id as dependente_paciente_id,
+                    ha.registro_profissional,
+                    ha.tipo_acesso
+                FROM historico_acessos ha
+                INNER JOIN usuarios u_prof ON ha.profissional_id = u_prof.id
+                LEFT JOIN usuarios u_pac ON ha.paciente_id = u_pac.id
+                LEFT JOIN dependentes d ON ha.dependente_id = d.id
+                WHERE (ha.paciente_id = ? OR (ha.dependente_id IS NOT NULL AND d.paciente_id = ?))
+                ORDER BY ha.data_hora DESC
+            ");
+            $stmt->execute([$usuario_id, $usuario_id]);
+        }
         $acessos = $stmt->fetchAll();
         
         foreach ($acessos as $acesso) {
@@ -65,11 +106,15 @@ if ($pdo && $usuario_id) {
             }
             
             $historico_acessos[] = [
+                'historico_id' => $acesso['historico_id'] ?? null,
                 'nome' => $acesso['nome_profissional'],
                 'registro' => $registro,
                 'data_hora' => $acesso['data_hora'],
                 'tipo' => $tipo_prof,
-                'paciente_consultado' => $paciente_nome
+                'paciente_consultado' => $paciente_nome,
+                'denuncia_id' => $acesso['denuncia_id'] ?? null,
+                'denuncia_status' => $acesso['denuncia_status'] ?? null,
+                'denuncia_data' => $acesso['denuncia_data'] ?? null
             ];
         }
     } catch(PDOException $e) {
@@ -254,6 +299,7 @@ $valor_fim = htmlspecialchars($data_fim ?? '');
                                 <th>Profissional</th>
                                 <th>Registro</th>
                                 <th>Tipo de Acesso</th>
+                                <th>Ação</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -311,6 +357,23 @@ $valor_fim = htmlspecialchars($data_fim ?? '');
                                             <?= $tipo_icon ?> <?= htmlspecialchars($acesso['tipo']); ?>
                                         </span>
                                     </td>
+                                    <td class="td-acao-denuncia">
+                                        <?php if (!empty($acesso['denuncia_id'])): ?>
+                                            <span class="badge-denunciado" title="Denunciado em <?= date('d/m/Y H:i', strtotime($acesso['denuncia_data'])) ?> — status: <?= htmlspecialchars($acesso['denuncia_status'] ?? 'pendente') ?>">
+                                                🚩 Denunciado
+                                            </span>
+                                        <?php elseif (!empty($acesso['historico_id'])): ?>
+                                            <button type="button" class="btn-denunciar"
+                                                data-historico-id="<?= (int) $acesso['historico_id'] ?>"
+                                                data-paciente="<?= htmlspecialchars($acesso['paciente_consultado']) ?>"
+                                                data-data="<?= date('d/m/Y H:i', strtotime($acesso['data_hora'])) ?>"
+                                                data-profissional="<?= htmlspecialchars($acesso['nome']) ?>">
+                                                🚩 Denunciar
+                                            </button>
+                                        <?php else: ?>
+                                            <span class="acao-indisponivel">—</span>
+                                        <?php endif; ?>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -329,6 +392,44 @@ $valor_fim = htmlspecialchars($data_fim ?? '');
 
         </section>
 
+        <!-- Modal de Denúncia -->
+        <div class="modal-denuncia" id="modalDenuncia" aria-hidden="true">
+            <div class="modal-denuncia-overlay" data-fechar-modal></div>
+            <div class="modal-denuncia-card" role="dialog" aria-modal="true" aria-labelledby="modalDenunciaTitulo">
+                <div class="modal-denuncia-header">
+                    <h3 id="modalDenunciaTitulo">🚩 Denunciar consulta</h3>
+                    <button type="button" class="modal-denuncia-fechar" data-fechar-modal aria-label="Fechar">×</button>
+                </div>
+                <form method="POST" action="denunciar_acesso.php" class="modal-denuncia-form" id="formDenuncia">
+                    <input type="hidden" name="historico_acesso_id" id="denunciaHistoricoId">
+
+                    <div class="modal-denuncia-info">
+                        <p><strong>Paciente:</strong> <span id="denunciaPaciente">—</span></p>
+                        <p><strong>Data:</strong> <span id="denunciaData">—</span></p>
+                        <p><strong>Profissional:</strong> <span id="denunciaProfissional">—</span></p>
+                    </div>
+
+                    <label for="denunciaMotivo">Motivo da denúncia *</label>
+                    <select name="motivo" id="denunciaMotivo" required>
+                        <option value="">Selecione um motivo</option>
+                        <option value="acesso_indevido">Acesso indevido / sem autorização</option>
+                        <option value="dados_incorretos">Dados incorretos no histórico</option>
+                        <option value="profissional_desconhecido">Não reconheço este profissional</option>
+                        <option value="outro">Outro</option>
+                    </select>
+
+                    <label for="denunciaDescricao">Descrição *</label>
+                    <textarea name="descricao" id="denunciaDescricao" rows="4" required minlength="10"
+                              placeholder="Descreva o que aconteceu (mínimo 10 caracteres)"></textarea>
+                    <small class="modal-denuncia-hint">Sua denúncia será analisada pela equipe SAMED. Não compartilharemos seu nome com o profissional.</small>
+
+                    <div class="modal-denuncia-acoes">
+                        <button type="button" class="btn-denuncia-cancelar" data-fechar-modal>Cancelar</button>
+                        <button type="submit" class="btn-denuncia-enviar">Enviar denúncia</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
     </main>
 
@@ -344,6 +445,48 @@ $valor_fim = htmlspecialchars($data_fim ?? '');
              <img src="img/googleplay.webp" alt="App Store">
         </div>
     </footer>
+
+    <script>
+        (function () {
+            var modal = document.getElementById('modalDenuncia');
+            if (!modal) return;
+            var inputId = document.getElementById('denunciaHistoricoId');
+            var elPac = document.getElementById('denunciaPaciente');
+            var elData = document.getElementById('denunciaData');
+            var elProf = document.getElementById('denunciaProfissional');
+            var form = document.getElementById('formDenuncia');
+
+            function abrir(btn) {
+                inputId.value = btn.getAttribute('data-historico-id') || '';
+                elPac.textContent = btn.getAttribute('data-paciente') || '—';
+                elData.textContent = btn.getAttribute('data-data') || '—';
+                elProf.textContent = btn.getAttribute('data-profissional') || '—';
+                if (form) form.reset();
+                inputId.value = btn.getAttribute('data-historico-id') || '';
+                modal.classList.add('aberto');
+                modal.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function fechar() {
+                modal.classList.remove('aberto');
+                modal.setAttribute('aria-hidden', 'true');
+                document.body.style.overflow = '';
+            }
+
+            document.querySelectorAll('.btn-denunciar').forEach(function (b) {
+                b.addEventListener('click', function () { abrir(b); });
+            });
+
+            modal.querySelectorAll('[data-fechar-modal]').forEach(function (el) {
+                el.addEventListener('click', fechar);
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && modal.classList.contains('aberto')) fechar();
+            });
+        })();
+    </script>
 </body>
 
 </html>

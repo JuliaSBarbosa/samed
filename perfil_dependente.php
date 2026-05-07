@@ -146,6 +146,10 @@ function formatarSexo($sexo) {
                                 <span class="btn-icon">✏️</span>
                                 <span>Editar Perfil</span>
                             </a>
+                            <button type="button" class="btn-vincular-pulseira" onclick="document.getElementById('modalPulseira').classList.add('aberto'); document.body.style.overflow='hidden';">
+                                <span class="btn-icon">📿</span>
+                                <span>Vincular Pulseira</span>
+                            </button>
                             <a href="dependentes.php" class="btn-voltar-perfil">
                                 <span class="btn-icon">←</span>
                                 <span>Voltar</span>
@@ -295,6 +299,27 @@ function formatarSexo($sexo) {
             </div>
             <?php endif; ?>
         </section>
+
+        <!-- Modal Vincular Pulseira -->
+        <div class="modal-pulseira" id="modalPulseira" aria-hidden="true">
+            <div class="modal-pulseira-overlay" onclick="document.getElementById('modalPulseira').classList.remove('aberto'); document.body.style.overflow='';"></div>
+            <div class="modal-pulseira-card" role="dialog" aria-modal="true" aria-labelledby="modalPulseiraTitulo">
+                <div class="modal-pulseira-header">
+                    <h3 id="modalPulseiraTitulo">📿 Vincular pulseira de <?= htmlspecialchars($dependente['nome'] ?? 'Dependente') ?></h3>
+                    <button type="button" class="modal-pulseira-fechar" aria-label="Fechar"
+                        onclick="document.getElementById('modalPulseira').classList.remove('aberto'); document.body.style.overflow='';">×</button>
+                </div>
+                <div class="modal-pulseira-body">
+                    <div class="modal-pulseira-icon">📿</div>
+                    <p><strong>Aproxime a pulseira NFC do dependente</strong> no leitor para gravar os dados da ficha médica e permitir leitura em emergências.</p>
+                    <p class="modal-pulseira-aviso">Funcionalidade em desenvolvimento — em breve a gravação será feita diretamente pelo aplicativo.</p>
+                </div>
+                <div class="modal-pulseira-acoes">
+                    <button type="button" class="btn-pulseira-fechar"
+                        onclick="document.getElementById('modalPulseira').classList.remove('aberto'); document.body.style.overflow='';">Fechar</button>
+                </div>
+            </div>
+        </div>
     </main>
 
     <!-- Rodapé -->

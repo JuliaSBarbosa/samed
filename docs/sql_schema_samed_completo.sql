@@ -17,6 +17,7 @@ USE `samed`;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
+DROP TABLE IF EXISTS `denuncias_acessos`;
 DROP TABLE IF EXISTS `historico_acessos`;
 DROP TABLE IF EXISTS `contatos_emergencia`;
 DROP TABLE IF EXISTS `perfis_medicos`;
@@ -131,6 +132,24 @@ CREATE TABLE `historico_acessos` (
   CONSTRAINT `fk_hist_prof` FOREIGN KEY (`profissional_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_hist_pac` FOREIGN KEY (`paciente_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_hist_dep` FOREIGN KEY (`dependente_id`) REFERENCES `dependentes` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -----------------------------------------------------------------------------
+-- denuncias_acessos (paciente denuncia acesso indevido à sua ficha / do dependente)
+-- -----------------------------------------------------------------------------
+CREATE TABLE `denuncias_acessos` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `historico_acesso_id` int(11) NOT NULL,
+  `denunciante_id` int(11) NOT NULL,
+  `motivo` varchar(64) NOT NULL,
+  `descricao` text NOT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'pendente',
+  `data_denuncia` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `historico_acesso_id` (`historico_acesso_id`),
+  KEY `denunciante_id` (`denunciante_id`),
+  CONSTRAINT `fk_denuncia_historico` FOREIGN KEY (`historico_acesso_id`) REFERENCES `historico_acessos` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_denuncia_user` FOREIGN KEY (`denunciante_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =============================================================================
