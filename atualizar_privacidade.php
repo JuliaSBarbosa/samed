@@ -16,7 +16,6 @@ if (!$usuario_id || !$pdo) {
 }
 
 try {
-    $compartilhar_localizacao = isset($_POST['compartilhar_localizacao']) && $_POST['compartilhar_localizacao'] === 'sim' ? 'sim' : 'nao';
     $autorizacao_usuario = isset($_POST['autorizacao_usuario']) && $_POST['autorizacao_usuario'] === 'sim' ? 'sim' : 'nao';
     
     // Verificar se existe perfil médico
@@ -32,11 +31,6 @@ try {
         
         $set_parts = [];
         $valores = [];
-        
-        if (in_array('compartilhar_localizacao', $colunas)) {
-            $set_parts[] = 'compartilhar_localizacao = ?';
-            $valores[] = $compartilhar_localizacao;
-        }
         
         if (in_array('autorizacao_usuario', $colunas)) {
             $set_parts[] = 'autorizacao_usuario = ?';

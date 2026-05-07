@@ -572,13 +572,6 @@ if (isset($_SESSION['dados_form'])) {
             <div class="form-step" id="step5" data-step="5">
                 <h2>CONFIGURAÇÕES DE PRIVACIDADE</h2> <br>
 
-                <label for="compartilhar_localizacao">Autoriza o compartilhamento da localização?</label>
-                <select id="compartilhar_localizacao" name="compartilhar_localizacao" required>
-                    <option value="">Selecione</option>
-                    <option value="sim">Sim, autorizo</option>
-                    <option value="nao">Não autorizo</option>
-                </select>
-
                 <label for="autorizacao_usuario">Autoriza usuários comuns consultar informações básicas (nome, telefone, contato de emergência)?</label>
                 <select id="autorizacao_usuario" name="autorizacao_usuario" required>
                     <option value="">Selecione</option>

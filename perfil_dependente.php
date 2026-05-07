@@ -165,13 +165,6 @@ function formatarSexo($sexo) {
                             <form method="POST" action="atualizar_privacidade_dependente.php" class="privacidade-form">
                                 <input type="hidden" name="dependente_id" value="<?= $dependente_id ?>">
                                 <label class="privacidade-checkbox">
-                                    <input type="checkbox" name="compartilhar_localizacao" value="sim" 
-                                        <?= ($perfil['compartilhar_localizacao'] ?? 'nao') === 'sim' ? 'checked' : '' ?>
-                                        onchange="this.form.submit()">
-                                    <span class="checkmark"></span>
-                                    <span class="checkbox-label">Compartilhar localização</span>
-                                </label>
-                                <label class="privacidade-checkbox">
                                     <input type="checkbox" name="autorizacao_usuario" value="sim"
                                         <?= ($perfil['autorizacao_usuario'] ?? 'nao') === 'sim' ? 'checked' : '' ?>
                                         onchange="this.form.submit()">
