@@ -692,7 +692,30 @@ if (isset($_SESSION['dados_form'])) {
         <?php endif; ?>
     </script>
 
-  
-</body>
+    <script>
+        // Integração com ViaCEP para preenchimento automático de endereço
+        document.getElementById('cep').addEventListener('blur', function() {
+            let cep = this.value.replace(/\D/g, '');
+
+            if (cep.length === 8) {
+                fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.erro) {
+                            document.getElementById('rua').value = data.logradouro || '';
+                            document.getElementById('bairro').value = data.bairro || '';
+                            document.getElementById('cidade').value = data.localidade || '';
+                            document.getElementById('estado').value = data.uf || '';
+                            document.getElementById('numero').focus();
+                        } else {
+                            console.warn('CEP não encontrado na ViaCEP');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro ao consultar ViaCEP:', error);
+                    });
+            }
+        });
+    </script>
 
 </html>

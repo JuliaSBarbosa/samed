@@ -406,12 +406,26 @@ try {
 
     // Processar upload de foto
     $foto_perfil = null;
+    error_log("Iniciando processamento de upload. _FILES: " . print_r($_FILES, true));
+    if (isset($_FILES['foto_perfil'])) {
+        error_log("Campo foto_perfil encontrado. Error: " . $_FILES['foto_perfil']['error']);
+    } else {
+        error_log("Campo foto_perfil NÃO encontrado em _FILES");
+    }
+    
     if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] === UPLOAD_ERR_OK) {
         $upload_dir = 'uploads/fotos/';
         
         // Criar diretório se não existir
         if (!file_exists($upload_dir)) {
-            mkdir($upload_dir, 0755, true);
+            if (!mkdir($upload_dir, 0755, true)) {
+                throw new Exception("Erro ao criar diretório de upload: $upload_dir");
+            }
+        }
+        
+        // Verificar se o diretório é gravável
+        if (!is_writable($upload_dir)) {
+            throw new Exception("Diretório de upload não tem permissões de escrita: $upload_dir");
         }
         
         $file = $_FILES['foto_perfil'];
@@ -423,19 +437,40 @@ try {
             throw new Exception("Formato de arquivo não permitido. Use JPG, PNG ou GIF.");
         }
         
-        // Validar tamanho (máx 5MB)
-        if ($file['size'] > 5 * 1024 * 1024) {
-            throw new Exception("Arquivo muito grande. Tamanho máximo: 5MB.");
+        // Validar tamanho (máx 10MB temporariamente para teste)
+        if ($file['size'] > 10 * 1024 * 1024) {
+            throw new Exception("Arquivo muito grande. Tamanho máximo: 10MB.");
         }
         
         // Gerar nome único
         $foto_perfil = uniqid('foto_') . '_' . time() . '.' . $file_ext;
         $upload_path = $upload_dir . $foto_perfil;
         
+        // Debug: log informações do arquivo
+        error_log("Tentando fazer upload: " . $file['name'] . " -> " . $upload_path);
+        error_log("Tamanho: " . $file['size'] . " bytes, Tipo: " . $file['type']);
+        
         // Mover arquivo
         if (!move_uploaded_file($file['tmp_name'], $upload_path)) {
-            throw new Exception("Erro ao fazer upload da foto.");
+            $upload_error = error_get_last();
+            error_log("Erro no move_uploaded_file: " . print_r($upload_error, true));
+            throw new Exception("Erro ao fazer upload da foto. Verifique as permissões do diretório uploads/fotos/.");
         }
+        
+        error_log("Upload realizado com sucesso: " . $upload_path);
+    } elseif (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] !== UPLOAD_ERR_NO_FILE) {
+        // Se houve erro no upload, mas não é "nenhum arquivo enviado"
+        $upload_errors = [
+            UPLOAD_ERR_INI_SIZE => 'Arquivo muito grande (limite do PHP).',
+            UPLOAD_ERR_FORM_SIZE => 'Arquivo muito grande (limite do formulário).',
+            UPLOAD_ERR_PARTIAL => 'Upload incompleto.',
+            UPLOAD_ERR_NO_TMP_DIR => 'Diretório temporário não encontrado.',
+            UPLOAD_ERR_CANT_WRITE => 'Erro ao escrever arquivo.',
+            UPLOAD_ERR_EXTENSION => 'Upload bloqueado por extensão.'
+        ];
+        $error_code = $_FILES['foto_perfil']['error'];
+        $error_msg = isset($upload_errors[$error_code]) ? $upload_errors[$error_code] : 'Erro desconhecido no upload.';
+        throw new Exception("Erro no upload da foto: " . $error_msg);
     }
 
     // Iniciar transação
@@ -901,6 +936,9 @@ try {
     $mensagem_erro = $e->getMessage();
     if (strpos($mensagem_erro, 'Banco de dados não disponível') !== false) {
         $mensagem_erro = "O sistema está temporariamente indisponível. Por favor, tente novamente em alguns instantes.";
+    } elseif (strpos($mensagem_erro, 'upload') !== false || strpos($mensagem_erro, 'foto') !== false) {
+        // Manter a mensagem específica do upload
+        $mensagem_erro = $e->getMessage();
     }
     
     $_SESSION['erros'] = [$mensagem_erro];

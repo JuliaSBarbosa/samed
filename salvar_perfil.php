@@ -92,7 +92,6 @@ $telefone = trim($_POST['telefone'] ?? '');
 
 // Email: obrigatório, usar o do formulário
 $email = trim($_POST['email'] ?? '');
-<<<<<<< HEAD
 $cep = trim($_POST['cep'] ?? '');
 $rua = trim($_POST['rua'] ?? '');
 $numero = trim($_POST['numero'] ?? '');
@@ -100,8 +99,6 @@ $complemento = trim($_POST['complemento'] ?? '');
 $bairro = trim($_POST['bairro'] ?? '');
 $cidade = trim($_POST['cidade'] ?? '');
 $estado = trim($_POST['estado'] ?? '');
-=======
->>>>>>> 8b655687d72825d3eabf6da834727bc41de77ae8
 
 // Dados de contato de emergência
 $contato_nome = trim($_POST['contato_nome'] ?? '');
@@ -110,11 +107,8 @@ $contato_telefone = trim($_POST['contato_telefone'] ?? '');
 
 // Dados médicos
 $tipo_sanguineo = $_POST['tipo_sanguineo'] ?? null;
-<<<<<<< HEAD
 $fuma = $_POST['fuma'] ?? null;
 $bebe = $_POST['bebe'] ?? null;
-=======
->>>>>>> 8b655687d72825d3eabf6da834727bc41de77ae8
 
 // Processar doenças crônicas (pode ser array ou string)
 $doencas_input = $_POST['doencas'] ?? '';
@@ -207,7 +201,6 @@ if (!$aceitar_termo) {
     $erros[] = "Você deve aceitar o termo de consentimento para continuar.";
 }
 
-<<<<<<< HEAD
 // Validar hábito de fumar
 if (!empty($fuma) && !in_array($fuma, ['sim', 'nao'])) {
     $erros[] = "Valor inválido para o campo 'Fuma'.";
@@ -218,8 +211,6 @@ if (!empty($bebe) && !in_array($bebe, ['sim', 'nao'])) {
     $erros[] = "Valor inválido para o campo 'Bebe'.";
 }
 
-=======
->>>>>>> 8b655687d72825d3eabf6da834727bc41de77ae8
 // Validar CPF (obrigatório)
 if (empty($cpf) || trim($cpf) === '') {
     $erros[] = "CPF é obrigatório.";
@@ -398,7 +389,6 @@ try {
         $coluna_foto_existe = false;
     }
     
-<<<<<<< HEAD
     // Verificar se as colunas de hábitos existem
     $coluna_fuma_existe = false;
     $coluna_bebe_existe = false;
@@ -471,8 +461,6 @@ try {
         $coluna_endereco_existe = false;
     }
 
-=======
->>>>>>> 8b655687d72825d3eabf6da834727bc41de77ae8
     // Verificar se a coluna autorizacao_usuario existe
     $coluna_autorizacao_existe = false;
     try {
@@ -522,7 +510,6 @@ try {
             $valores_update[] = $foto_perfil;
         }
         
-<<<<<<< HEAD
         if ($coluna_fuma_existe) {
             $set_parts[] = 'fuma = ?';
             $valores_update[] = in_array($fuma, ['sim', 'nao']) ? $fuma : 'nao';
@@ -563,8 +550,6 @@ try {
             $set_parts[] = 'endereco = ?';
             $valores_update[] = null;
         }
-=======
->>>>>>> 8b655687d72825d3eabf6da834727bc41de77ae8
         if ($coluna_autorizacao_existe) {
             $set_parts[] = 'autorizacao_usuario = ?';
             $valores_update[] = $autorizacao_usuario;
@@ -585,7 +570,6 @@ try {
         $stmt->execute($valores_update);
     } else {
         // Inserir novo perfil
-<<<<<<< HEAD
         $campos_insert = ['usuario_id', 'data_nascimento', 'sexo', 'cpf', 'telefone', 'email', 'tipo_sanguineo'];
         $valores_insert = [$usuario_id, $data_nascimento_formatada, $sexo, $cpf_formatado, $telefone, $email, $tipo_sanguineo];
         if ($coluna_fuma_existe) {
@@ -630,14 +614,6 @@ try {
         }
         $campos_insert = array_merge($campos_insert, ['doencas_cronicas', 'alergias', 'medicacao_continua', 'doenca_mental', 'dispositivo_implantado', 'info_relevantes', 'cirurgias']);
         $valores_insert = array_merge($valores_insert, [$doencas_cronicas ?: null, $alergias ?: null, $medicacao_continua ?: null, $doenca_mental ?: null, $dispositivo_implantado ?: null, $info_relevantes ?: null, $cirurgias ?: null]);
-=======
-        $campos_insert = ['usuario_id', 'data_nascimento', 'sexo', 'cpf', 'telefone', 'email', 'tipo_sanguineo', 
-                         'doencas_cronicas', 'alergias', 'medicacao_continua', 'doenca_mental', 
-                         'dispositivo_implantado', 'info_relevantes', 'cirurgias'];
-        $valores_insert = [$usuario_id, $data_nascimento_formatada, $sexo, $cpf_formatado, $telefone, $email,
-                          $tipo_sanguineo, $doencas_cronicas ?: null, $alergias ?: null, $medicacao_continua ?: null,
-                          $doenca_mental ?: null, $dispositivo_implantado ?: null, $info_relevantes ?: null, $cirurgias ?: null];
->>>>>>> 8b655687d72825d3eabf6da834727bc41de77ae8
         
         if ($coluna_foto_existe) {
             $campos_insert[] = 'foto_perfil';
