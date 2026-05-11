@@ -1,0 +1,37 @@
+# Arquivo de documentação local - não subir para o repositório
+API_VALIDACAO.md
+RESUMO_IMPLEMENTACOES.md
+ANALISE_COMPLETA_SITE.md
+ANALISE_SISTEMA_COMPLETA.md
+
+# Arquivo de banco de dados - não subir para o repositório
+database.sql
+
+# Arquivos de configuração local
+config.local.php
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Arquivos temporários
+*.tmp
+*.temp
+
+# Fotos de perfil / KYC (documento, selfie) — não versionar
+uploads/fotos/*
+!uploads/fotos/.gitkeep
+
+# Script único para criar admin localmente — não versionar (risco se ficar em produção)
+criar_admin.php
+

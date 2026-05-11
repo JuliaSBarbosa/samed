@@ -1,0 +1,29 @@
+-- ============================================
+-- CRIAR USUÁRIO ADMINISTRADOR
+-- ============================================
+-- Banco: samed
+--
+-- IMPORTANTE: No banco, a coluna "tipo" costuma ser ENUM só com paciente, medico, enfermeiro.
+-- Antes de criar o admin, execute: docs/sql_adicionar_tipo_admin.sql
+-- Assim o tipo "admin" passa a ser aceito.
+--
+-- Depois use o script PHP no navegador uma vez:
+--   http://localhost/samed-1/criar_admin.php
+-- Por segurança, exclua o arquivo criar_admin.php após usar.
+--
+-- Login do admin:
+--   E-mail: admin@samed.com
+--   Senha:  Admin@123
+-- ============================================
+--
+-- Opção manual por SQL:
+-- 1. Gere o hash no PHP: php -r "echo password_hash('Admin@123', PASSWORD_DEFAULT);"
+-- 2. Se a tabela JÁ tem a coluna status_validacao (após rodar sql_validacao_profissionais.sql):
+--
+-- INSERT INTO usuarios (nome, email, senha, tipo, crm, coren, status_validacao)
+-- VALUES ('Administrador SAMED', 'admin@samed.com', 'HASH_AQUI', 'admin', NULL, NULL, 'aprovado');
+--
+-- 3. Se a tabela NÃO tem status_validacao ainda:
+--
+-- INSERT INTO usuarios (nome, email, senha, tipo, crm, coren)
+-- VALUES ('Administrador SAMED', 'admin@samed.com', 'HASH_AQUI', 'admin', NULL, NULL);
