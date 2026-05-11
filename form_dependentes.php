@@ -673,10 +673,6 @@ if (isset($_SESSION['dados_form'])) {
             <h1>SAMED</h1>
         </div>
         <p>&copy; 2025 Grupo SAMED. Todos os direitos reservados.</p>
-        <div class="lojas">
-            <img src="img/appstore.webp" alt="App Store">
-            <img src="img/googleplay.webp" alt="App Store">
-        </div>
     </footer>
     <script src="js/dependentes.js"></script>
     <script src="js/toast.js"></script>

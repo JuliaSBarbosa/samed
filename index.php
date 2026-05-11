@@ -123,10 +123,6 @@ if ($tipo_usuario_lower === 'admin') {
             <h1>SAMED</h1>
         </div>
         <p>&copy; 2025 Grupo SAMED. Todos os direitos reservados.</p>
-        <div class="lojas">
-            <img src="img/appstore.webp" alt="App Store">
-             <img src="img/googleplay.webp" alt="App Store">
-        </div>
     </footer>
    
 </body>

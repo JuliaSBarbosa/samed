@@ -3561,6 +3561,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     }
     
     .btn-editar-perfil,
+    .btn-vincular-pulseira,
+    .btn-esquecer-pulseira,
     .btn-voltar-perfil {
         width: 100%;
         justify-content: center;
@@ -3926,6 +3928,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         min-width: auto;
         height: auto;
         min-height: 180px;
+        flex: 1 1 100%;
     }
     
     .card {
@@ -3938,6 +3941,17 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         width: 70px !important;
         height: 70px !important;
         margin-bottom: 12px;
+    }
+
+    .card i.icone {
+        width: auto !important;
+        height: auto !important;
+        font-size: 70px !important;
+        line-height: 1;
+    }
+
+    .card p {
+        font-size: 0.95rem;
     }
     
     .card h3,
@@ -4475,7 +4489,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     /* Botões */
     .btn-editar-perfil,
     .btn-voltar-perfil,
-    .btn-cadastrar-perfil {
+    .btn-cadastrar-perfil,
+    .btn-vincular-pulseira,
+    .btn-esquecer-pulseira {
         width: 100%;
         justify-content: center;
         padding: 12px;
@@ -4756,6 +4772,17 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     .card i.icone {
         width: 60px !important;
         height: 60px !important;
+    }
+
+    .card i.icone {
+        width: auto !important;
+        height: auto !important;
+        font-size: 56px !important;
+    }
+
+    .card p {
+        font-size: 0.9rem;
+        line-height: 1.35;
     }
     
     /* Ficha médica */
@@ -5453,15 +5480,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 /* ============================================================
-   BOTÃO E MODAL "VINCULAR PULSEIRA" (visual)
+   BOTÕES E MODAIS DE PULSEIRA
    ============================================================ */
-.btn-vincular-pulseira {
+.btn-vincular-pulseira,
+.btn-esquecer-pulseira {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     padding: 10px 20px;
-    background: #6a4ea8;
-    color: #fff;
     border: none;
     border-radius: 8px;
     font-weight: 600;
@@ -5469,8 +5495,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     cursor: pointer;
     font-family: inherit;
     transition: all 0.3s;
-    box-shadow: 0 2px 8px rgba(106, 78, 168, 0.3);
     white-space: nowrap;
+}
+
+.btn-vincular-pulseira {
+    background: #6a4ea8;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(106, 78, 168, 0.3);
 }
 
 .btn-vincular-pulseira:hover {
@@ -5479,7 +5510,21 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     box-shadow: 0 4px 12px rgba(85, 62, 137, 0.4);
 }
 
-.btn-vincular-pulseira .btn-icon {
+.btn-esquecer-pulseira {
+    background: #fff2f2;
+    color: #b3261e;
+    border: 1px solid #f2b8b5;
+    box-shadow: 0 2px 8px rgba(179, 38, 30, 0.12);
+}
+
+.btn-esquecer-pulseira:hover {
+    background: #ffe2e0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(179, 38, 30, 0.2);
+}
+
+.btn-vincular-pulseira .btn-icon,
+.btn-esquecer-pulseira .btn-icon {
     font-size: 1.05rem;
 }
 
@@ -5562,6 +5607,38 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     line-height: 1.5;
 }
 
+.modal-pulseira-ficha {
+    margin: 14px 0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #f3f7fb;
+    color: #244357;
+    font-weight: 600;
+}
+
+.modal-pulseira-status {
+    margin-top: 14px !important;
+    padding: 12px 14px;
+    border-radius: 8px;
+    text-align: left;
+    font-size: 0.92rem;
+}
+
+.modal-pulseira-status.info {
+    background: #eef6fb;
+    color: #244357;
+}
+
+.modal-pulseira-status.sucesso {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.modal-pulseira-status.erro {
+    background: #ffebee;
+    color: #c62828;
+}
+
 .modal-pulseira-aviso {
     margin-top: 14px !important;
     padding: 10px 12px;
@@ -5575,25 +5652,47 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .modal-pulseira-acoes {
     display: flex;
+    gap: 12px;
     justify-content: flex-end;
     padding: 14px 22px 18px;
     border-top: 1px solid #eef2f4;
 }
 
+.btn-pulseira-acao,
+.btn-pulseira-secundario,
 .btn-pulseira-fechar {
     padding: 10px 22px;
     border-radius: 8px;
     border: none;
-    background: #4ca9c7;
-    color: #fff;
     font-weight: 600;
     cursor: pointer;
     font-family: inherit;
-    transition: background 0.2s;
+    transition: background 0.2s, opacity 0.2s;
 }
 
+.btn-pulseira-acao,
+.btn-pulseira-fechar {
+    background: #4ca9c7;
+    color: #fff;
+}
+
+.btn-pulseira-acao:hover,
 .btn-pulseira-fechar:hover {
     background: #3a8ba8;
+}
+
+.btn-pulseira-secundario {
+    background: #eef3f6;
+    color: #244357;
+}
+
+.btn-pulseira-secundario:hover {
+    background: #dce7ec;
+}
+
+.btn-pulseira-acao:disabled {
+    opacity: 0.65;
+    cursor: wait;
 }
 
 @media (max-width: 600px) {

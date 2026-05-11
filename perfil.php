@@ -6,6 +6,7 @@ $usuario_id = $_SESSION['usuario_id'] ?? null;
 $perfil = null;
 $contato_emergencia = null;
 $tem_dados = false;
+$id_ficha_pulseira = null;
 
 // Buscar dados do perfil médico
 if ($pdo && $usuario_id) {
@@ -26,6 +27,7 @@ if ($pdo && $usuario_id) {
             $stmt->execute([$usuario_id]);
             $contato_emergencia = $stmt->fetch();
             $tem_dados = true;
+            $id_ficha_pulseira = isset($perfil['id']) ? (int) $perfil['id'] : null;
         }
     } catch(PDOException $e) {
         // Erro ao buscar dados
@@ -136,9 +138,13 @@ function formatarSexo($sexo) {
                             <span class="btn-icon">✏️</span>
                             <span>Editar Perfil</span>
                         </a>
-                        <button type="button" class="btn-vincular-pulseira" onclick="document.getElementById('modalPulseira').classList.add('aberto'); document.body.style.overflow='hidden';">
+                        <button type="button" class="btn-vincular-pulseira" data-modal-target="modalPulseira" data-nfc-action="write">
                             <span class="btn-icon">📿</span>
                             <span>Vincular Pulseira</span>
+                        </button>
+                        <button type="button" class="btn-esquecer-pulseira" data-modal-target="modalEsquecerPulseira">
+                            <span class="btn-icon">🧹</span>
+                            <span>Esquecer Pulseira</span>
                         </button>
                     </div>
                     
@@ -356,22 +362,45 @@ function formatarSexo($sexo) {
         </section>
 
         <!-- Modal Vincular Pulseira -->
-        <div class="modal-pulseira" id="modalPulseira" aria-hidden="true">
-            <div class="modal-pulseira-overlay" onclick="document.getElementById('modalPulseira').classList.remove('aberto'); document.body.style.overflow='';"></div>
+        <div class="modal-pulseira" id="modalPulseira" aria-hidden="true" data-id-ficha="<?= (int) ($id_ficha_pulseira ?? 0) ?>">
+            <div class="modal-pulseira-overlay" data-modal-close></div>
             <div class="modal-pulseira-card" role="dialog" aria-modal="true" aria-labelledby="modalPulseiraTitulo">
                 <div class="modal-pulseira-header">
                     <h3 id="modalPulseiraTitulo">📿 Vincular pulseira SAMED</h3>
-                    <button type="button" class="modal-pulseira-fechar" aria-label="Fechar"
-                        onclick="document.getElementById('modalPulseira').classList.remove('aberto'); document.body.style.overflow='';">×</button>
+                    <button type="button" class="modal-pulseira-fechar" aria-label="Fechar" data-modal-close>×</button>
                 </div>
                 <div class="modal-pulseira-body">
                     <div class="modal-pulseira-icon">📿</div>
-                    <p><strong>Aproxime sua pulseira NFC do leitor</strong> para gravar os dados da sua ficha médica e permitir leitura em emergências.</p>
-                    <p class="modal-pulseira-aviso">Funcionalidade em desenvolvimento — em breve a gravação será feita diretamente pelo aplicativo.</p>
+                    <p><strong>Aproxime a pulseira NFC do celular</strong> para gravar o ID da sua ficha médica.</p>
+                    <div class="modal-pulseira-ficha">ID da ficha: <?= $id_ficha_pulseira ? '#' . $id_ficha_pulseira : 'Indisponível' ?></div>
+                    <p class="modal-pulseira-status js-nfc-status info" data-default-message="Ao abrir esta janela em um celular compatível, o site tenta iniciar a gravação por NFC automaticamente.">
+                        Ao abrir esta janela em um celular compatível, o site tenta iniciar a gravação por NFC automaticamente.
+                    </p>
+                    <p class="modal-pulseira-aviso">A gravação por NFC depende de Android com Chrome ou Edge compatível em HTTPS ou localhost. A leitura automática na tela de escanear continua em desenvolvimento.</p>
                 </div>
                 <div class="modal-pulseira-acoes">
-                    <button type="button" class="btn-pulseira-fechar"
-                        onclick="document.getElementById('modalPulseira').classList.remove('aberto'); document.body.style.overflow='';">Fechar</button>
+                    <button type="button" class="btn-pulseira-secundario" data-modal-close>Fechar</button>
+                    <button type="button" class="btn-pulseira-acao js-nfc-write-button">Gravar na pulseira</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Esquecer Pulseira -->
+        <div class="modal-pulseira" id="modalEsquecerPulseira" aria-hidden="true">
+            <div class="modal-pulseira-overlay" data-modal-close></div>
+            <div class="modal-pulseira-card" role="dialog" aria-modal="true" aria-labelledby="modalEsquecerPulseiraTitulo">
+                <div class="modal-pulseira-header">
+                    <h3 id="modalEsquecerPulseiraTitulo">🧹 Esquecer pulseira</h3>
+                    <button type="button" class="modal-pulseira-fechar" aria-label="Fechar" data-modal-close>×</button>
+                </div>
+                <div class="modal-pulseira-body">
+                    <div class="modal-pulseira-icon">🧹</div>
+                    <p><strong>Esta opção ainda será conectada ao vínculo da pulseira.</strong></p>
+                    <p>Por enquanto, o botão foi adicionado apenas na interface e ainda não remove nenhum dado do sistema.</p>
+                    <p class="modal-pulseira-aviso">Quando a funcionalidade for concluída, esta ação poderá desfazer a associação da pulseira com a ficha médica.</p>
+                </div>
+                <div class="modal-pulseira-acoes">
+                    <button type="button" class="btn-pulseira-fechar" data-modal-close>Entendi</button>
                 </div>
             </div>
         </div>
@@ -383,10 +412,6 @@ function formatarSexo($sexo) {
             <h1>SAMED</h1>
         </div>
         <p>&copy; 2025 Grupo SAMED. Todos os direitos reservados.</p>
-        <div class="lojas">
-            <img src="img/appstore.webp" alt="App Store">
-             <img src="img/googleplay.webp" alt="App Store">
-        </div>
     </footer>
 
     <script>
@@ -425,6 +450,8 @@ function formatarSexo($sexo) {
             });
         });
     </script>
+
+    <script src="js/nfc-pulseira.js"></script>
 
 
 </body>
