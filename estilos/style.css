@@ -2954,6 +2954,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     margin: 2rem 0;
 }
 
+.scanner-acoes {
+    margin: 1.5rem auto 0;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
 .scanner-frame {
     position: relative;
     width: 100%;
@@ -3106,6 +3114,42 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .btn-scanner span {
     font-size: 1.2rem;
+}
+
+.btn-scanner:disabled {
+    opacity: 0.7;
+    cursor: wait;
+    transform: none;
+}
+
+.scanner-status {
+    padding: 14px 16px;
+    border-radius: 10px;
+    text-align: left;
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+.scanner-status.info {
+    background: #eef6fb;
+    color: #244357;
+}
+
+.scanner-status.sucesso {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.scanner-status.erro {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.scanner-status-detalhes {
+    text-align: left;
+    color: #244357;
+    font-size: 0.92rem;
+    line-height: 1.5;
 }
 
 .btn-voltar-scanner {

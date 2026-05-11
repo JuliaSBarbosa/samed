@@ -92,6 +92,17 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
                 </div>
             </div>
 
+            <div class="scanner-acoes" data-pulseira-scanner>
+                <button type="button" class="btn-scanner js-pulseira-read-trigger" data-acao="ler">
+                    <span>📿</span>
+                    Ler Pulseira Agora
+                </button>
+                <div class="scanner-status js-scanner-status info" data-default-message="Clique em Ler Pulseira Agora e aproxime a NTAG215 do leitor PN532 conectado ao Raspberry.">
+                    Clique em Ler Pulseira Agora e aproxime a NTAG215 do leitor PN532 conectado ao Raspberry.
+                </div>
+                <div class="scanner-status-detalhes js-scanner-status-detalhes"></div>
+            </div>
+
             <!-- Busca por Número de Série da Pulseira -->
             <div class="scanner-manual">
                 <p class="manual-text">Digite o número de série da pulseira para consultar:</p>
@@ -135,7 +146,7 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
 
             <!-- Aviso sobre funcionalidade futura -->
             <div class="aviso-futuro">
-                <p><strong>⚠️ Nota:</strong> A funcionalidade de escaneamento por NFC/QR Code será implementada quando a pulseira física estiver disponível. Por enquanto, use a busca manual acima.</p>
+                <p><strong>⚠️ Nota:</strong> A leitura automática via Raspberry + PN532 depende de o dispositivo estar online e conectado à AWS. Se o leitor não responder, use a busca manual acima.</p>
                 <p style="margin-top: 10px;"><strong>ℹ️ Informação:</strong> Como profissional de saúde, você terá acesso completo aos dados médicos do paciente após a busca.</p>
             </div>
         </div>
@@ -168,6 +179,7 @@ if ($_SESSION['usuario_tipo'] === 'medico') {
     </script>
     
     <script src="js/toast.js"></script>
+    <script src="js/nfc-pulseira.js"></script>
 
     <style>
         @keyframes scanLine {

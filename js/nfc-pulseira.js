@@ -1,4 +1,11 @@
 (function () {
+    const endpoints = {
+        create: "api/pulseira/criar_comando.php",
+        status: "api/pulseira/status_comando.php",
+    };
+
+    const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
     const openModal = (modal) => {
         modal.classList.add("aberto");
         modal.setAttribute("aria-hidden", "false");
@@ -14,123 +21,262 @@
         }
     };
 
-    const updateStatus = (modal, type, message) => {
-        const status = modal.querySelector(".js-nfc-status");
+    const getStatusElement = (container) =>
+        container.querySelector(".js-nfc-status, .js-scanner-status");
+
+    const getDetailsElement = (container) =>
+        container.querySelector(".js-scanner-status-detalhes");
+
+    const getStatusClass = (type) => {
+        if (type === "sucesso") {
+            return "sucesso";
+        }
+
+        if (type === "erro") {
+            return "erro";
+        }
+
+        return "info";
+    };
+
+    const escapeHtml = (value) =>
+        String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    const updateStatus = (container, type, message) => {
+        const status = getStatusElement(container);
         if (!status) {
             return;
         }
 
-        status.className = "modal-pulseira-status js-nfc-status " + type;
+        const statusClass = getStatusClass(type);
+        if (status.classList.contains("modal-pulseira-status")) {
+            status.className = "modal-pulseira-status js-nfc-status " + statusClass;
+        } else {
+            status.className = "scanner-status js-scanner-status " + statusClass;
+        }
+
         status.textContent = message;
     };
 
-    const resetWriteButton = (modal) => {
-        const button = modal.querySelector(".js-nfc-write-button");
-        if (!button) {
+    const renderResultDetails = (container, result) => {
+        const details = getDetailsElement(container);
+        if (!details) {
             return;
         }
 
-        if (!button.dataset.defaultLabel) {
-            button.dataset.defaultLabel = button.textContent.trim();
-        }
-
-        button.textContent = button.dataset.defaultLabel;
-        button.disabled = false;
-    };
-
-    const setWriteButtonState = (modal, label, disabled) => {
-        const button = modal.querySelector(".js-nfc-write-button");
-        if (!button) {
+        if (!result || typeof result !== "object") {
+            details.innerHTML = "";
             return;
         }
 
-        button.textContent = label;
-        button.disabled = disabled;
+        const lines = [];
+
+        if (result.uid_tag) {
+            lines.push("<strong>UID:</strong> " + escapeHtml(result.uid_tag));
+        }
+
+        if (result.payload_ndef) {
+            lines.push("<strong>Payload:</strong> " + escapeHtml(result.payload_ndef));
+        }
+
+        if (result.perfil_medico_id) {
+            lines.push("<strong>ID da ficha:</strong> #" + escapeHtml(result.perfil_medico_id));
+        }
+
+        if (Array.isArray(result.uids_desvinculados) && result.uids_desvinculados.length > 0) {
+            lines.push("<strong>UIDs liberados:</strong> " + escapeHtml(result.uids_desvinculados.join(", ")));
+        }
+
+        details.innerHTML = lines.join("<br>");
     };
 
-    const resetNfcModal = (modal) => {
-        const status = modal.querySelector(".js-nfc-status");
+    const setButtonsBusy = (container, busy, activeButton, busyLabel) => {
+        const buttons = container.querySelectorAll(".js-pulseira-command, .js-pulseira-read-trigger");
+        buttons.forEach((button) => {
+            if (!button.dataset.defaultLabel) {
+                button.dataset.defaultLabel = button.textContent.trim();
+            }
+            if (!button.dataset.defaultHtml) {
+                button.dataset.defaultHtml = button.innerHTML;
+            }
+
+            button.disabled = busy;
+            if (busy && button === activeButton && busyLabel) {
+                button.textContent = busyLabel;
+            } else {
+                button.innerHTML = button.dataset.defaultHtml;
+            }
+        });
+    };
+
+    const resetContainer = (container) => {
+        const status = getStatusElement(container);
         if (status) {
             if (!status.dataset.defaultMessage) {
                 status.dataset.defaultMessage = status.textContent.trim();
             }
 
-            updateStatus(modal, "info", status.dataset.defaultMessage);
+            updateStatus(container, "info", status.dataset.defaultMessage);
         }
 
-        resetWriteButton(modal);
-        delete modal.dataset.nfcBusy;
+        renderResultDetails(container, null);
+        setButtonsBusy(container, false);
+        delete container.dataset.busy;
     };
 
-    const hasWebNfcSupport = () => window.isSecureContext && "NDEFReader" in window;
+    const requestJson = async (url, options = {}) => {
+        const response = await fetch(url, options);
+        const contentType = response.headers.get("content-type") || "";
+        const payload = contentType.includes("application/json")
+            ? await response.json()
+            : {};
 
-    const getSupportErrorMessage = () => {
-        if (!window.isSecureContext) {
-            return "O navegador precisa abrir este site em HTTPS ou localhost para usar Web NFC.";
+        if (!response.ok || payload.success === false) {
+            throw new Error(payload.message || "Falha ao comunicar com o servidor de pulseiras.");
         }
 
-        return "Este dispositivo ou navegador nao oferece suporte a gravacao NFC pelo site. Use Android com Chrome ou Edge compativel.";
+        return payload;
     };
 
-    const getWriteErrorMessage = (error) => {
-        switch (error && error.name) {
-            case "NotAllowedError":
-                return "A permissao de NFC foi negada. Ative o NFC do aparelho e permita o acesso do navegador.";
-            case "NotSupportedError":
-                return "Este aparelho nao suporta gravacao NFC pelo navegador.";
-            case "NotReadableError":
-                return "Nao foi possivel acessar a pulseira. Tente aproximar novamente.";
-            case "NetworkError":
-                return "A pulseira nao pode ser gravada neste momento. Tente novamente.";
-            case "AbortError":
-                return "A gravacao foi cancelada antes da conclusao.";
-            default:
-                return "Nao foi possivel gravar a pulseira agora. Tente novamente com o celular desbloqueado e a pulseira encostada no aparelho.";
+    const createCommand = (payload) =>
+        requestJson(endpoints.create, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+        });
+
+    const fetchCommandStatus = (commandId) =>
+        requestJson(endpoints.status + "?command_id=" + encodeURIComponent(commandId));
+
+    const pollCommandUntilDone = async (commandId, onProgress) => {
+        for (let attempt = 0; attempt < 60; attempt += 1) {
+            const response = await fetchCommandStatus(commandId);
+            const command = response.command || {};
+
+            if (onProgress) {
+                onProgress(command);
+            }
+
+            if (["sucesso", "erro", "expirado"].includes(command.status)) {
+                return command;
+            }
+
+            await wait(1500);
         }
+
+        throw new Error("Tempo limite aguardando resposta do Raspberry.");
     };
 
-    const writeFichaIdToTag = async (modal) => {
-        if (modal.dataset.nfcBusy === "true") {
+    const runModalCommand = async (modal, action, button) => {
+        if (modal.dataset.busy === "true") {
             return;
         }
 
-        const idFicha = Number(modal.dataset.idFicha || 0);
-
-        if (!idFicha) {
-            updateStatus(modal, "erro", "Nao foi possivel identificar o ID da ficha para gravar na pulseira.");
-            setWriteButtonState(modal, "ID indisponivel", true);
+        const perfilMedicoId = Number(modal.dataset.perfilMedicoId || 0);
+        if (!perfilMedicoId) {
+            updateStatus(modal, "erro", "Não foi possível identificar a ficha para esta operação.");
             return;
         }
 
-        if (!hasWebNfcSupport()) {
-            updateStatus(modal, "erro", getSupportErrorMessage());
-            setWriteButtonState(modal, "NFC indisponivel", true);
-            return;
-        }
-
-        modal.dataset.nfcBusy = "true";
-        updateStatus(
+        modal.dataset.busy = "true";
+        setButtonsBusy(
             modal,
-            "info",
-            "Aproxime a pulseira do celular para gravar o ID da ficha " + idFicha + ". Mantenha o aparelho desbloqueado ate concluir."
+            true,
+            button,
+            action === "gravar" ? "Enviando comando..." : "Processando..."
         );
-        setWriteButtonState(modal, "Aguardando pulseira...", true);
 
         try {
-            const ndef = new NDEFReader();
-            await ndef.write(String(idFicha));
+            const created = await createCommand({
+                acao: action,
+                perfil_medico_id: perfilMedicoId,
+            });
 
+            updateStatus(modal, "info", created.message || "Comando enviado ao Raspberry.");
+
+            if (created.status === "sucesso") {
+                renderResultDetails(modal, created.result || {});
+                updateStatus(modal, "sucesso", created.message || "Operação concluída com sucesso.");
+                return;
+            }
+
+            const finalCommand = await pollCommandUntilDone(created.command_id, (command) => {
+                updateStatus(modal, command.status, command.message || "Aguardando o Raspberry processar a pulseira...");
+            });
+
+            renderResultDetails(modal, finalCommand.result || {});
             updateStatus(
                 modal,
-                "sucesso",
-                "Pulseira gravada com sucesso com o ID da ficha " + idFicha + "."
+                finalCommand.status,
+                finalCommand.message ||
+                    (finalCommand.status === "sucesso"
+                        ? "Operação na pulseira concluída com sucesso."
+                        : "Falha na operação da pulseira.")
             );
-            setWriteButtonState(modal, "Gravar novamente", false);
         } catch (error) {
-            updateStatus(modal, "erro", getWriteErrorMessage(error));
-            setWriteButtonState(modal, "Tentar novamente", false);
+            updateStatus(modal, "erro", error.message);
         } finally {
-            modal.dataset.nfcBusy = "false";
+            modal.dataset.busy = "false";
+            setButtonsBusy(modal, false);
+        }
+    };
+
+    const runScannerRead = async (scannerContainer, button) => {
+        if (scannerContainer.dataset.busy === "true") {
+            return;
+        }
+
+        scannerContainer.dataset.busy = "true";
+        setButtonsBusy(scannerContainer, true, button, "Aguardando leitura...");
+        renderResultDetails(scannerContainer, null);
+
+        try {
+            const created = await createCommand({ acao: "ler" });
+            updateStatus(scannerContainer, "info", created.message || "Comando de leitura enviado ao Raspberry.");
+
+            const finalCommand =
+                created.status === "sucesso"
+                    ? { status: "sucesso", message: created.message, result: created.result || {} }
+                    : await pollCommandUntilDone(created.command_id, (command) => {
+                          updateStatus(
+                              scannerContainer,
+                              command.status,
+                              command.message || "Raspberry aguardando aproximação da pulseira..."
+                          );
+                      });
+
+            renderResultDetails(scannerContainer, finalCommand.result || {});
+            updateStatus(
+                scannerContainer,
+                finalCommand.status,
+                finalCommand.message ||
+                    (finalCommand.status === "sucesso"
+                        ? "Leitura da pulseira concluída."
+                        : "Falha ao consultar a pulseira.")
+            );
+
+            if (
+                finalCommand.status === "sucesso" &&
+                finalCommand.result &&
+                finalCommand.result.redirect_url
+            ) {
+                updateStatus(scannerContainer, "sucesso", "Pulseira localizada. Abrindo a ficha...");
+                window.setTimeout(() => {
+                    window.location.href = finalCommand.result.redirect_url;
+                }, 900);
+            }
+        } catch (error) {
+            updateStatus(scannerContainer, "erro", error.message);
+        } finally {
+            scannerContainer.dataset.busy = "false";
+            setButtonsBusy(scannerContainer, false);
         }
     };
 
@@ -144,30 +290,31 @@
             return;
         }
 
-        const writeTrigger = event.target.closest(".js-nfc-write-button");
-        if (writeTrigger) {
-            const modal = writeTrigger.closest(".modal-pulseira");
+        const openTrigger = event.target.closest("[data-modal-target]");
+        if (openTrigger) {
+            const modal = document.getElementById(openTrigger.dataset.modalTarget);
             if (modal) {
-                void writeFichaIdToTag(modal);
+                openModal(modal);
+                resetContainer(modal);
             }
             return;
         }
 
-        const openTrigger = event.target.closest("[data-modal-target]");
-        if (!openTrigger) {
+        const commandTrigger = event.target.closest(".js-pulseira-command");
+        if (commandTrigger) {
+            const modal = commandTrigger.closest(".modal-pulseira");
+            if (modal) {
+                void runModalCommand(modal, commandTrigger.dataset.acao || modal.dataset.acao || "", commandTrigger);
+            }
             return;
         }
 
-        const modal = document.getElementById(openTrigger.dataset.modalTarget);
-        if (!modal) {
-            return;
-        }
-
-        openModal(modal);
-        resetNfcModal(modal);
-
-        if (openTrigger.dataset.nfcAction === "write") {
-            void writeFichaIdToTag(modal);
+        const scannerTrigger = event.target.closest(".js-pulseira-read-trigger");
+        if (scannerTrigger) {
+            const scannerContainer = scannerTrigger.closest("[data-pulseira-scanner]");
+            if (scannerContainer) {
+                void runScannerRead(scannerContainer, scannerTrigger);
+            }
         }
     });
 
@@ -178,4 +325,6 @@
 
         document.querySelectorAll(".modal-pulseira.aberto").forEach(closeModal);
     });
+
+    document.querySelectorAll(".modal-pulseira, [data-pulseira-scanner]").forEach(resetContainer);
 })();

@@ -138,7 +138,7 @@ function formatarSexo($sexo) {
                             <span class="btn-icon">✏️</span>
                             <span>Editar Perfil</span>
                         </a>
-                        <button type="button" class="btn-vincular-pulseira" data-modal-target="modalPulseira" data-nfc-action="write">
+                        <button type="button" class="btn-vincular-pulseira" data-modal-target="modalPulseira">
                             <span class="btn-icon">📿</span>
                             <span>Vincular Pulseira</span>
                         </button>
@@ -362,7 +362,7 @@ function formatarSexo($sexo) {
         </section>
 
         <!-- Modal Vincular Pulseira -->
-        <div class="modal-pulseira" id="modalPulseira" aria-hidden="true" data-id-ficha="<?= (int) ($id_ficha_pulseira ?? 0) ?>">
+        <div class="modal-pulseira" id="modalPulseira" aria-hidden="true" data-perfil-medico-id="<?= (int) ($id_ficha_pulseira ?? 0) ?>" data-acao="gravar">
             <div class="modal-pulseira-overlay" data-modal-close></div>
             <div class="modal-pulseira-card" role="dialog" aria-modal="true" aria-labelledby="modalPulseiraTitulo">
                 <div class="modal-pulseira-header">
@@ -371,22 +371,22 @@ function formatarSexo($sexo) {
                 </div>
                 <div class="modal-pulseira-body">
                     <div class="modal-pulseira-icon">📿</div>
-                    <p><strong>Aproxime a pulseira NFC do celular</strong> para gravar o ID da sua ficha médica.</p>
+                    <p><strong>Use o leitor PN532 conectado ao Raspberry</strong> para gravar esta pulseira com a sua ficha médica.</p>
                     <div class="modal-pulseira-ficha">ID da ficha: <?= $id_ficha_pulseira ? '#' . $id_ficha_pulseira : 'Indisponível' ?></div>
-                    <p class="modal-pulseira-status js-nfc-status info" data-default-message="Ao abrir esta janela em um celular compatível, o site tenta iniciar a gravação por NFC automaticamente.">
-                        Ao abrir esta janela em um celular compatível, o site tenta iniciar a gravação por NFC automaticamente.
+                    <p class="modal-pulseira-status js-nfc-status info" data-default-message="Clique em Gravar na pulseira e aproxime a NTAG215 do leitor PN532 conectado ao Raspberry para vincular esta ficha.">
+                        Clique em Gravar na pulseira e aproxime a NTAG215 do leitor PN532 conectado ao Raspberry para vincular esta ficha.
                     </p>
-                    <p class="modal-pulseira-aviso">A gravação por NFC depende de Android com Chrome ou Edge compatível em HTTPS ou localhost. A leitura automática na tela de escanear continua em desenvolvimento.</p>
+                    <p class="modal-pulseira-aviso">O site enviará o comando para a AWS, e o Raspberry executará a gravação física da tag. Depois, a leitura da pulseira usará esse vínculo para localizar a ficha.</p>
                 </div>
                 <div class="modal-pulseira-acoes">
                     <button type="button" class="btn-pulseira-secundario" data-modal-close>Fechar</button>
-                    <button type="button" class="btn-pulseira-acao js-nfc-write-button">Gravar na pulseira</button>
+                    <button type="button" class="btn-pulseira-acao js-pulseira-command" data-acao="gravar">Gravar na pulseira</button>
                 </div>
             </div>
         </div>
 
         <!-- Modal Esquecer Pulseira -->
-        <div class="modal-pulseira" id="modalEsquecerPulseira" aria-hidden="true">
+        <div class="modal-pulseira" id="modalEsquecerPulseira" aria-hidden="true" data-perfil-medico-id="<?= (int) ($id_ficha_pulseira ?? 0) ?>" data-acao="esquecer">
             <div class="modal-pulseira-overlay" data-modal-close></div>
             <div class="modal-pulseira-card" role="dialog" aria-modal="true" aria-labelledby="modalEsquecerPulseiraTitulo">
                 <div class="modal-pulseira-header">
@@ -395,12 +395,15 @@ function formatarSexo($sexo) {
                 </div>
                 <div class="modal-pulseira-body">
                     <div class="modal-pulseira-icon">🧹</div>
-                    <p><strong>Esta opção ainda será conectada ao vínculo da pulseira.</strong></p>
-                    <p>Por enquanto, o botão foi adicionado apenas na interface e ainda não remove nenhum dado do sistema.</p>
-                    <p class="modal-pulseira-aviso">Quando a funcionalidade for concluída, esta ação poderá desfazer a associação da pulseira com a ficha médica.</p>
+                    <p><strong>Esta ação remove o vínculo lógico da pulseira com a ficha atual.</strong></p>
+                    <p class="modal-pulseira-status js-nfc-status info" data-default-message="Clique em Esquecer pulseira para liberar a ficha atual e permitir uma nova gravação depois.">
+                        Clique em Esquecer pulseira para liberar a ficha atual e permitir uma nova gravação depois.
+                    </p>
+                    <p class="modal-pulseira-aviso">No MVP, o sistema desvincula a pulseira no banco. A limpeza física do conteúdo NDEF da tag pode ser feita depois, se desejarem.</p>
                 </div>
                 <div class="modal-pulseira-acoes">
-                    <button type="button" class="btn-pulseira-fechar" data-modal-close>Entendi</button>
+                    <button type="button" class="btn-pulseira-secundario" data-modal-close>Cancelar</button>
+                    <button type="button" class="btn-pulseira-fechar js-pulseira-command" data-acao="esquecer">Esquecer pulseira</button>
                 </div>
             </div>
         </div>

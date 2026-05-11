@@ -1,0 +1,15 @@
+[Unit]
+Description=SAMED Pulseira Worker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/samed/raspberry
+ExecStart=/usr/bin/python3 /opt/samed/raspberry/app.py /opt/samed/raspberry/config.json
+Restart=always
+RestartSec=3
+User=pi
+
+[Install]
+WantedBy=multi-user.target

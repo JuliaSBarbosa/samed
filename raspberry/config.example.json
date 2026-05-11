@@ -1,0 +1,10 @@
+{
+  "api_base_url": "https://seu-dominio-na-aws.com",
+  "device_id": "raspberry-01",
+  "api_token": "troque-este-token",
+  "nfc_device": "tty:S0:pn532",
+  "simulate": true,
+  "poll_interval_seconds": 2,
+  "tag_timeout_seconds": 25,
+  "request_timeout_seconds": 20
+}
