@@ -313,8 +313,38 @@ function formatarSexo($sexo) {
                                 <?php if ($perfil['info_relevantes']): ?>
                                     <p><strong>INFORMAÇÕES RELEVANTES:</strong> <?= htmlspecialchars(strtoupper($perfil['info_relevantes'])) ?></p>
                                 <?php endif; ?>
-                                <?php if ($perfil['cirurgias']): ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 2 -->
+                    <div class="carousel-item">
+                        <div class="card-ficha">
+                            <div class="perfil">
+                                <img src="<?= htmlspecialchars($foto_src) ?>" alt="Foto do dependente" style="object-fit: cover;">
+                                <div>
+                                    <h3><?= htmlspecialchars(strtoupper($dependente['nome'])) ?></h3>
+                                    <?php if ($idade): ?>
+                                        <p><strong>IDADE:</strong> <?= $idade ?> ANOS</p>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <div class="info-basica">
+                                <h4>HISTÓRICO MÉDICO</h4>
+                                <?php if (!empty($perfil['cirurgias'] ?? '')): ?>
                                     <p><strong>CIRURGIAS:</strong> <?= htmlspecialchars(strtoupper($perfil['cirurgias'])) ?></p>
+                                <?php else: ?>
+                                    <p><strong>CIRURGIAS:</strong> NENHUMA REGISTRADA</p>
+                                <?php endif; ?>
+                                <?php if (!empty($perfil['historico_emergencias'] ?? '')): ?>
+                                    <p><strong>HISTÓRICO DE EMERGÊNCIAS:</strong> <?= htmlspecialchars(strtoupper($perfil['historico_emergencias'] ?? '')) ?></p>
+                                <?php else: ?>
+                                    <p><strong>HISTÓRICO DE EMERGÊNCIAS:</strong> NENHUMA REGISTRADA</p>
+                                <?php endif; ?>
+                                <?php if (!empty($perfil['habitos_importantes'] ?? '')): ?>
+                                    <p><strong>HÁBITOS IMPORTANTES:</strong> <?= htmlspecialchars(strtoupper($perfil['habitos_importantes'] ?? '')) ?></p>
+                                <?php else: ?>
+                                    <p><strong>HÁBITOS IMPORTANTES:</strong> NENHUMA REGISTRADA</p>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -329,6 +359,7 @@ function formatarSexo($sexo) {
                 <div class="carousel-indicators">
                     <span data-slide="0" class="active"></span>
                     <span data-slide="1"></span>
+                    <span data-slide="2"></span>
                 </div>
             </div>
             <?php endif; ?>

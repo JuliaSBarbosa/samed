@@ -632,10 +632,10 @@ if (isset($_SESSION['dados_form'])) {
                 <textarea id="cirurgias" name="cirurgias" rows="4"><?= htmlspecialchars($dados_form['cirurgias'] ?? $perfil['cirurgias'] ?? '') ?></textarea>
 
                 <label for="emergencia">Histórico de emergências</label>
-                <textarea id="emergencia" name="emergencia" rows="4"></textarea>
+                <textarea id="emergencia" name="emergencia" rows="4"><?= htmlspecialchars($dados_form['emergencia'] ?? $perfil['historico_emergencias'] ?? '') ?></textarea>
 
                 <label for="habitos">Hábitos importantes</label>
-                <textarea id="habitos" name="habitos" rows="4"></textarea>
+                <textarea id="habitos" name="habitos" rows="4"><?= htmlspecialchars($dados_form['habitos'] ?? $perfil['habitos_importantes'] ?? '') ?></textarea>
 
             </div>
 

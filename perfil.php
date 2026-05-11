@@ -318,10 +318,22 @@ function formatarSexo($sexo) {
                             </div>
                             <div class="info-basica">
                                 <h4>HISTÓRICO MÉDICO</h4>
-                                <?php if ($perfil['cirurgias']): ?>
+                                <?php if (!empty($perfil['cirurgias'])): ?>
                                     <p><strong>CIRURGIA:</strong> <?= htmlspecialchars(strtoupper($perfil['cirurgias'])) ?></p>
                                 <?php else: ?>
                                     <p><strong>CIRURGIA:</strong> NENHUMA REGISTRADA</p>
+                                <?php endif; ?>
+
+                                <?php if (!empty($perfil['historico_emergencias'] ?? '')): ?>
+                                    <p><strong>HISTÓRICO DE EMERGÊNCIAS:</strong> <?= htmlspecialchars(strtoupper($perfil['historico_emergencias'] ?? '')) ?></p>
+                                <?php else: ?>
+                                    <p><strong>HISTÓRICO DE EMERGÊNCIAS:</strong> NENHUMA REGISTRADA</p>
+                                <?php endif; ?>
+
+                                <?php if (!empty($perfil['habitos_importantes'] ?? '')): ?>
+                                    <p><strong>HÁBITOS IMPORTANTES:</strong> <?= htmlspecialchars(strtoupper($perfil['habitos_importantes'] ?? '')) ?></p>
+                                <?php else: ?>
+                                    <p><strong>HÁBITOS IMPORTANTES:</strong> NENHUMA REGISTRADA</p>
                                 <?php endif; ?>
                             </div>
                         </div>

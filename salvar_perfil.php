@@ -167,6 +167,8 @@ if (is_array($dispositivo_input)) {
 
 $info_relevantes = trim($_POST['info_relevantes'] ?? '');
 $cirurgias = trim($_POST['cirurgias'] ?? '');
+$emergencia = trim($_POST['emergencia'] ?? '');
+$habitos = trim($_POST['habitos'] ?? '');
 
 // Configurações de privacidade
 $autorizacao_usuario = $_POST['autorizacao_usuario'] ?? 'nao';
@@ -294,11 +296,19 @@ try {
     // Processar upload de foto
     $foto_perfil = null;
     if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] === UPLOAD_ERR_OK) {
-        $upload_dir = 'uploads/fotos/';
+        $upload_dir = __DIR__ . '/uploads/fotos/';
+        $upload_public_dir = 'uploads/fotos/';
         
         // Criar diretório se não existir
         if (!file_exists($upload_dir)) {
-            mkdir($upload_dir, 0755, true);
+            if (!mkdir($upload_dir, 0755, true)) {
+                throw new Exception("Erro ao criar diretório de upload: $upload_dir");
+            }
+        }
+        
+        // Verificar se o diretório é gravável
+        if (!is_writable($upload_dir)) {
+            throw new Exception("Diretório de upload não tem permissões de escrita: $upload_dir");
         }
         
         $file = $_FILES['foto_perfil'];
@@ -321,7 +331,7 @@ try {
         
         // Mover arquivo
         if (!move_uploaded_file($file['tmp_name'], $upload_path)) {
-            throw new Exception("Erro ao fazer upload da foto.");
+            throw new Exception("Erro ao fazer upload da foto. Verifique as permissões de escrita no diretório: $upload_dir");
         }
         
         // Se houver foto antiga, deletá-la (só se a coluna existir)
@@ -392,6 +402,8 @@ try {
     // Verificar se as colunas de hábitos existem
     $coluna_fuma_existe = false;
     $coluna_bebe_existe = false;
+    $coluna_historico_emergencias_existe = false;
+    $coluna_habitos_importantes_existe = false;
     $coluna_endereco_existe = false;
     try {
         $stmt = $pdo->query("SHOW COLUMNS FROM perfis_medicos LIKE 'fuma'");
@@ -404,6 +416,18 @@ try {
         $coluna_bebe_existe = $stmt->rowCount() > 0;
     } catch(PDOException $e) {
         $coluna_bebe_existe = false;
+    }
+    try {
+        $stmt = $pdo->query("SHOW COLUMNS FROM perfis_medicos LIKE 'historico_emergencias'");
+        $coluna_historico_emergencias_existe = $stmt->rowCount() > 0;
+    } catch(PDOException $e) {
+        $coluna_historico_emergencias_existe = false;
+    }
+    try {
+        $stmt = $pdo->query("SHOW COLUMNS FROM perfis_medicos LIKE 'habitos_importantes'");
+        $coluna_habitos_importantes_existe = $stmt->rowCount() > 0;
+    } catch(PDOException $e) {
+        $coluna_habitos_importantes_existe = false;
     }
     $coluna_cep_existe = false;
     $coluna_rua_existe = false;
@@ -510,6 +534,15 @@ try {
             $valores_update[] = $foto_perfil;
         }
         
+        if ($coluna_historico_emergencias_existe) {
+            $set_parts[] = 'historico_emergencias = ?';
+            $valores_update[] = $emergencia ?: null;
+        }
+        if ($coluna_habitos_importantes_existe) {
+            $set_parts[] = 'habitos_importantes = ?';
+            $valores_update[] = $habitos ?: null;
+        }
+        
         if ($coluna_fuma_existe) {
             $set_parts[] = 'fuma = ?';
             $valores_update[] = in_array($fuma, ['sim', 'nao']) ? $fuma : 'nao';
@@ -579,6 +612,14 @@ try {
         if ($coluna_bebe_existe) {
             $campos_insert[] = 'bebe';
             $valores_insert[] = $bebe ?? 'nao';
+        }
+        if ($coluna_historico_emergencias_existe) {
+            $campos_insert[] = 'historico_emergencias';
+            $valores_insert[] = $emergencia ?: null;
+        }
+        if ($coluna_habitos_importantes_existe) {
+            $campos_insert[] = 'habitos_importantes';
+            $valores_insert[] = $habitos ?: null;
         }
         if ($coluna_cep_existe) {
             $campos_insert[] = 'cep';

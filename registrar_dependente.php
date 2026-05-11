@@ -414,7 +414,8 @@ try {
     }
     
     if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] === UPLOAD_ERR_OK) {
-        $upload_dir = 'uploads/fotos/';
+        $upload_dir = __DIR__ . '/uploads/fotos/';
+        $upload_public_dir = 'uploads/fotos/';
         
         // Criar diretório se não existir
         if (!file_exists($upload_dir)) {

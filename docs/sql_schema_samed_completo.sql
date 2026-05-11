@@ -89,6 +89,8 @@ CREATE TABLE `perfis_medicos` (
   `dispositivo_implantado` text,
   `info_relevantes` text,
   `cirurgias` text,
+  `historico_emergencias` text,
+  `habitos_importantes` text,
   `foto_perfil` varchar(255) DEFAULT NULL,
   `autorizacao_usuario` varchar(8) NOT NULL DEFAULT 'nao',
   `compartilhar_localizacao` varchar(8) NOT NULL DEFAULT 'nao',
