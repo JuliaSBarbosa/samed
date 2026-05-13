@@ -1,6 +1,7 @@
 <?php
 require_once 'verificar_login.php';
 require_once 'config.php';
+require_once 'funcoes_auxiliares.php';
 
 $usuario_id = $_SESSION['usuario_id'] ?? null;
 $tipo = $_SESSION['usuario_tipo'] ?? '';
@@ -17,13 +18,24 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Verificar se os arquivos foram enviados
-if (!isset($_FILES['foto_documento']) || $_FILES['foto_documento']['error'] !== UPLOAD_ERR_OK) {
-    $erros[] = "Envie a foto do documento profissional.";
-}
-
-if (!isset($_FILES['foto_selfie']) || $_FILES['foto_selfie']['error'] !== UPLOAD_ERR_OK) {
-    $erros[] = "Envie a selfie com o documento.";
+// Verificar se os arquivos foram enviados (mensagens específicas para limite do PHP etc.)
+$camposValidacao = [
+    'foto_documento' => 'Envie a foto do documento profissional.',
+    'foto_selfie' => 'Envie a selfie com o documento.',
+];
+foreach ($camposValidacao as $campo => $msgObrigatorio) {
+    if (!isset($_FILES[$campo])) {
+        $erros[] = $msgObrigatorio;
+        continue;
+    }
+    $codigo = (int) ($_FILES[$campo]['error'] ?? UPLOAD_ERR_NO_FILE);
+    if ($codigo === UPLOAD_ERR_NO_FILE) {
+        $erros[] = $msgObrigatorio;
+        continue;
+    }
+    if ($codigo !== UPLOAD_ERR_OK) {
+        $erros[] = samed_mensagem_erro_upload($codigo, $campo);
+    }
 }
 
 if (!empty($erros)) {
@@ -36,6 +48,13 @@ if (!empty($erros)) {
 $pasta_upload = __DIR__ . '/uploads/fotos/';
 if (!is_dir($pasta_upload)) {
     mkdir($pasta_upload, 0775, true);
+}
+if (!is_writable($pasta_upload)) {
+    $_SESSION['erros_validacao'] = [
+        'A pasta uploads/fotos/ não permite escrita no servidor. Ajuste permissões para o usuário do Apache/PHP (ex.: www-data no Linux/AWS).'
+    ];
+    header('Location: validacao_pendente.php');
+    exit;
 }
 
 function salvarArquivo($arquivo, $prefixo, $usuario_id, $pasta_upload)
@@ -51,8 +70,11 @@ function salvarArquivo($arquivo, $prefixo, $usuario_id, $pasta_upload)
     $nome_arquivo = $prefixo . '_' . $usuario_id . '_' . time() . '.' . $extensao;
     $destino = $pasta_upload . $nome_arquivo;
 
+    if (!is_uploaded_file($arquivo['tmp_name'])) {
+        return [false, 'Arquivo de upload inválido. Tente outra imagem ou verifique limites e upload_tmp_dir no PHP.'];
+    }
     if (!move_uploaded_file($arquivo['tmp_name'], $destino)) {
-        return [false, "Erro ao salvar o arquivo de upload."];
+        return [false, 'Não foi possível gravar o arquivo em uploads/fotos/. Confira permissões da pasta e espaço em disco no servidor (comum após deploy na AWS).'];
     }
 
     return [true, $nome_arquivo];

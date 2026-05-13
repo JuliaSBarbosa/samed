@@ -106,3 +106,29 @@ function validarCPF($cpf) {
     return true;
 }
 
+/**
+ * Mensagem clara para códigos de $_FILES[...]['error'] (produção costuma ter limites menores que no XAMPP local).
+ *
+ * @param string $campo Nome do campo, ex.: foto_documento, foto_selfie
+ */
+function samed_mensagem_erro_upload(int $code, string $campo): string
+{
+    $rotulo = $campo === 'foto_selfie' ? 'Selfie com o documento' : 'Foto do documento';
+    switch ($code) {
+        case UPLOAD_ERR_INI_SIZE:
+            return $rotulo . ': arquivo muito grande (limite upload_max_filesize do PHP no servidor). Peça ao administrador para aumentar upload_max_filesize e post_max_size no php.ini ou envie uma imagem menor.';
+        case UPLOAD_ERR_FORM_SIZE:
+            return $rotulo . ': arquivo muito grande (limite do formulário).';
+        case UPLOAD_ERR_PARTIAL:
+            return $rotulo . ': upload incompleto. Tente novamente.';
+        case UPLOAD_ERR_NO_TMP_DIR:
+            return $rotulo . ': servidor sem diretório temporário para upload (upload_tmp_dir).';
+        case UPLOAD_ERR_CANT_WRITE:
+            return $rotulo . ': não foi possível gravar no disco temporário.';
+        case UPLOAD_ERR_EXTENSION:
+            return $rotulo . ': upload bloqueado por extensão no PHP.';
+        default:
+            return $rotulo . ': erro no envio (código ' . $code . ').';
+    }
+}
+

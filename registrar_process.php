@@ -81,11 +81,24 @@ if ($tipo === 'enfermeiro') {
 $foto_documento_nome = null;
 $foto_selfie_nome = null;
 if (in_array($tipo, ['medico', 'enfermeiro'])) {
-    if (empty($_FILES['foto_documento']['name']) || $_FILES['foto_documento']['error'] !== UPLOAD_ERR_OK) {
-        $erros[] = "Envie a foto do documento profissional (CRM/COREN ou RG com registro).";
-    }
-    if (empty($_FILES['foto_selfie']['name']) || $_FILES['foto_selfie']['error'] !== UPLOAD_ERR_OK) {
-        $erros[] = "Envie a selfie segurando o documento.";
+    foreach (['foto_documento', 'foto_selfie'] as $campoFoto) {
+        if (!isset($_FILES[$campoFoto])) {
+            $erros[] = $campoFoto === 'foto_documento'
+                ? "Envie a foto do documento profissional (CRM/COREN ou RG com registro)."
+                : "Envie a selfie segurando o documento.";
+            continue;
+        }
+        $err = (int) ($_FILES[$campoFoto]['error'] ?? UPLOAD_ERR_NO_FILE);
+        $nomeInformado = trim((string) ($_FILES[$campoFoto]['name'] ?? ''));
+        if ($err === UPLOAD_ERR_NO_FILE || ($nomeInformado === '' && $err !== UPLOAD_ERR_OK)) {
+            $erros[] = $campoFoto === 'foto_documento'
+                ? "Envie a foto do documento profissional (CRM/COREN ou RG com registro)."
+                : "Envie a selfie segurando o documento.";
+            continue;
+        }
+        if ($err !== UPLOAD_ERR_OK) {
+            $erros[] = samed_mensagem_erro_upload($err, $campoFoto);
+        }
     }
 }
 
@@ -149,11 +162,27 @@ try {
     if (!is_dir($pasta_upload)) {
         mkdir($pasta_upload, 0775, true);
     }
+    if (!is_writable($pasta_upload)) {
+        $_SESSION['erros'] = [
+            'A pasta uploads/fotos/ não permite escrita no servidor. No Linux (ex.: AWS), ajuste dono/grupo para o usuário do Apache/PHP (ex.: www-data) e permissões (ex.: chmod 775).'
+        ];
+        $_SESSION['dados_form'] = $_POST;
+        header('Location: registrar.php');
+        exit;
+    }
     $permitidas = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
     if (in_array($tipo, ['medico', 'enfermeiro'])) {
         foreach (['foto_documento' => 'doc_reg', 'foto_selfie' => 'selfie_reg'] as $key => $prefixo) {
             $arq = $_FILES[$key] ?? null;
             if ($arq && $arq['error'] === UPLOAD_ERR_OK) {
+                if (!is_uploaded_file($arq['tmp_name'])) {
+                    $_SESSION['erros'] = [
+                        "Arquivo temporário inválido para $key. Tente outra imagem ou verifique upload_tmp_dir e limites de upload no PHP."
+                    ];
+                    $_SESSION['dados_form'] = $_POST;
+                    header('Location: registrar.php');
+                    exit;
+                }
                 $ext = strtolower(pathinfo($arq['name'], PATHINFO_EXTENSION));
                 if (!in_array($ext, $permitidas)) {
                     $_SESSION['erros'] = ["Formato inválido em \"$key\". Use JPG, PNG, GIF ou WEBP."];
@@ -163,7 +192,9 @@ try {
                 }
                 $nome_arquivo = $prefixo . '_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
                 if (!move_uploaded_file($arq['tmp_name'], $pasta_upload . $nome_arquivo)) {
-                    $_SESSION['erros'] = ["Erro ao salvar o arquivo de $key."];
+                    $_SESSION['erros'] = [
+                        "Não foi possível gravar o arquivo de $key em uploads/fotos/. Confira permissões da pasta e espaço em disco no servidor (comum após deploy na AWS)."
+                    ];
                     $_SESSION['dados_form'] = $_POST;
                     header('Location: registrar.php');
                     exit;

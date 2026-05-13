@@ -1,0 +1,18 @@
+# Apache + mod_php: aumenta limites de POST/upload para fotos (cadastro, ficha, KYC).
+# Se o site passar a responder HTTP 500, comente este bloco — use .user.ini ou php.ini (ex.: PHP-FPM).
+<IfModule mod_php.c>
+	php_value upload_max_filesize 32M
+	php_value post_max_size 40M
+</IfModule>
+<IfModule mod_php7.c>
+	php_value upload_max_filesize 32M
+	php_value post_max_size 40M
+</IfModule>
+<IfModule mod_php8.c>
+	php_value upload_max_filesize 32M
+	php_value post_max_size 40M
+</IfModule>
+<IfModule php_module>
+	php_value upload_max_filesize 32M
+	php_value post_max_size 40M
+</IfModule>
