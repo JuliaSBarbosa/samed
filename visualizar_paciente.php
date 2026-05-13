@@ -1,6 +1,7 @@
 <?php
 require_once 'verificar_login.php';
 require_once 'config.php';
+require_once 'funcoes_auxiliares.php';
 
 $usuario_id = $_SESSION['usuario_id'] ?? null;
 $usuario_tipo = $_SESSION['usuario_tipo'] ?? '';
@@ -35,11 +36,11 @@ if ($pdo && $usuario_id) {
 
     try {
         if ($id_ficha) {
-            $stmt = $pdo->prepare("SELECT pm.*, u.nome AS nome_usuario, u.id AS usuario_id FROM perfis_medicos pm LEFT JOIN usuarios u ON pm.usuario_id = u.id WHERE pm.id = ?");
+            $stmt = $pdo->prepare("SELECT pm.*, u.nome AS nome_usuario FROM perfis_medicos pm LEFT JOIN usuarios u ON pm.usuario_id = u.id WHERE pm.id = ?");
             $stmt->execute([$id_ficha]);
             $perfil = $stmt->fetch();
         } elseif ($cpf_busca) {
-            $stmt = $pdo->prepare("SELECT pm.*, u.nome AS nome_usuario, u.id AS usuario_id FROM perfis_medicos pm LEFT JOIN usuarios u ON pm.usuario_id = u.id WHERE pm.cpf = ?");
+            $stmt = $pdo->prepare("SELECT pm.*, u.nome AS nome_usuario FROM perfis_medicos pm LEFT JOIN usuarios u ON pm.usuario_id = u.id WHERE pm.cpf = ?");
             $stmt->execute([$cpf_busca]);
             $perfil = $stmt->fetch();
         }
@@ -68,7 +69,10 @@ if ($pdo && $usuario_id) {
             }
 
             $autorizacao_usuario = $perfil['autorizacao_usuario'] ?? 'nao';
-            $eh_dono = $usuario_id === $usuario_id_paciente || ($dependente && $usuario_id === ($dependente['paciente_id'] ?? null));
+            $uid_sessao = (int) $usuario_id;
+            $uid_titular = (int) ($usuario_id_paciente ?? 0);
+            $eh_dono = ($uid_titular > 0 && $uid_sessao === $uid_titular)
+                || ($dependente && $uid_sessao === (int) ($dependente['paciente_id'] ?? 0));
             $pode_ver_dados_completos = $eh_profissional || $eh_dono;
             $pode_ver_dados_basicos = $pode_ver_dados_completos || ($eh_paciente && $autorizacao_usuario === 'sim');
             $pode_acessar = $pode_ver_dados_basicos || $pode_ver_dados_completos;

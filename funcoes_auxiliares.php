@@ -107,6 +107,26 @@ function validarCPF($cpf) {
 }
 
 /**
+ * Texto livre (alergias, doenças, etc.) com capitalização legível para exibição.
+ * Usado em visualizar_paciente.php e outras fichas.
+ */
+function formatarNomeLegivel(?string $texto): string
+{
+    if ($texto === null) {
+        return '';
+    }
+    $t = trim($texto);
+    if ($t === '') {
+        return '';
+    }
+    if (function_exists('mb_convert_case')) {
+        return mb_convert_case($t, MB_CASE_TITLE, 'UTF-8');
+    }
+
+    return ucwords(strtolower($t));
+}
+
+/**
  * Mensagem clara para códigos de $_FILES[...]['error'] (produção costuma ter limites menores que no XAMPP local).
  *
  * @param string $campo Nome do campo, ex.: foto_documento, foto_selfie
