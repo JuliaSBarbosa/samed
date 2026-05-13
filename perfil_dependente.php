@@ -430,48 +430,52 @@ function formatarSexo($sexo) {
     
     <script src="js/toast.js"></script>
     <script>
-        // Script do carrossel (mesmo do perfil.php)
-        const slides = document.querySelectorAll("#fichaCarousel .carousel-item");
-        const indicators = document.querySelectorAll("#fichaCarousel .carousel-indicators span");
-        const inner = document.querySelector("#fichaCarousel .carousel-inner");
+    <script>
+        (function () {
+            var root = document.getElementById('fichaCarousel');
+            if (!root) return;
+            var slides = root.querySelectorAll('.carousel-item');
+            var indicators = root.querySelectorAll('.carousel-indicators span');
+            var prevBtn = root.querySelector('.carousel-control.prev');
+            var nextBtn = root.querySelector('.carousel-control.next');
+            if (!slides.length || !prevBtn || !nextBtn) return;
 
-        if (slides.length > 0) {
-            let index = 0;
-
-            function updateCarousel() {
-                inner.style.transform = `translateX(-${index * 100}%)`;
-
-                // Atualiza os indicadores
-                indicators.forEach(ind => ind.classList.remove("active"));
-                if (indicators[index]) {
-                    indicators[index].classList.add("active");
+            var activeSlide = 0;
+            for (var s = 0; s < slides.length; s++) {
+                if (slides[s].classList.contains('active')) {
+                    activeSlide = s;
+                    break;
                 }
-
-                // Atualiza a classe active nos slides
-                slides.forEach(slide => slide.classList.remove("active"));
-                slides[index].classList.add("active");
             }
 
-            // Inicializa o carrossel
-            updateCarousel();
+            function showSlide(index) {
+                slides.forEach(function (slide, i) {
+                    slide.classList.toggle('active', i === index);
+                });
+                indicators.forEach(function (indicator, i) {
+                    indicator.classList.toggle('active', i === index);
+                });
+                activeSlide = index;
+            }
 
-            document.querySelector(".carousel-control.next")?.addEventListener("click", () => {
-                index = (index + 1) % slides.length;
-                updateCarousel();
+            prevBtn.addEventListener('click', function () {
+                var nextIndex = activeSlide === 0 ? slides.length - 1 : activeSlide - 1;
+                showSlide(nextIndex);
             });
 
-            document.querySelector(".carousel-control.prev")?.addEventListener("click", () => {
-                index = (index - 1 + slides.length) % slides.length;
-                updateCarousel();
+            nextBtn.addEventListener('click', function () {
+                var nextIndex = activeSlide === slides.length - 1 ? 0 : activeSlide + 1;
+                showSlide(nextIndex);
             });
 
-            indicators.forEach(ind => {
-                ind.addEventListener("click", () => {
-                    index = Number(ind.dataset.slide);
-                    updateCarousel();
+            indicators.forEach(function (indicator, index) {
+                indicator.addEventListener('click', function () {
+                    var i = indicator.getAttribute('data-slide');
+                    showSlide(i !== null && i !== '' ? parseInt(i, 10) : index);
                 });
             });
-        }
+        })();
+    </script>
     </script>
     <script src="js/nfc-pulseira.js"></script>
 </body>

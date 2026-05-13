@@ -455,33 +455,50 @@ if ($pdo && $usuario_id) {
     </footer>
 
     <script>
-        const slides = document.querySelectorAll("#fichaCarousel .carousel-item");
-        const indicators = document.querySelectorAll("#fichaCarousel .carousel-indicators span");
-        let activeSlide = 0;
+        (function () {
+            var root = document.getElementById('fichaCarousel');
+            if (!root) return;
+            var slides = root.querySelectorAll('.carousel-item');
+            var indicators = root.querySelectorAll('.carousel-indicators span');
+            var prevBtn = root.querySelector('.carousel-control.prev');
+            var nextBtn = root.querySelector('.carousel-control.next');
+            if (!slides.length || !prevBtn || !nextBtn) return;
 
-        function showSlide(index) {
-            slides.forEach((slide, i) => {
-                slide.classList.toggle('active', i === index);
+            var activeSlide = 0;
+            for (var s = 0; s < slides.length; s++) {
+                if (slides[s].classList.contains('active')) {
+                    activeSlide = s;
+                    break;
+                }
+            }
+
+            function showSlide(index) {
+                slides.forEach(function (slide, i) {
+                    slide.classList.toggle('active', i === index);
+                });
+                indicators.forEach(function (indicator, i) {
+                    indicator.classList.toggle('active', i === index);
+                });
+                activeSlide = index;
+            }
+
+            prevBtn.addEventListener('click', function () {
+                var nextIndex = activeSlide === 0 ? slides.length - 1 : activeSlide - 1;
+                showSlide(nextIndex);
             });
-            indicators.forEach((indicator, i) => {
-                indicator.classList.toggle('active', i === index);
+
+            nextBtn.addEventListener('click', function () {
+                var nextIndex = activeSlide === slides.length - 1 ? 0 : activeSlide + 1;
+                showSlide(nextIndex);
             });
-            activeSlide = index;
-        }
 
-        document.querySelector('.carousel-control.prev').addEventListener('click', function() {
-            const nextIndex = activeSlide === 0 ? slides.length - 1 : activeSlide - 1;
-            showSlide(nextIndex);
-        });
-
-        document.querySelector('.carousel-control.next').addEventListener('click', function() {
-            const nextIndex = activeSlide === slides.length - 1 ? 0 : activeSlide + 1;
-            showSlide(nextIndex);
-        });
-
-        indicators.forEach((indicator, index) => {
-            indicator.addEventListener('click', () => showSlide(index));
-        });
+            indicators.forEach(function (indicator, index) {
+                indicator.addEventListener('click', function () {
+                    var i = indicator.getAttribute('data-slide');
+                    showSlide(i !== null && i !== '' ? parseInt(i, 10) : index);
+                });
+            });
+        })();
     </script>
 </body>
 </html>
