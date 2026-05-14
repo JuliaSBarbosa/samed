@@ -1,6 +1,6 @@
 /**
- * Carrossel da ficha médica (#fichaCarousel) — perfil, dependente e visualizar paciente.
- * Rolagem horizontal em pixels (scrollTo): evita desalinhamento de translateX(%) vs. largura da faixa.
+ * Carrossel #fichaCarousel — rolagem horizontal em pixels (um slide = largura visível).
+ * Evita transform + % ; sem scroll-snap obrigatório (conflitava com scroll programático).
  */
 (function () {
     function initFichaCarousel() {
@@ -21,8 +21,10 @@
 
         root.setAttribute("data-ficha-carousel-init", "1");
 
-        var n = slides.length;
+        inner.style.transform = "";
+        inner.style.transition = "";
 
+        var n = slides.length;
         var index = 0;
         for (var i = 0; i < slides.length; i++) {
             if (slides[i].classList.contains("active")) {
@@ -31,24 +33,28 @@
             }
         }
 
-        function viewportWidth() {
-            return inner.clientWidth || root.clientWidth || 0;
-        }
-
-        function applySlide() {
-            var w = viewportWidth();
-            if (w <= 0) {
-                return;
-            }
-            var left = Math.round(index * w);
-            inner.scrollTo({ left: left, top: 0, behavior: "auto" });
-
+        function syncUi() {
             slides.forEach(function (slide, j) {
                 slide.classList.toggle("active", j === index);
             });
             indicators.forEach(function (ind, j) {
                 ind.classList.toggle("active", j === index);
             });
+        }
+
+        function applySlide() {
+            var slide = slides[index];
+            if (!slide) {
+                return false;
+            }
+            if (inner.clientWidth <= 0 && root.getBoundingClientRect().width <= 0) {
+                return false;
+            }
+            var maxScroll = Math.max(0, inner.scrollWidth - inner.clientWidth);
+            var left = Math.min(slide.offsetLeft, maxScroll);
+            inner.scrollLeft = left;
+            syncUi();
+            return true;
         }
 
         function go(delta) {
@@ -88,36 +94,22 @@
             });
         });
 
-        var scrollEndTimer = null;
-        inner.addEventListener("scroll", function () {
-            if (scrollEndTimer) {
-                clearTimeout(scrollEndTimer);
+        function tryLayout(timesLeft) {
+            if (applySlide() || timesLeft <= 0) {
+                return;
             }
-            scrollEndTimer = setTimeout(function () {
-                scrollEndTimer = null;
-                var w = viewportWidth();
-                if (w <= 0) {
-                    return;
-                }
-                var snapped = Math.round(inner.scrollLeft / w);
-                if (snapped !== index && snapped >= 0 && snapped < n) {
-                    index = snapped;
-                    slides.forEach(function (slide, j) {
-                        slide.classList.toggle("active", j === index);
-                    });
-                    indicators.forEach(function (ind, j) {
-                        ind.classList.toggle("active", j === index);
-                    });
-                }
-            }, 80);
+            setTimeout(function () {
+                tryLayout(timesLeft - 1);
+            }, 50);
+        }
+
+        tryLayout(12);
+
+        requestAnimationFrame(function () {
+            tryLayout(3);
         });
 
         window.addEventListener("resize", function () {
-            applySlide();
-        });
-
-        applySlide();
-        requestAnimationFrame(function () {
             applySlide();
         });
     }
