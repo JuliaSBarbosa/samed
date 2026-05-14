@@ -25,8 +25,36 @@
             return;
         }
         index = ((index % n) + n) % n;
+
+        var inner = root.querySelector(".carousel-inner");
+        if (inner) {
+            inner.style.removeProperty("transform");
+            inner.style.removeProperty("transition");
+            inner.scrollLeft = 0;
+            inner.style.setProperty("display", "block", "important");
+            inner.style.setProperty("overflow", "hidden", "important");
+            inner.style.setProperty("flex-direction", "unset", "important");
+            inner.style.setProperty("flex-wrap", "unset", "important");
+        }
+
         slides.forEach(function (slide, j) {
-            slide.classList.toggle("active", j === index);
+            var on = j === index;
+            slide.classList.toggle("active", on);
+            slide.style.removeProperty("flex");
+            slide.style.removeProperty("flex-grow");
+            slide.style.removeProperty("flex-shrink");
+            slide.style.removeProperty("flex-basis");
+            slide.style.removeProperty("min-width");
+            if (on) {
+                slide.style.setProperty("display", "flex", "important");
+                slide.style.setProperty("flex-direction", "column", "important");
+                slide.style.setProperty("align-items", "center", "important");
+                slide.style.setProperty("justify-content", "center", "important");
+                slide.style.setProperty("width", "100%", "important");
+                slide.style.setProperty("box-sizing", "border-box", "important");
+            } else {
+                slide.style.setProperty("display", "none", "important");
+            }
         });
         indicators.forEach(function (ind, j) {
             ind.classList.toggle("active", j === index);

@@ -67,7 +67,7 @@ function formatarSexo($sexo) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAMED - Perfil</title>
-    <link rel="stylesheet" href="estilos/style.css">
+    <link rel="stylesheet" href="estilos/style.css?v=<?php echo file_exists(__DIR__ . '/estilos/style.css') ? filemtime(__DIR__ . '/estilos/style.css') : 0; ?>">
     <link rel="icon" href="img/logo.svg" type="image/png">
 
 </head>
@@ -417,7 +417,7 @@ function formatarSexo($sexo) {
         <p>&copy; 2025 Grupo SAMED. Todos os direitos reservados.</p>
     </footer>
 
-    <script src="js/ficha-carousel.js"></script>
+    <script src="js/ficha-carousel.js?v=<?php echo file_exists(__DIR__ . '/js/ficha-carousel.js') ? filemtime(__DIR__ . '/js/ficha-carousel.js') : 0; ?>"></script>
     <script src="js/nfc-pulseira.js"></script>
 
 
