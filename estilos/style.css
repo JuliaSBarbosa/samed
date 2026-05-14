@@ -737,7 +737,7 @@ strong {
 }
 
 
-/* ======= CARROSSEL FICHA MÉDICA (#fichaCarousel) — transform na faixa ======= */
+/* ======= CARROSSEL FICHA MÉDICA (#fichaCarousel) — scroll horizontal (1 slide = 100% da área visível) ======= */
 
 #fichaCarousel {
     position: relative;
@@ -745,7 +745,6 @@ strong {
     max-width: 900px;
     margin: 0 auto;
     overflow: hidden;
-    --ficha-slide-count: 1;
 }
 
 #fichaCarousel .carousel-inner {
@@ -753,19 +752,28 @@ strong {
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: stretch;
-    width: calc(var(--ficha-slide-count, 1) * 100%);
-    transform: translateX(0);
-    transition: transform 0.35s ease;
-    will-change: transform;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+#fichaCarousel .carousel-inner::-webkit-scrollbar {
+    display: none;
 }
 
 #fichaCarousel .carousel-item {
-    flex: 0 0 calc(100% / var(--ficha-slide-count, 1));
+    flex: 0 0 100%;
     min-width: 0;
     box-sizing: border-box;
     display: flex;
     justify-content: center;
     padding: 20px 0;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
 }
 
 /* SETAS */

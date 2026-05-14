@@ -1,6 +1,6 @@
 /**
  * Carrossel da ficha médica (#fichaCarousel) — perfil, dependente e visualizar paciente.
- * Usa transform na faixa (.carousel-inner) para compatibilidade entre navegadores.
+ * Rolagem horizontal em pixels (scrollTo): evita desalinhamento de translateX(%) vs. largura da faixa.
  */
 (function () {
     function initFichaCarousel() {
@@ -22,7 +22,6 @@
         root.setAttribute("data-ficha-carousel-init", "1");
 
         var n = slides.length;
-        root.style.setProperty("--ficha-slide-count", String(n));
 
         var index = 0;
         for (var i = 0; i < slides.length; i++) {
@@ -32,9 +31,17 @@
             }
         }
 
+        function viewportWidth() {
+            return inner.clientWidth || root.clientWidth || 0;
+        }
+
         function applySlide() {
-            var pct = (100 * index) / n;
-            inner.style.transform = "translateX(-" + pct + "%)";
+            var w = viewportWidth();
+            if (w <= 0) {
+                return;
+            }
+            var left = Math.round(index * w);
+            inner.scrollTo({ left: left, top: 0, behavior: "auto" });
 
             slides.forEach(function (slide, j) {
                 slide.classList.toggle("active", j === index);
@@ -61,13 +68,11 @@
 
         prevBtn.addEventListener("click", function (e) {
             e.preventDefault();
-            e.stopPropagation();
             go(-1);
         });
 
         nextBtn.addEventListener("click", function (e) {
             e.preventDefault();
-            e.stopPropagation();
             go(1);
         });
 
@@ -83,7 +88,38 @@
             });
         });
 
+        var scrollEndTimer = null;
+        inner.addEventListener("scroll", function () {
+            if (scrollEndTimer) {
+                clearTimeout(scrollEndTimer);
+            }
+            scrollEndTimer = setTimeout(function () {
+                scrollEndTimer = null;
+                var w = viewportWidth();
+                if (w <= 0) {
+                    return;
+                }
+                var snapped = Math.round(inner.scrollLeft / w);
+                if (snapped !== index && snapped >= 0 && snapped < n) {
+                    index = snapped;
+                    slides.forEach(function (slide, j) {
+                        slide.classList.toggle("active", j === index);
+                    });
+                    indicators.forEach(function (ind, j) {
+                        ind.classList.toggle("active", j === index);
+                    });
+                }
+            }, 80);
+        });
+
+        window.addEventListener("resize", function () {
+            applySlide();
+        });
+
         applySlide();
+        requestAnimationFrame(function () {
+            applySlide();
+        });
     }
 
     if (document.readyState === "loading") {
