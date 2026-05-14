@@ -737,41 +737,39 @@ strong {
 }
 
 
-/* ======= CARROSSEL FICHA MÉDICA ======= */
-/* ======= CARROSSEL FICHA MÉDICA ======= */
+/* ======= CARROSSEL FICHA MÉDICA (#fichaCarousel) — transform na faixa ======= */
 
-/* Container */
-.carousel {
+#fichaCarousel {
     position: relative;
     width: 90%;
     max-width: 900px;
     margin: 0 auto;
-    overflow: hidden; /* Esconde os slides que estão fora da área visível */
+    overflow: hidden;
+    --ficha-slide-count: 1;
 }
 
-/* Faixa dos slides: empilha itens; só .carousel-item.active é visível (JS troca a classe) */
-.carousel-inner {
-    display: block;
-    width: 100%;
+#fichaCarousel .carousel-inner {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    width: calc(var(--ficha-slide-count, 1) * 100%);
+    transform: translateX(0);
+    transition: transform 0.35s ease;
+    will-change: transform;
 }
 
-/* Slide */
-.carousel-item {
-    min-width: 100%;
-    width: 100%;
-    flex-shrink: 0;
-    flex-basis: 100%;
-    display: none;
+#fichaCarousel .carousel-item {
+    flex: 0 0 calc(100% / var(--ficha-slide-count, 1));
+    min-width: 0;
+    box-sizing: border-box;
+    display: flex;
     justify-content: center;
     padding: 20px 0;
-    box-sizing: border-box;
 }
 
-.carousel-item.active {
-    display: flex;
-}
-
-/* SETAS ÚNICAS */
+/* SETAS */
+#fichaCarousel .carousel-control,
 .carousel-control {
     position: absolute;
     top: 50%;
@@ -790,6 +788,10 @@ strong {
     color: white;
     box-shadow: 0 4px 12px rgba(76, 169, 199, 0.4);
     transition: all 0.3s ease;
+}
+
+#fichaCarousel .carousel-control {
+    z-index: 50;
 }
 
 .carousel-control:hover {
@@ -4100,14 +4102,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         margin-right: 5px;
     }
     
-    /* Carrossel */
-    .carousel {
+    /* Carrossel ficha */
+    #fichaCarousel {
         margin: 15px 5px;
         width: calc(100% - 10px);
         max-width: 100%;
     }
     
-    .carousel-item {
+    #fichaCarousel .carousel-item {
         padding: 15px 0;
     }
     
@@ -4898,13 +4900,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         font-size: 0.8rem;
     }
     
-    /* Carrossel */
-    .carousel {
+    /* Carrossel ficha */
+    #fichaCarousel {
         margin: 12px 3px;
         width: calc(100% - 6px);
     }
     
-    .carousel-item {
+    #fichaCarousel .carousel-item {
         padding: 12px 0;
     }
     

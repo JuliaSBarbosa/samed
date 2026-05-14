@@ -347,8 +347,8 @@ function formatarSexo($sexo) {
                 </div>
 
                 <!-- Controles -->
-                <button class="carousel-control prev">❮</button>
-                <button class="carousel-control next">❯</button>
+                <button type="button" class="carousel-control prev" aria-label="Slide anterior">❮</button>
+                <button type="button" class="carousel-control next" aria-label="Próximo slide">❯</button>
 
                 <!-- Indicadores -->
                 <div class="carousel-indicators">
@@ -417,53 +417,7 @@ function formatarSexo($sexo) {
         <p>&copy; 2025 Grupo SAMED. Todos os direitos reservados.</p>
     </footer>
 
-    <script>
-        (function () {
-            var root = document.getElementById('fichaCarousel');
-            if (!root) return;
-            var slides = root.querySelectorAll('.carousel-item');
-            var indicators = root.querySelectorAll('.carousel-indicators span');
-            var prevBtn = root.querySelector('.carousel-control.prev');
-            var nextBtn = root.querySelector('.carousel-control.next');
-            if (!slides.length || !prevBtn || !nextBtn) return;
-
-            var activeSlide = 0;
-            for (var s = 0; s < slides.length; s++) {
-                if (slides[s].classList.contains('active')) {
-                    activeSlide = s;
-                    break;
-                }
-            }
-
-            function showSlide(index) {
-                slides.forEach(function (slide, i) {
-                    slide.classList.toggle('active', i === index);
-                });
-                indicators.forEach(function (indicator, i) {
-                    indicator.classList.toggle('active', i === index);
-                });
-                activeSlide = index;
-            }
-
-            prevBtn.addEventListener('click', function () {
-                var nextIndex = activeSlide === 0 ? slides.length - 1 : activeSlide - 1;
-                showSlide(nextIndex);
-            });
-
-            nextBtn.addEventListener('click', function () {
-                var nextIndex = activeSlide === slides.length - 1 ? 0 : activeSlide + 1;
-                showSlide(nextIndex);
-            });
-
-            indicators.forEach(function (indicator, index) {
-                indicator.addEventListener('click', function () {
-                    var i = indicator.getAttribute('data-slide');
-                    showSlide(i !== null && i !== '' ? parseInt(i, 10) : index);
-                });
-            });
-        })();
-    </script>
-
+    <script src="js/ficha-carousel.js"></script>
     <script src="js/nfc-pulseira.js"></script>
 
 
