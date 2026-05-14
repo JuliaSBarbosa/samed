@@ -737,7 +737,7 @@ strong {
 }
 
 
-/* ======= CARROSSEL FICHA MÉDICA (#fichaCarousel) — scroll horizontal (1 slide = 100% da área visível) ======= */
+/* ======= CARROSSEL FICHA MÉDICA (#fichaCarousel) — só um slide visível (CSS), JS só troca .active ======= */
 
 #fichaCarousel {
     position: relative;
@@ -749,17 +749,9 @@ strong {
 
 #fichaCarousel .carousel-inner {
     position: relative;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: stretch;
+    display: block;
     width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    touch-action: pan-x;
+    overflow: hidden;
 }
 
 #fichaCarousel .carousel-inner::-webkit-scrollbar {
@@ -767,14 +759,17 @@ strong {
 }
 
 #fichaCarousel .carousel-item {
-    flex: 0 0 100%;
+    display: none !important;
     width: 100%;
-    min-width: 100%;
-    max-width: 100%;
     box-sizing: border-box;
-    display: flex;
-    justify-content: center;
     padding: 20px 0;
+}
+
+#fichaCarousel .carousel-item.active {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 /* SETAS */

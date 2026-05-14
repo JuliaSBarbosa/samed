@@ -1,6 +1,6 @@
 /**
- * Carrossel #fichaCarousel — rolagem horizontal em pixels (um slide = largura visível).
- * Evita transform + % ; sem scroll-snap obrigatório (conflitava com scroll programático).
+ * Carrossel #fichaCarousel — um slide de cada vez via CSS (.carousel-item.active).
+ * Não usa scrollLeft nem transform na faixa (evita desincronia indicador vs conteúdo no mobile).
  */
 (function () {
     function initFichaCarousel() {
@@ -23,6 +23,7 @@
 
         inner.style.transform = "";
         inner.style.transition = "";
+        inner.scrollLeft = 0;
 
         var n = slides.length;
         var index = 0;
@@ -33,28 +34,13 @@
             }
         }
 
-        function syncUi() {
+        function applySlide() {
             slides.forEach(function (slide, j) {
                 slide.classList.toggle("active", j === index);
             });
             indicators.forEach(function (ind, j) {
                 ind.classList.toggle("active", j === index);
             });
-        }
-
-        function applySlide() {
-            var slide = slides[index];
-            if (!slide) {
-                return false;
-            }
-            if (inner.clientWidth <= 0 && root.getBoundingClientRect().width <= 0) {
-                return false;
-            }
-            var maxScroll = Math.max(0, inner.scrollWidth - inner.clientWidth);
-            var left = Math.min(slide.offsetLeft, maxScroll);
-            inner.scrollLeft = left;
-            syncUi();
-            return true;
         }
 
         function go(delta) {
@@ -94,24 +80,7 @@
             });
         });
 
-        function tryLayout(timesLeft) {
-            if (applySlide() || timesLeft <= 0) {
-                return;
-            }
-            setTimeout(function () {
-                tryLayout(timesLeft - 1);
-            }, 50);
-        }
-
-        tryLayout(12);
-
-        requestAnimationFrame(function () {
-            tryLayout(3);
-        });
-
-        window.addEventListener("resize", function () {
-            applySlide();
-        });
+        applySlide();
     }
 
     if (document.readyState === "loading") {
